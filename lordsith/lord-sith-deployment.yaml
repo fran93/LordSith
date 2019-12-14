@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lord-sith
+  labels:
+    app: lord-sith
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lord-sith
+  template:
+    metadata:
+      labels:
+        app: lord-sith
+    spec:
+      containers:
+      - name: lord-sith
+        image: lord-sith-docker:latest
+        imagePullPolicy: Never
+        ports:
+        - protocol: TPC
+          containerPort: 8080
