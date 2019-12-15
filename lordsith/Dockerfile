@@ -1,4 +1,14 @@
 FROM openjdk:8-jdk-alpine
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} app.jar
+# Switch to edge (for latest firefox)
+RUN sed -i -e 's/v[[:digit:]]\.[[:digit:]]/edge/g' /etc/apk/repositories
+RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories
+RUN apk update && apk upgrade
+
+RUN apk add firefox jq curl
+RUN rm -rf /var/cache/apk/*
+
+COPY geckodriver.sh geckodriver.sh
+RUN sh geckodriver.sh
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
