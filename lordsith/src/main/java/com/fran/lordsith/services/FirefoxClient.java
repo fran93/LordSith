@@ -6,6 +6,7 @@ import javax.annotation.PostConstruct;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,7 +16,9 @@ public class FirefoxClient {
 	
 	@PostConstruct
 	private void init() {
-		driver = new FirefoxDriver();
+		FirefoxOptions options = new FirefoxOptions();
+		options.setHeadless(true);
+		driver = new FirefoxDriver(options);
 	}
 
 	public WebDriver get() {

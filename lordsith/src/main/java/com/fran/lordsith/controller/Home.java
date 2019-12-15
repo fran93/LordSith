@@ -22,7 +22,6 @@ public class Home {
 	public ResponseEntity<String> main() {
 		loginService.login();
 		technologyService.buildSomething();
-		loginService.logout();
 		return ResponseEntity.ok("Ok");
 	}
 	
@@ -35,6 +34,6 @@ public class Home {
 	@GetMapping("shutdown")
 	public void shutdown() {
 		loginService.logout();
-		//System.exit(0);
+		System.exit(0);
 	}
 }
