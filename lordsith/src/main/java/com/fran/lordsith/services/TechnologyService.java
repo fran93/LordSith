@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -43,32 +44,37 @@ public class TechnologyService {
 				building.set(true);
 
 			if(id <= TechnologyEnum.DEUTERIUMSYNTHETISIERER.getId()) {
-				int level = Integer.parseInt(technology.findElement(By.className("level")).getAttribute("data-value"));	
-				Technology techno =  new Technology(id, level, status);
-				calculateCost(techno);
-				mines.add(techno);
+				parseTechnology(mines, technology, id, status);
 			} else if( id == TechnologyEnum.SOLARKRAFTWERK.getId()) {
-				int level = Integer.parseInt(technology.findElement(By.className("level")).getAttribute("data-value"));	
-				Technology techno =  new Technology(id, level, status);
-				calculateCost(techno);
-				powerPlants.add(techno);
+				parseTechnology(powerPlants, technology, id, status);
+			} else if (id == TechnologyEnum.FUSIONKRAFTWERK.getId() && !status.equals(StatusEnum.OFF.getValue())) {
+				parseTechnology(powerPlants, technology, id, status);
 			} else if(id >= TechnologyEnum.METALLSPEICHER.getId() && id <= TechnologyEnum.DEUTERIUMTANK.getId()) {
-				int level = Integer.parseInt(technology.findElement(By.className("level")).getAttribute("data-value"));	
-				Technology techno =  new Technology(id, level, status);
-				calculateCost(techno);
-				storages.add(techno);
+				parseTechnology(storages, technology, id, status);
 			}
 		});
 			
+		chooseWhatToBuild(mines, powerPlants, storages, building, energy, storage);
+	}
+
+	private void chooseWhatToBuild(ArrayList<Technology> mines, ArrayList<Technology> powerPlants,
+			ArrayList<Technology> storages, AtomicBoolean building, double energy, Resources storage) {
 		if(!building.get()) {
 			if(energy < 0) {
+				powerPlants.sort(Comparator.comparingDouble(Technology::getTotalCost));
 				upTechnology(powerPlants.get(0), storage, storages);
 			} else {
-				mines.sort(Comparator.comparingDouble(Technology::getTotalCost));
-				Technology cheaper = mines.get(0);				
-				upTechnology(cheaper, storage, storages);
+				mines.sort(Comparator.comparingDouble(Technology::getTotalCost));			
+				upTechnology(mines.get(0), storage, storages);
 			}
 		}
+	}
+
+	private void parseTechnology(ArrayList<Technology> mines, WebElement technology, int id, String status) {
+		int level = Integer.parseInt(technology.findElement(By.className("level")).getAttribute("data-value"));	
+		Technology techno =  new Technology(id, level, status);
+		calculateCost(techno);
+		mines.add(techno);
 	}
 	
 	private void upTechnology(Technology tech, Resources storage, ArrayList<Technology> storages) {

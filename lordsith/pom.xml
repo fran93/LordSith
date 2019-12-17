@@ -60,5 +60,24 @@
 	        </resource>
     	</resources>
 	</build>
+	
+	<profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <headless.mode>false</headless.mode>
+            </properties>
+        </profile>
+        
+         <profile>
+            <id>pro</id>
+            <properties>
+                <headless.mode>true</headless.mode>
+            </properties>
+        </profile>
+	</profiles>
 
 </project>

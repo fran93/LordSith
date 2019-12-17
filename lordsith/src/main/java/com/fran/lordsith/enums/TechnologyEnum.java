@@ -11,6 +11,7 @@ public enum TechnologyEnum {
 	KRISTALLMINE(2, TypeEnum.PRODUCERS, new Resources(48,24), 1.6),
 	DEUTERIUMSYNTHETISIERER(3, TypeEnum.PRODUCERS, new Resources(225,75), 1.5),
 	SOLARKRAFTWERK(4, TypeEnum.ENERGY, new Resources(75,30), 1.5),
+	FUSIONKRAFTWERK(12, TypeEnum.ENERGY, new Resources(900,360,180), 1.8),
 	METALLSPEICHER(22, TypeEnum.STORAGE, new Resources(1000),2),
 	KRISTALLSPEICHER(23, TypeEnum.STORAGE, new Resources(1000, 500),2),
 	DEUTERIUMTANK(24, TypeEnum.STORAGE, new Resources(1000, 1000),2);

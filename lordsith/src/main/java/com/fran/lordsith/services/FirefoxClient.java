@@ -7,17 +7,21 @@ import javax.annotation.PostConstruct;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class FirefoxClient {
+
+	@Value("${headless.mode}")
+	private boolean headlessMode;
 
 	private WebDriver driver;
 	
 	@PostConstruct
 	private void init() {
 		FirefoxOptions options = new FirefoxOptions();
-		options.setHeadless(true);
+		options.setHeadless(headlessMode);
 		driver = new FirefoxDriver(options);
 	}
 

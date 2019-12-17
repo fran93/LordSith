@@ -36,4 +36,9 @@ public class Home {
 		loginService.logout();
 		System.exit(0);
 	}
+	
+	@GetMapping("close")
+	public void close() {
+		loginService.logout();
+	}
 }
