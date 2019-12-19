@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: lord-sith
-        image: localhost:5000/lord-sith-docker:latest
+        image: lord-sith-docker:latest
         imagePullPolicy: IfNotPresent
         ports:
         - protocol: TCP
