@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: lord-sith-cronjob
+spec:
+  template:
+    spec:
+      containers:
+      - name: lord-sith-cronjob
+        image: curlimages/curl
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - >
+            bash -c 
+               " echo \"Running cron loop\";
+                  sunset=21;
+                  sunrise=5;
+                  
+                  while true  
+                  do
+                      hour=$(date +%H);
+                      curl 127.0.0.1:8080/
+                      if (($hour>=sunrise && $hour<=sunset)); then 
+                      #Day
+                          sleep 900  
+                      else 
+                      #Night
+                          sleep 10800;
+                      fi
+                  done
+              "
+      restartPolicy: OnFailure
+  backoffLimit: 4
+  

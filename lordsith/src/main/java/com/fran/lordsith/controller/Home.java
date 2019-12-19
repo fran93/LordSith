@@ -22,8 +22,9 @@ public class Home {
 
 	@GetMapping("/")
 	public ResponseEntity<String> main() {
+		System.out.println("Procesing petition at: ".concat(new Date().toString()));
 		commanderService.command();
-		return ResponseEntity.ok("Ok " + new Date());
+		return ResponseEntity.ok("Ok");
 	}
 
 	@GetMapping("shutdown")
