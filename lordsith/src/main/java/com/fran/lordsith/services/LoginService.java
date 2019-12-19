@@ -33,6 +33,10 @@ public class LoginService {
 		firefox.closeTab();
 	}
 	
+	public boolean isLogged() {
+		return firefox.get().getCurrentUrl().contains("page=ingame");
+	}
+	
 	public void logout() {
 		firefox.get().quit();
 	}

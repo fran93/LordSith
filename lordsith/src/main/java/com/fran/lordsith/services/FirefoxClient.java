@@ -35,6 +35,7 @@ public class FirefoxClient {
 	
 	public void closeTab() {
 		String oldtab = driver.getWindowHandle();
+		driver.close();
 		driver.getWindowHandles().forEach(window -> {
 			if(!window.equals(oldtab)) {
 				driver.switchTo().window(window);
