@@ -1,4 +1,4 @@
-FROM alpine:edge
+FROM arm64v8/alpine:edge
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} app.jar
 
@@ -24,6 +24,8 @@ RUN addgroup -S players && adduser -S player -G players
 
 # Relaxing permissions
 RUN chmod -R 777 /usr/bin/geckodriver
+
+RUN export PATH=$PATH:/usr/bin/geckodriver
 
 # Non root user.
 USER player

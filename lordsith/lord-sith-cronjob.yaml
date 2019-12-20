@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
       - name: lord-sith-cronjob
-        image: curlimages/curl
+        image: hectormolinero/curl
         command: ["/bin/sh"]
         args:
           - -c
