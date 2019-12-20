@@ -34,6 +34,8 @@ public class LoginService {
 	}
 	
 	public boolean isLogged() {
+		firefox.get().findElements(By.className("menubutton")).get(0).click();
+		firefox.loading();
 		return firefox.get().getCurrentUrl().contains("page=ingame");
 	}
 	
