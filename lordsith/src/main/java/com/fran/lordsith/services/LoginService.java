@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import com.fran.lordsith.enums.MenuEnum;
 import com.fran.lordsith.enums.PagesEnum;
 
 @Service
@@ -35,7 +36,7 @@ public class LoginService {
 	
 	public boolean isLogged() {
 		if(firefox.get().getCurrentUrl().contains("page=ingame")) { 
-			firefox.get().findElements(By.className("menubutton")).get(0).click();
+			firefox.get().findElements(By.className("menubutton")).get(MenuEnum.UBERSICHT.getId()).click();
 			firefox.loading();
 		}
 		return firefox.get().getCurrentUrl().contains("page=ingame");

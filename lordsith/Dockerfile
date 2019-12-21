@@ -11,7 +11,7 @@ RUN apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing firef
 
 # Then install GeckoDriver
 RUN wget https://github.com/d0ku/GeckoDriver_ARMv6/releases/download/v0.26.0/geckodriver
-RUN mv geckodriver /usr/bin
+RUN mv geckodriver /usr/bin/geckodriver
 
 # Add non privileged user
 RUN addgroup -S players && adduser -S player -G players
@@ -19,11 +19,11 @@ RUN addgroup -S players && adduser -S player -G players
 # Relaxing permissions
 RUN chmod -R 777 /usr/bin/geckodriver
 
+# Add path
+RUN export PATH=$PATH:/usr/bin/geckodriver
+
 # Non root user.
 USER player
-
-# Version
-RUN geckodriver --version
 
 EXPOSE 8080
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]

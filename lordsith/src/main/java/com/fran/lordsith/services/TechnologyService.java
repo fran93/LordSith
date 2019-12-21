@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import com.fran.lordsith.enums.MenuEnum;
 import com.fran.lordsith.enums.StatusEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
 import com.fran.lordsith.model.Resources;
@@ -23,12 +24,40 @@ public class TechnologyService {
 	private FirefoxClient firefox;
 	
 	public void buildSomething() {
+		if(buildMinesOrFacilities()) {
+			research();
+		}	
+	}
+	
+	private void research() {
+		ArrayList<Technology> researchs = new ArrayList<>();
+		AtomicBoolean researching = new AtomicBoolean(false);
+
+		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.FORSCHUNG.getId()).click();
+		firefox.loading();
+		
+		firefox.get().findElements(By.className("technology")).forEach(technology -> {
+			int id = Integer.parseInt(technology.getAttribute("data-technology"));
+			String status = technology.getAttribute("data-status");
+			if(status.equals(StatusEnum.ACTIVE.getValue()))
+				researching.set(true);
+
+			if(!status.equals(StatusEnum.OFF.getValue()) && id >= TechnologyEnum.SPIONAGETECHNIK.getId() && id <= TechnologyEnum.INTERGALAKTISCHES_FORSCHUNGSNETZWERK.getId()) {
+				parseTechnology(researchs, technology, id, status);
+			}
+		});
+			
+		chooseWhatToBuild(researchs, researching);
+	}
+
+	private boolean buildMinesOrFacilities() {
 		ArrayList<Technology> mines = new ArrayList<>();
 		ArrayList<Technology> powerPlants = new ArrayList<>();
 		ArrayList<Technology> storages = new ArrayList<>();
+		ArrayList<Technology> facilities = new ArrayList<>();
 		AtomicBoolean building = new AtomicBoolean(false);
 		
-		firefox.get().findElements(By.className("menubutton")).get(1).click();
+		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
 		firefox.loading();
 		
 		double energy = Double.parseDouble(firefox.get().findElement(By.id("resources_energy")).getAttribute("data-raw"));
@@ -37,6 +66,38 @@ public class TechnologyService {
 		double deuteriumStorage = processStorage(firefox.get().findElement(By.id("deuterium_box")).getAttribute("title"));
 		Resources storage = new Resources(metallStorage, kristallStorage, deuteriumStorage, energy); 
 		
+		parseMines(mines, powerPlants, storages, building);
+		
+		if(!building.get()) {
+			firefox.get().findElements(By.className("menubutton")).get(MenuEnum.ANLAGEN.getId()).click();
+			firefox.loading();
+		
+			parseFacilities(facilities, building);
+			chooseWhatToBuild(mines, powerPlants, storages, facilities, building, energy, storage);
+		}
+		
+		return building.get();
+	}
+
+	private void parseFacilities(ArrayList<Technology> facilities, AtomicBoolean building) {
+		firefox.get().findElements(By.className("technology")).forEach(technology -> {
+			int id = Integer.parseInt(technology.getAttribute("data-technology"));
+			String status = technology.getAttribute("data-status");
+			if(status.equals(StatusEnum.ACTIVE.getValue()))
+				building.set(true);
+
+			if(!status.equals(StatusEnum.OFF.getValue())) {
+				if (id == TechnologyEnum.RAUMSCHIFFSWERFT.getId() || id == TechnologyEnum.RAKETENSILO.getId() || id == TechnologyEnum.NANITENFABRIK.getId() || id == TechnologyEnum.TERRAFORMER.getId() || 
+					(id == TechnologyEnum.FORSCHUNGSLABOR.getId() && status.equals(StatusEnum.ON.getValue())) || 
+					(id == TechnologyEnum.ROBOTERFABRIK.getId() && Integer.parseInt(technology.findElement(By.className("level")).getAttribute("data-value")) < 10)) {
+					parseTechnology(facilities, technology, id, status);
+				}
+			}
+		});
+	}
+
+	private void parseMines(ArrayList<Technology> mines, ArrayList<Technology> powerPlants,
+			ArrayList<Technology> storages, AtomicBoolean building) {
 		firefox.get().findElements(By.className("technology")).forEach(technology -> {
 			int id = Integer.parseInt(technology.getAttribute("data-technology"));
 			String status = technology.getAttribute("data-status");
@@ -53,20 +114,32 @@ public class TechnologyService {
 				parseTechnology(storages, technology, id, status);
 			}
 		});
-			
-		chooseWhatToBuild(mines, powerPlants, storages, building, energy, storage);
 	}
 
-	private void chooseWhatToBuild(ArrayList<Technology> mines, ArrayList<Technology> powerPlants,
-			ArrayList<Technology> storages, AtomicBoolean building, double energy, Resources storage) {
+	private void chooseWhatToBuild(ArrayList<Technology> mines, ArrayList<Technology> powerPlants, ArrayList<Technology> storages, ArrayList<Technology> facilities, 
+		AtomicBoolean building, double energy, Resources storage) {
 		if(!building.get()) {
 			if(energy < 0) {
 				powerPlants.sort(Comparator.comparingDouble(Technology::getTotalCost));
-				upTechnology(powerPlants.get(0), storage, storages);
+				upTechnology(powerPlants.get(0), storage, storages, building);
 			} else {
-				mines.sort(Comparator.comparingDouble(Technology::getTotalCost));			
-				upTechnology(mines.get(0), storage, storages);
+				mines.sort(Comparator.comparingDouble(Technology::getTotalCost));		
+				facilities.sort(Comparator.comparingDouble(Technology::getTotalCost));	
+				if(!facilities.isEmpty() && facilities.get(0).getTotalCost() * 2 < mines.get(0).getTotalCost()) {
+					upTechnology(facilities.get(0), storage, storages, building);
+				} else {
+					firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
+					firefox.loading();
+					upTechnology(mines.get(0), storage, storages, building);
+				}	
 			}
+		}
+	}
+	
+	private void chooseWhatToBuild(ArrayList<Technology> researchs, AtomicBoolean researching) {
+		if(!researching.get() && !researchs.isEmpty()) {
+			researchs.sort(Comparator.comparingDouble(Technology::getTotalCost));			
+			upTechnology(researchs.get(0));
 		}
 	}
 
@@ -77,7 +150,7 @@ public class TechnologyService {
 		mines.add(techno);
 	}
 	
-	private void upTechnology(Technology tech, Resources storage, ArrayList<Technology> storages) {
+	private void upTechnology(Technology tech, Resources storage, ArrayList<Technology> storages, AtomicBoolean building) {
 		if(tech.getCost().getMetall() > storage.getMetall()) {
 			Optional<Technology> optional = storages.stream().filter(ss -> ss.getId() == TechnologyEnum.METALLSPEICHER.getId()).findFirst();
 			if(optional.isPresent()) 
@@ -91,6 +164,15 @@ public class TechnologyService {
 			if(optional.isPresent()) 
 				tech = optional.get();
 		}
+
+		if(tech.getStatus().equals(StatusEnum.ON.getValue())) {
+			upTechnology(tech);
+			building.set(true);
+		}
+	}
+	
+	private void upTechnology(Technology tech) {			
+		System.out.println("I order to work on >>>>> " + TechnologyEnum.getById(tech.getId()).name() + " at current level >>>>> " + tech.getLevel());
 		
 		if(tech.getStatus().equals(StatusEnum.ON.getValue())) {
 			firefox.get().findElement(By.xpath("//li[@data-technology="+tech.getId()+"]")).findElement(By.tagName("button")).click();
