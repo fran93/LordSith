@@ -23,11 +23,14 @@ public class LoginService {
 	
 	public void login() {
 		firefox.get().get(PagesEnum.LOBBY.getUrl());
-		firefox.get().findElement(By.id("loginRegisterTabs")).findElement(By.tagName("span")).click();
-		firefox.get().findElement(By.name("email")).sendKeys(email);
-		firefox.get().findElement(By.name("password")).sendKeys(password);
-		firefox.get().findElement(By.xpath("//button[@type='submit']")).click();
-		firefox.loading();
+		
+		if(!firefox.get().getCurrentUrl().contains("hub")) {
+			firefox.get().findElement(By.id("loginRegisterTabs")).findElement(By.tagName("span")).click();
+			firefox.get().findElement(By.name("email")).sendKeys(email);
+			firefox.get().findElement(By.name("password")).sendKeys(password);
+			firefox.get().findElement(By.xpath("//button[@type='submit']")).click();
+			firefox.loading();
+		}
 		
 		firefox.get().findElement(By.id("joinGame")).findElement(By.tagName("a")).findElement(By.tagName("button")).click();
 		firefox.get().findElement(By.id("accountlist")).findElement(By.tagName("button")).click();
