@@ -44,7 +44,7 @@ public class CommanderService {
 			if(buildingService.buildMinesOrFacilities() && researchService.research()) {
 				hangarService.buildExpeditionFleet(loginService.getPoints());
 			}
-			firefox.loading();
+			firefox.shortLoading();
 		}
 	}
 	

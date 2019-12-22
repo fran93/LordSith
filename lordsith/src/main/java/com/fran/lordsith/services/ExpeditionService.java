@@ -43,39 +43,33 @@ public class ExpeditionService {
 	
 	public void sendExpedition(long points) {
 		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.FLOTTE.getId()).click();
-		firefox.loading();
+		firefox.shortLoading();
 				
 		if(isExpeditionAvailable() && firefox.get().findElements(By.className("icon_warning")).isEmpty() 
 			&& firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.GROSSER_TRANSPORTER.getId()+"]")).getAttribute("data-status").equals("on")) {
+
 			firefox.get().findElement(By.name("transporterLarge")).sendKeys(String.valueOf(calculateNumberOfCargos(points)));
-			firefox.loading();
-			
-			if(firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.SPIONAGESONDE.getId()+"]")).getAttribute("data-status").equals("on")) {
-				firefox.get().findElement(By.name("espionageProbe")).sendKeys("1");
-				firefox.loading();
-			}
+			firefox.shortLoading();
+
 			if(firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.PATHFINDER.getId()+"]")).getAttribute("data-status").equals("on")) {
 				firefox.get().findElement(By.name("explorer")).sendKeys("1");
-				firefox.loading();
+				firefox.shortLoading();
 			}
 			
 			if(firefox.get().findElement(By.id("continueToFleet2")).getAttribute("class").trim().endsWith("on")) {
 				firefox.get().findElement(By.id("continueToFleet2")).click();
-				firefox.loading();
+				firefox.shortLoading();
 				
 				firefox.get().findElement(By.id("position")).sendKeys("16");
-				firefox.loading();
+				firefox.shortLoading();
 				
 				if(firefox.get().findElement(By.id("continueToFleet3")).getAttribute("class").trim().endsWith("on")) {
 					firefox.get().findElement(By.id("continueToFleet3")).click();
-					firefox.loading();
-					
-					firefox.executeJavascript("$('#missionButton15').click();");
-					firefox.loading();
-					
+					firefox.longLoading();
+
 					if(firefox.get().findElement(By.id("sendFleet")).getAttribute("class").trim().endsWith("on")) {
 						firefox.get().findElement(By.id("sendFleet")).click();
-						firefox.loading();
+						firefox.shortLoading();
 						
 						logger.info("I order to send an expedition!");
 					}

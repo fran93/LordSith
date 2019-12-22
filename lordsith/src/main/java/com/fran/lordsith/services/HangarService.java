@@ -25,7 +25,7 @@ public class HangarService {
 
 	public void buildExpeditionFleet(long points) {
 		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.SCHIFFSWERFT.getId()).click();
-		firefox.loading();
+		firefox.shortLoading();
 		
 		int desiredCargos = expeditionService.calculateNumberOfCargos(points);
 		int amountCargos = Integer.parseInt(firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.GROSSER_TRANSPORTER.getId()+"]")).findElement(By.className("amount")).getAttribute("data-value"));
@@ -35,14 +35,14 @@ public class HangarService {
 			WebElement cargoElement = firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.GROSSER_TRANSPORTER.getId()+"]"));
 			if(cargoElement.getAttribute("data-status").equals(StatusEnum.ON.getValue())) { 
 				cargoElement.click();
-				firefox.loading();
+				firefox.shortLoading();
 				
 				int amountToBuild = desiredCargos - amountCargos;
 				firefox.get().findElement(By.id("build_amount")).sendKeys(String.valueOf(amountToBuild));
-				firefox.loading();
+				firefox.shortLoading();
 
 				firefox.get().findElement(By.className("upgrade")).click();
-				firefox.loading();
+				firefox.shortLoading();
 				
 				logger.info("I order to build " + amountToBuild + " " + TechnologyEnum.GROSSER_TRANSPORTER.name());
 			}
@@ -52,13 +52,13 @@ public class HangarService {
 			WebElement pathElement = firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.PATHFINDER.getId()+"]"));
 			if(pathElement.getAttribute("data-status").equals(StatusEnum.ON.getValue())) { 
 				pathElement.click();
-				firefox.loading();
+				firefox.shortLoading();
 
 				firefox.get().findElement(By.id("build_amount")).sendKeys("1");
-				firefox.loading();
+				firefox.shortLoading();
 
 				firefox.get().findElement(By.className("upgrade")).click();
-				firefox.loading();
+				firefox.shortLoading();
 			}
 		}
 		

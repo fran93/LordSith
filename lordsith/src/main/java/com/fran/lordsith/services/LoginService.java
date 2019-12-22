@@ -31,7 +31,7 @@ public class LoginService {
 			firefox.get().findElement(By.name("email")).sendKeys(email);
 			firefox.get().findElement(By.name("password")).sendKeys(password);
 			firefox.get().findElement(By.xpath("//button[@type='submit']")).click();
-			firefox.loading();
+			firefox.shortLoading();
 		}
 
 		firefox.get().findElement(By.id("joinGame")).findElement(By.tagName("a")).findElement(By.tagName("button")).click();
@@ -41,7 +41,7 @@ public class LoginService {
 
 	public void extractPoints() {
 		firefox.get().findElement(By.id("bar")).findElements(By.tagName("li")).get(1).findElement(By.tagName("a")).click();
-		firefox.loading();
+		firefox.shortLoading();
 		points = Long.parseLong(firefox.get().findElements(By.className("score")).get(1).getText().replaceAll("\\.", ""));
 	}
 	

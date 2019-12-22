@@ -35,7 +35,7 @@ public class FirefoxClient {
 		js.executeScript(script, new Object[0]);
 	}
 	
-	public void loading() {
+	public void shortLoading() {
 		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 	}
 	
@@ -47,6 +47,10 @@ public class FirefoxClient {
 				driver.switchTo().window(window);
 			}
 		});
+		longLoading();
+	}
+
+	public void longLoading() {
 		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 	}
 }

@@ -36,7 +36,7 @@ public class BuildingService {
 		AtomicBoolean building = new AtomicBoolean(false);
 		
 		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
-		firefox.loading();
+		firefox.shortLoading();
 		
 		double energy = Double.parseDouble(firefox.get().findElement(By.id("resources_energy")).getAttribute("data-raw"));
 		double metallStorage = processStorage(firefox.get().findElement(By.id("metal_box")).getAttribute("title"));
@@ -48,7 +48,7 @@ public class BuildingService {
 		
 		if(!building.get()) {
 			firefox.get().findElements(By.className("menubutton")).get(MenuEnum.ANLAGEN.getId()).click();
-			firefox.loading();
+			firefox.shortLoading();
 		
 			parseFacilities(facilities, building);
 			chooseWhatToBuild(mines, powerPlants, storages, facilities, building, energy, storage);
@@ -99,7 +99,7 @@ public class BuildingService {
 		if(!building.get()) {
 			if(energy < 0) {
 				firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
-				firefox.loading();
+				firefox.shortLoading();
 				
 				powerPlants.sort(Comparator.comparingDouble(Technology::getTotalCost));
 				upTechnology(powerPlants.get(0), storage, storages, building);
@@ -110,7 +110,7 @@ public class BuildingService {
 					upTechnology(facilities.get(0), storage, storages, building);
 				} else {
 					firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
-					firefox.loading();
+					firefox.shortLoading();
 					
 					upTechnology(mines.get(0), storage, storages, building);
 				}	
@@ -151,7 +151,7 @@ public class BuildingService {
 		
 		if(tech.getStatus().equals(StatusEnum.ON.getValue())) {
 			firefox.get().findElement(By.xpath("//li[@data-technology="+tech.getId()+"]")).findElement(By.tagName("button")).click();
-			firefox.loading();
+			firefox.shortLoading();
 		}
 	}
 

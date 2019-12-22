@@ -32,7 +32,7 @@ public class ResearchService {
 		AtomicBoolean researching = new AtomicBoolean(false);
 
 		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.FORSCHUNG.getId()).click();
-		firefox.loading();
+		firefox.shortLoading();
 		
 		firefox.get().findElements(By.className("technology")).forEach(technology -> {
 			int id = Integer.parseInt(technology.getAttribute("data-technology"));
@@ -69,7 +69,7 @@ public class ResearchService {
 		
 		if(tech.getStatus().equals(StatusEnum.ON.getValue())) {
 			firefox.get().findElement(By.xpath("//li[@data-technology="+tech.getId()+"]")).findElement(By.tagName("button")).click();
-			firefox.loading();
+			firefox.shortLoading();
 			researching.set(true);
 		}
 	}
