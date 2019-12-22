@@ -41,7 +41,6 @@ public class CommanderService {
 		for(String id: planetIds) {
 			firefox.get().findElement(By.id(id)).click();	
 			expeditionService.sendExpedition(loginService.getPoints());
-			
 			if(buildingService.buildMinesOrFacilities() && researchService.research()) {
 				hangarService.buildExpeditionFleet(loginService.getPoints());
 			}

@@ -2,6 +2,8 @@ package com.fran.lordsith.controller;
 
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +21,12 @@ public class Home {
 	
 	@Autowired @Lazy
 	private LoginService loginService;
+	
+	Logger logger = LoggerFactory.getLogger(Home.class);
 
 	@GetMapping("/")
 	public ResponseEntity<String> main() {
-		System.out.println("Procesing petition at: ".concat(new Date().toString()));
+		logger.info("Procesing petition at: ".concat(new Date().toString()));
 		commanderService.command();
 		return ResponseEntity.ok("Ok");
 	}

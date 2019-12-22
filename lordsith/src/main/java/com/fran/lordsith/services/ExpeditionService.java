@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,8 @@ public class ExpeditionService {
 
 	@Autowired @Lazy
 	private FirefoxClient firefox;
+	
+	Logger logger = LoggerFactory.getLogger(ExpeditionService.class);
 	
 	public int calculateNumberOfCargos(long points) {
 		if(points < 100000) {
@@ -68,7 +72,7 @@ public class ExpeditionService {
 			firefox.get().findElement(By.id("sendFleet")).click();
 			firefox.loading();
 			
-			System.out.println("I order to send an expedition!");
+			logger.info("I order to send an expedition!");
 		}
 	}
 	

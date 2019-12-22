@@ -6,6 +6,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,9 @@ public class ResearchService {
 
 	@Autowired @Lazy
 	private FirefoxClient firefox;
+	
+	
+	Logger logger = LoggerFactory.getLogger(ResearchService.class);
 	
 	public boolean research() {
 		ArrayList<Technology> researchs = new ArrayList<>();
@@ -60,7 +65,7 @@ public class ResearchService {
 	}
 	
 	private void upTechnology(Technology tech, AtomicBoolean researching) {			
-		System.out.println("I order to work on >>>>> " + TechnologyEnum.getById(tech.getId()).name() + " at current level >>>>> " + tech.getLevel());
+		logger.info("I order to work on >>>>> " + TechnologyEnum.getById(tech.getId()).name() + " at current level >>>>> " + tech.getLevel());
 		
 		if(tech.getStatus().equals(StatusEnum.ON.getValue())) {
 			firefox.get().findElement(By.xpath("//li[@data-technology="+tech.getId()+"]")).findElement(By.tagName("button")).click();
