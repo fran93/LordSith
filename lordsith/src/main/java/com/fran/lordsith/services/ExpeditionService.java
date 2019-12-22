@@ -58,21 +58,31 @@ public class ExpeditionService {
 				firefox.get().findElement(By.name("explorer")).sendKeys("1");
 				firefox.loading();
 			}
-			firefox.get().findElement(By.id("continueToFleet2")).click();
-			firefox.loading();
 			
-			firefox.get().findElement(By.id("position")).sendKeys("16");
-			firefox.loading();
-			firefox.get().findElement(By.id("continueToFleet3")).click();
-			firefox.loading();
+			if(firefox.get().findElement(By.id("continueToFleet2")).getAttribute("class").trim().endsWith("on")) {
+				firefox.get().findElement(By.id("continueToFleet2")).click();
+				firefox.loading();
+				
+				firefox.get().findElement(By.id("position")).sendKeys("16");
+				firefox.loading();
+				
+				if(firefox.get().findElement(By.id("continueToFleet3")).getAttribute("class").trim().endsWith("on")) {
+					firefox.get().findElement(By.id("continueToFleet3")).click();
+					firefox.loading();
+					
+					firefox.executeJavascript("$('#missionButton15').click();");
+					firefox.loading();
+					
+					if(firefox.get().findElement(By.id("sendFleet")).getAttribute("class").trim().endsWith("on")) {
+						firefox.get().findElement(By.id("sendFleet")).click();
+						firefox.loading();
+						
+						logger.info("I order to send an expedition!");
+					}
+				}
+			}
 			
-			firefox.executeJavascript("$('#missionButton15').click();");
-			firefox.loading();
 
-			firefox.get().findElement(By.id("sendFleet")).click();
-			firefox.loading();
-			
-			logger.info("I order to send an expedition!");
 		}
 	}
 	
