@@ -94,6 +94,9 @@ public class BuildingService {
 		AtomicBoolean building, double energy, Resources storage) {
 		if(!building.get()) {
 			if(energy < 0) {
+				firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
+				firefox.loading();
+				
 				powerPlants.sort(Comparator.comparingDouble(Technology::getTotalCost));
 				upTechnology(powerPlants.get(0), storage, storages, building);
 			} else {
@@ -104,6 +107,7 @@ public class BuildingService {
 				} else {
 					firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
 					firefox.loading();
+					
 					upTechnology(mines.get(0), storage, storages, building);
 				}	
 			}
