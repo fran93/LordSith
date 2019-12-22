@@ -5,5 +5,6 @@ public enum TypeEnum {
 	ENERGY,
 	STORAGE,
 	TECHNOLOGY,
-	FACILITIES;
+	FACILITIES,
+	SPACESHIPS;
 }

@@ -5,7 +5,9 @@ public enum MenuEnum {
 	UBERSICHT(0),
 	VERSORGUNG(1),
 	ANLAGEN(2),
-	FORSCHUNG(5);
+	FORSCHUNG(5),
+	SCHIFFSWERFT(6),
+	FLOTTE(8);
 	
 	private int id;
 	

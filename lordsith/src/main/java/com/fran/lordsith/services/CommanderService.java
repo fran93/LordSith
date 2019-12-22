@@ -21,32 +21,32 @@ public class CommanderService {
 	private ResearchService researchService;
 	
 	@Autowired @Lazy
+	private ExpeditionService expeditionService;
+	
+	@Autowired @Lazy
+	private HangarService hangarService;
+	
+	@Autowired @Lazy
 	private FirefoxClient firefox;
 	
 	public void command() {
 		if(!loginService.isLogged()) {
 			loginService.login();
 		}
+		loginService.extractPoints();
 		
 		List<String> planetIds = new ArrayList<>();
 		firefox.get().findElement(By.id("planetList")).findElements(By.className("smallplanet")).forEach(planet -> planetIds.add(planet.getAttribute("id")));
 		
 		for(String id: planetIds) {
-			firefox.get().findElement(By.id(id)).click();
-			if(buildingService.buildMinesOrFacilities()) {
-				researchService.research();
+			firefox.get().findElement(By.id(id)).click();	
+			expeditionService.sendExpedition(loginService.getPoints());
+			
+			if(buildingService.buildMinesOrFacilities() && researchService.research()) {
+				hangarService.buildExpeditionFleet(loginService.getPoints());
 			}
 			firefox.loading();
-		}	
-		
-		/*
-		 * 96 Misils
-		 * 96 Small lasers
-		 * 48 Big lassers
-		 * 48 Ionics
-		 * 24 Gauss
-		 * 12 Plasmas
-		 */
+		}
 	}
 	
 }

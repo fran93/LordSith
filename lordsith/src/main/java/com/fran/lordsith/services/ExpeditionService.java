@@ -1,8 +1,15 @@
 package com.fran.lordsith.services;
 
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
+import com.fran.lordsith.enums.MenuEnum;
+import com.fran.lordsith.enums.TechnologyEnum;
 
 @Service
 public class ExpeditionService {
@@ -10,17 +17,74 @@ public class ExpeditionService {
 	@Autowired @Lazy
 	private FirefoxClient firefox;
 	
+	public int calculateNumberOfCargos(long points) {
+		if(points < 100000) {
+			return 42;
+		} else if(points < 1000000) {
+			return 125; 
+		} else if(points < 5000000) {
+			return 150; 
+		} else if(points < 25000000) {
+			return 200; 
+		} else if(points < 50000000) {
+			return 250; 
+		} else if(points < 75000000) {
+			return 300; 
+		} else if(points < 100000000) {
+			return 350; 
+		} else {
+			return 400;
+		}
+	}
 	
+	public void sendExpedition(long points) {
+		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.FLOTTE.getId()).click();
+		firefox.loading();
+				
+		if(isExpeditionAvailable() && firefox.get().findElements(By.className("icon_warning")).isEmpty() 
+			&& firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.GROSSER_TRANSPORTER.getId()+"]")).getAttribute("data-status").equals("on")) {
+			firefox.get().findElement(By.name("transporterLarge")).sendKeys(String.valueOf(calculateNumberOfCargos(points)));
+			firefox.loading();
+			
+			if(firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.SPIONAGESONDE.getId()+"]")).getAttribute("data-status").equals("on")) {
+				firefox.get().findElement(By.name("espionageProbe")).sendKeys("1");
+				firefox.loading();
+			}
+			if(firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.PATHFINDER.getId()+"]")).getAttribute("data-status").equals("on")) {
+				firefox.get().findElement(By.name("explorer")).sendKeys("1");
+				firefox.loading();
+			}
+			firefox.get().findElement(By.id("continueToFleet2")).click();
+			firefox.loading();
+			
+			firefox.get().findElement(By.id("position")).sendKeys("16");
+			firefox.loading();
+			firefox.get().findElement(By.id("continueToFleet3")).click();
+			firefox.loading();
+			
+			firefox.executeJavascript("$('#missionButton15').click();");
+			firefox.loading();
+
+			firefox.get().findElement(By.id("sendFleet")).click();
+			firefox.loading();
+			
+			System.out.println("I order to send an expedition!");
+		}
+	}
 	
-	/**
-	Top 1 < 100k points,  1 Destroyer, 1 probes and 33 Larges Cargo
-    Top 1 < 1M points 1 Destroyer, 1 probes and 91 Larges Cargo/273 Smalls Cargo
-    Top 1 < 5M points 1 Destroyer, 1 probes and 141 Larges Cargo/423 Smalls Cargo
-    Top 1 < 25M points 1 Destroyer, 1 probes and 191 Larges Cargo/573 Smalls Cargo
-    Top 1 < 50M points 1 Destroyer, 1 probes and 241 Larges Cargo/723 Smalls Cargo
-    Top 1 < 75M points  1 Destroyer, 1 probes and 291 Larges Cargo/873 Smalls Cargo
-    Top 1 < 100M points  1 Destroyer, 1 probes and 341 Larges Cargo/1.023 Smalls Cargo
-    Top 1 > 100M points 1 Destroyer, 1 probes and 417 Larges Cargo/1.223 Smalls Cargo 
-	 */
+	private boolean isExpeditionAvailable() {
+		List<WebElement> slotElements = firefox.get().findElement(By.id("slots")).findElements(By.className("fleft"));
+		String rawSlots = slotElements.get(0).getText();
+		String rawExpe = slotElements.get(1).getText();
+		String splitedSlots = rawSlots.split(":")[1].trim();
+		String splitedExpeditions = rawExpe.split(":")[1].trim();
+		
+		int currentSlots = Integer.parseInt(splitedSlots.split("/")[0]);
+		int maxSlots = Integer.parseInt(splitedSlots.split("/")[1]);
+		int currentExpeditions = Integer.parseInt(splitedExpeditions.split("/")[0]);
+		int maxExpeditions = Integer.parseInt(splitedExpeditions.split("/")[1]);
+		
+		return currentSlots < maxSlots && currentExpeditions < maxExpeditions;
+	}
 	
 }

@@ -36,16 +36,18 @@ public class LoginService {
 
 		firefox.get().findElement(By.id("joinGame")).findElement(By.tagName("a")).findElement(By.tagName("button")).click();
 		firefox.get().findElement(By.id("accountlist")).findElement(By.tagName("button")).click();
-		firefox.closeTab();
-		
-		points = Long.parseLong(firefox.get().findElement(By.id("scoreContentField")).getText().split(" ")[0].replaceAll("\\.", ""));
+		firefox.closeTab();	
+	}
+
+	public void extractPoints() {
+		firefox.get().findElement(By.id("bar")).findElements(By.tagName("li")).get(1).findElement(By.tagName("a")).click();
+		firefox.loading();
+		points = Long.parseLong(firefox.get().findElements(By.className("score")).get(1).getText().replaceAll("\\.", ""));
 	}
 	
 	public boolean isLogged() {
 		if(firefox.get().getCurrentUrl().contains("page=ingame")) { 
 			firefox.get().findElements(By.className("menubutton")).get(MenuEnum.UBERSICHT.getId()).click();
-			firefox.loading();
-			points = Long.parseLong(firefox.get().findElement(By.id("scoreContentField")).getText().split(" ")[0].replaceAll("\\.", ""));
 		}
 		return firefox.get().getCurrentUrl().contains("page=ingame");
 	}

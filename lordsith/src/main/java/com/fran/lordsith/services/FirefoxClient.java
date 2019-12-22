@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
@@ -27,6 +28,11 @@ public class FirefoxClient {
 
 	public WebDriver get() {
 		return driver;
+	}
+	
+	public void executeJavascript(String script) {
+		JavascriptExecutor js =  (JavascriptExecutor)driver;
+		js.executeScript(script, new Object[0]);
 	}
 	
 	public void loading() {
