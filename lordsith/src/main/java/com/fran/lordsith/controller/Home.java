@@ -1,7 +1,5 @@
 package com.fran.lordsith.controller;
 
-import java.util.Date;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +24,7 @@ public class Home {
 
 	@GetMapping("/")
 	public ResponseEntity<String> main() {
-		logger.info("Procesing petition at: ".concat(new Date().toString()));
+		logger.info("Procesing petition");
 		commanderService.command();
 		return ResponseEntity.ok("Ok");
 	}
