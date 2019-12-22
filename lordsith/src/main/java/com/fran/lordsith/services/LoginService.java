@@ -21,31 +21,44 @@ public class LoginService {
 	@Autowired @Lazy
 	private FirefoxClient firefox;
 	
+	private long points;
+	
 	public void login() {
 		firefox.get().get(PagesEnum.LOBBY.getUrl());
-		
-		if(!firefox.get().getCurrentUrl().contains("hub")) {
+
+		if(firefox.get().findElements(By.className("hub-logo")).isEmpty()) {
 			firefox.get().findElement(By.id("loginRegisterTabs")).findElement(By.tagName("span")).click();
 			firefox.get().findElement(By.name("email")).sendKeys(email);
 			firefox.get().findElement(By.name("password")).sendKeys(password);
 			firefox.get().findElement(By.xpath("//button[@type='submit']")).click();
 			firefox.loading();
 		}
-		
+
 		firefox.get().findElement(By.id("joinGame")).findElement(By.tagName("a")).findElement(By.tagName("button")).click();
 		firefox.get().findElement(By.id("accountlist")).findElement(By.tagName("button")).click();
 		firefox.closeTab();
+		
+		points = Long.parseLong(firefox.get().findElement(By.id("scoreContentField")).getText().split(" ")[0].replaceAll("\\.", ""));
 	}
 	
 	public boolean isLogged() {
 		if(firefox.get().getCurrentUrl().contains("page=ingame")) { 
 			firefox.get().findElements(By.className("menubutton")).get(MenuEnum.UBERSICHT.getId()).click();
 			firefox.loading();
+			points = Long.parseLong(firefox.get().findElement(By.id("scoreContentField")).getText().split(" ")[0].replaceAll("\\.", ""));
 		}
 		return firefox.get().getCurrentUrl().contains("page=ingame");
 	}
 	
 	public void logout() {
 		firefox.get().quit();
+	}
+
+	public long getPoints() {
+		return points;
+	}
+
+	public void setPoints(long points) {
+		this.points = points;
 	}
 }

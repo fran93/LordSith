@@ -15,7 +15,10 @@ public class CommanderService {
 	private LoginService loginService;
 	
 	@Autowired @Lazy
-	private TechnologyService technologyService;
+	private BuildingService buildingService;
+	
+	@Autowired @Lazy
+	private ResearchService researchService;
 	
 	@Autowired @Lazy
 	private FirefoxClient firefox;
@@ -30,9 +33,20 @@ public class CommanderService {
 		
 		for(String id: planetIds) {
 			firefox.get().findElement(By.id(id)).click();
-			technologyService.buildSomething();
+			if(buildingService.buildMinesOrFacilities()) {
+				researchService.research();
+			}
 			firefox.loading();
 		}	
+		
+		/*
+		 * 96 Misils
+		 * 96 Small lasers
+		 * 48 Big lassers
+		 * 48 Ionics
+		 * 24 Gauss
+		 * 12 Plasmas
+		 */
 	}
 	
 }

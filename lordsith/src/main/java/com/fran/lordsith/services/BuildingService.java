@@ -16,41 +16,15 @@ import com.fran.lordsith.enums.StatusEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
 import com.fran.lordsith.model.Resources;
 import com.fran.lordsith.model.Technology;
+import com.fran.lordsith.utilities.TechnologyUtils;
 
 @Service
-public class TechnologyService {
+public class BuildingService {
 
 	@Autowired @Lazy
 	private FirefoxClient firefox;
-	
-	public void buildSomething() {
-		if(buildMinesOrFacilities()) {
-			research();
-		}	
-	}
-	
-	private void research() {
-		ArrayList<Technology> researchs = new ArrayList<>();
-		AtomicBoolean researching = new AtomicBoolean(false);
 
-		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.FORSCHUNG.getId()).click();
-		firefox.loading();
-		
-		firefox.get().findElements(By.className("technology")).forEach(technology -> {
-			int id = Integer.parseInt(technology.getAttribute("data-technology"));
-			String status = technology.getAttribute("data-status");
-			if(status.equals(StatusEnum.ACTIVE.getValue()))
-				researching.set(true);
-
-			if(!status.equals(StatusEnum.OFF.getValue()) && id >= TechnologyEnum.SPIONAGETECHNIK.getId() && id <= TechnologyEnum.INTERGALAKTISCHES_FORSCHUNGSNETZWERK.getId()) {
-				parseTechnology(researchs, technology, id, status);
-			}
-		});
-			
-		chooseWhatToBuild(researchs, researching);
-	}
-
-	private boolean buildMinesOrFacilities() {
+	public boolean buildMinesOrFacilities() {
 		ArrayList<Technology> mines = new ArrayList<>();
 		ArrayList<Technology> powerPlants = new ArrayList<>();
 		ArrayList<Technology> storages = new ArrayList<>();
@@ -135,18 +109,11 @@ public class TechnologyService {
 			}
 		}
 	}
-	
-	private void chooseWhatToBuild(ArrayList<Technology> researchs, AtomicBoolean researching) {
-		if(!researching.get() && !researchs.isEmpty()) {
-			researchs.sort(Comparator.comparingDouble(Technology::getTotalCost));			
-			upTechnology(researchs.get(0));
-		}
-	}
 
 	private void parseTechnology(ArrayList<Technology> mines, WebElement technology, int id, String status) {
 		int level = Integer.parseInt(technology.findElement(By.className("level")).getAttribute("data-value"));	
 		Technology techno =  new Technology(id, level, status);
-		calculateCost(techno);
+		TechnologyUtils.calculateCost(techno);
 		mines.add(techno);
 	}
 	
@@ -177,28 +144,6 @@ public class TechnologyService {
 		if(tech.getStatus().equals(StatusEnum.ON.getValue())) {
 			firefox.get().findElement(By.xpath("//li[@data-technology="+tech.getId()+"]")).findElement(By.tagName("button")).click();
 			firefox.loading();
-		}
-	}
-	
-	private void calculateCost(Technology techno) {
-		TechnologyEnum technoEnum = TechnologyEnum.getById(techno.getId());
-		techno.setCost( new Resources(technoEnum.getCost().getMetall(), technoEnum.getCost().getKristall(), technoEnum.getCost().getDeuterium(), technoEnum.getCost().getEnergie()));
-		calculateCost(techno, 0, technoEnum.getFactorMultiplier());
-		double totalCost = techno.getCost().getMetall() * 1;
-		totalCost += techno.getCost().getKristall() * 2;
-		totalCost += techno.getCost().getDeuterium() * 3;
-		totalCost += techno.getCost().getEnergie() * 4;
-		techno.setTotalCost(totalCost);
-	}
-	
-	private void calculateCost(Technology techno, int currentLevel, double factorMultiplier) {
-		if(currentLevel < techno.getLevel()) {
-			techno.getCost().setMetall(techno.getCost().getMetall() * factorMultiplier);
-			techno.getCost().setKristall(techno.getCost().getKristall() * factorMultiplier);
-			techno.getCost().setDeuterium(techno.getCost().getDeuterium() * factorMultiplier);
-			techno.getCost().setEnergie(techno.getCost().getEnergie() * factorMultiplier);
-			currentLevel++;
-			calculateCost(techno, currentLevel, factorMultiplier);
 		}
 	}
 
