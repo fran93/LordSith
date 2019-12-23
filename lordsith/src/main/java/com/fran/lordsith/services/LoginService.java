@@ -25,6 +25,7 @@ public class LoginService {
 	
 	public void login() {
 		firefox.get().get(PagesEnum.LOBBY.getUrl());
+		firefox.shortLoading();
 
 		if(firefox.get().findElements(By.className("hub-logo")).isEmpty()) {
 			firefox.get().findElement(By.id("loginRegisterTabs")).findElement(By.tagName("span")).click();
