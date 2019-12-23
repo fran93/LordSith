@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,8 @@ public class CommanderService {
 	@Autowired @Lazy
 	private FirefoxClient firefox;
 	
+	Logger logger = LoggerFactory.getLogger(CommanderService.class);
+	
 	public void command() {
 		if(!loginService.isLogged()) {
 			loginService.login();
@@ -46,6 +50,8 @@ public class CommanderService {
 			}
 			firefox.shortLoading();
 		}
+		
+		logger.info("That't all");
 	}
 	
 }
