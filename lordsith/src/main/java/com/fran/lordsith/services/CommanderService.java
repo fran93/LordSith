@@ -51,7 +51,7 @@ public class CommanderService {
 			firefox.shortLoading();
 		}
 		
-		logger.info("That't all");
+		logger.info("That's all");
 	}
 	
 }

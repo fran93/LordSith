@@ -27,7 +27,7 @@ public class HangarService {
 		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.SCHIFFSWERFT.getId()).click();
 		firefox.shortLoading();
 		
-		int desiredCargos = expeditionService.calculateNumberOfCargos(points);
+		int desiredCargos = expeditionService.calculateNumberOfCargos(points)/2;
 		int amountCargos = Integer.parseInt(firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.GROSSER_TRANSPORTER.getId()+"]")).findElement(By.className("amount")).getAttribute("data-value"));
 		int amountPath = Integer.parseInt(firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.PATHFINDER.getId()+"]")).findElement(By.className("amount")).getAttribute("data-value"));
 		
@@ -39,7 +39,7 @@ public class HangarService {
 				
 				int amountToBuild = desiredCargos - amountCargos;
 				firefox.get().findElement(By.id("build_amount")).sendKeys(String.valueOf(amountToBuild));
-				firefox.shortLoading();
+				firefox.loading();
 
 				firefox.get().findElement(By.className("upgrade")).click();
 				firefox.shortLoading();

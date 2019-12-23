@@ -65,7 +65,7 @@ public class ExpeditionService {
 				
 				if(firefox.get().findElement(By.id("continueToFleet3")).getAttribute("class").trim().endsWith("on")) {
 					firefox.get().findElement(By.id("continueToFleet3")).click();
-					firefox.loading();
+					firefox.longLoading();
 
 					if(firefox.get().findElement(By.id("sendFleet")).getAttribute("class").trim().endsWith("on")) {
 						firefox.get().findElement(By.id("sendFleet")).click();
