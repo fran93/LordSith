@@ -23,7 +23,7 @@ public class HangarService {
 	
 	Logger logger = LoggerFactory.getLogger(HangarService.class);
 
-	public void buildExpeditionFleet(long points) {
+	public void buildExpeditionFleet(long points) throws InterruptedException {
 		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.SCHIFFSWERFT.getId()).click();
 		firefox.shortLoading();
 		

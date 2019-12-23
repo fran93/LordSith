@@ -1,7 +1,5 @@
 package com.fran.lordsith.services;
 
-import java.util.concurrent.TimeUnit;
-
 import javax.annotation.PostConstruct;
 
 import org.openqa.selenium.JavascriptExecutor;
@@ -35,19 +33,19 @@ public class FirefoxClient {
 		js.executeScript(script, new Object[0]);
 	}
 	
-	public void shortLoading() {
-		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+	public void shortLoading() throws InterruptedException {
+		Thread.sleep(1000);
 	}
 	
-	public void loading() {
-		driver.manage().timeouts().implicitlyWait(6, TimeUnit.SECONDS);
+	public void loading() throws InterruptedException {
+		Thread.sleep(2000);
 	}
 	
-	public void longLoading() {
-		driver.manage().timeouts().implicitlyWait(12, TimeUnit.SECONDS);
+	public void longLoading() throws InterruptedException {
+		Thread.sleep(3000);
 	}
 	
-	public void closeTab() {
+	public void closeTab() throws InterruptedException {
 		String oldtab = driver.getWindowHandle();
 		driver.close();
 		driver.getWindowHandles().forEach(window -> {

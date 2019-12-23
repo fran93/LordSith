@@ -23,19 +23,19 @@ public class Home {
 	Logger log = LoggerFactory.getLogger(Home.class);
 
 	@Scheduled(cron = "3 */15 6-21 * * *")
-	public void daily() {
+	public void daily() throws InterruptedException {
 		log.info("Daily job");
 		commanderService.command();
 	}
 	
 	@Scheduled(cron = "0 0 0 * * *")
-	public void midnight() {
+	public void midnight() throws InterruptedException {
 		log.info("Midnight");
 		commanderService.command();
 	}
 	
 	@Scheduled(cron = "0 0 3 * * *")
-	public void devilTime() {
+	public void devilTime() throws InterruptedException {
 		log.info("DevilTime");
 		commanderService.command();
 	}

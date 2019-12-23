@@ -33,7 +33,7 @@ public class CommanderService {
 	
 	Logger logger = LoggerFactory.getLogger(CommanderService.class);
 	
-	public void command() {
+	public void command() throws InterruptedException {
 		if(!loginService.isLogged()) {
 			loginService.login();
 		}

@@ -23,7 +23,7 @@ public class LoginService {
 	
 	private long points;
 	
-	public void login() {
+	public void login() throws InterruptedException {
 		firefox.get().get(PagesEnum.LOBBY.getUrl());
 		firefox.shortLoading();
 
@@ -40,7 +40,7 @@ public class LoginService {
 		firefox.closeTab();	
 	}
 
-	public void extractPoints() {
+	public void extractPoints() throws InterruptedException {
 		firefox.get().findElement(By.id("bar")).findElements(By.tagName("li")).get(1).findElement(By.tagName("a")).click();
 		firefox.shortLoading();
 		points = Long.parseLong(firefox.get().findElements(By.className("score")).get(1).getText().replaceAll("\\.", ""));

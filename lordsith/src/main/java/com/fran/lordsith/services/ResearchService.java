@@ -27,7 +27,7 @@ public class ResearchService {
 	
 	Logger logger = LoggerFactory.getLogger(ResearchService.class);
 	
-	public boolean research() {
+	public boolean research() throws InterruptedException {
 		ArrayList<Technology> researchs = new ArrayList<>();
 		AtomicBoolean researching = new AtomicBoolean(false);
 
@@ -57,14 +57,14 @@ public class ResearchService {
 		mines.add(techno);
 	}
 		
-	private void chooseWhatToBuild(ArrayList<Technology> researchs, AtomicBoolean researching) {
+	private void chooseWhatToBuild(ArrayList<Technology> researchs, AtomicBoolean researching) throws InterruptedException {
 		if(!researching.get() && !researchs.isEmpty()) {
 			researchs.sort(Comparator.comparingDouble(Technology::getTotalCost));			
 			upTechnology(researchs.get(0), researching);
 		}
 	}
 	
-	private void upTechnology(Technology tech, AtomicBoolean researching) {			
+	private void upTechnology(Technology tech, AtomicBoolean researching) throws InterruptedException {			
 		logger.info("I order to work on >>>>> " + TechnologyEnum.getById(tech.getId()).name() + " at current level >>>>> " + tech.getLevel());
 		
 		if(tech.getStatus().equals(StatusEnum.ON.getValue())) {

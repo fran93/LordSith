@@ -28,7 +28,7 @@ public class BuildingService {
 	
 	Logger logger = LoggerFactory.getLogger(BuildingService.class);
 
-	public boolean buildMinesOrFacilities() {
+	public boolean buildMinesOrFacilities() throws InterruptedException {
 		ArrayList<Technology> mines = new ArrayList<>();
 		ArrayList<Technology> powerPlants = new ArrayList<>();
 		ArrayList<Technology> storages = new ArrayList<>();
@@ -95,7 +95,7 @@ public class BuildingService {
 	}
 
 	private void chooseWhatToBuild(ArrayList<Technology> mines, ArrayList<Technology> powerPlants, ArrayList<Technology> storages, ArrayList<Technology> facilities, 
-		AtomicBoolean building, double energy, Resources storage) {
+		AtomicBoolean building, double energy, Resources storage) throws InterruptedException {
 		if(!building.get()) {
 			if(energy < 0) {
 				firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
@@ -125,7 +125,7 @@ public class BuildingService {
 		mines.add(techno);
 	}
 	
-	private void upTechnology(Technology tech, Resources storage, ArrayList<Technology> storages, AtomicBoolean building) {
+	private void upTechnology(Technology tech, Resources storage, ArrayList<Technology> storages, AtomicBoolean building) throws InterruptedException {
 		if(tech.getCost().getMetall() > storage.getMetall()) {
 			Optional<Technology> optional = storages.stream().filter(ss -> ss.getId() == TechnologyEnum.METALLSPEICHER.getId()).findFirst();
 			if(optional.isPresent()) 
@@ -146,7 +146,7 @@ public class BuildingService {
 		}
 	}
 	
-	private void upTechnology(Technology tech) {			
+	private void upTechnology(Technology tech) throws InterruptedException {			
 		logger.info("I order to work on >>>>> " + TechnologyEnum.getById(tech.getId()).name() + " at current level >>>>> " + tech.getLevel());
 		
 		if(tech.getStatus().equals(StatusEnum.ON.getValue())) {

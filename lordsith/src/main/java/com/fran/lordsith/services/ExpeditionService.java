@@ -41,7 +41,7 @@ public class ExpeditionService {
 		}
 	}
 	
-	public void sendExpedition(long points) {
+	public void sendExpedition(long points) throws InterruptedException {
 		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.FLOTTE.getId()).click();
 		firefox.shortLoading();
 				
