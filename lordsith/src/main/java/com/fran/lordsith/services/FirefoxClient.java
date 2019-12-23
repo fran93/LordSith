@@ -36,7 +36,15 @@ public class FirefoxClient {
 	}
 	
 	public void shortLoading() {
-		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+	}
+	
+	public void loading() {
+		driver.manage().timeouts().implicitlyWait(6, TimeUnit.SECONDS);
+	}
+	
+	public void longLoading() {
+		driver.manage().timeouts().implicitlyWait(12, TimeUnit.SECONDS);
 	}
 	
 	public void closeTab() {
@@ -50,7 +58,5 @@ public class FirefoxClient {
 		longLoading();
 	}
 
-	public void longLoading() {
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-	}
+
 }
