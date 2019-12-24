@@ -53,19 +53,19 @@ public class ExpeditionService {
 
 			if(firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.PATHFINDER.getId()+"]")).getAttribute("data-status").equals("on")) {
 				firefox.get().findElement(By.name("explorer")).sendKeys("1");
-				firefox.shortLoading();
+				firefox.loading();
 			}
 			
 			if(firefox.get().findElement(By.id("continueToFleet2")).getAttribute("class").trim().endsWith("on")) {
 				firefox.get().findElement(By.id("continueToFleet2")).click();
-				firefox.shortLoading();
+				firefox.loading();
 				
 				firefox.get().findElement(By.id("position")).sendKeys("16");
-				firefox.shortLoading();
+				firefox.loading();
 				
 				if(firefox.get().findElement(By.id("continueToFleet3")).getAttribute("class").trim().endsWith("on")) {
 					firefox.get().findElement(By.id("continueToFleet3")).click();
-					firefox.longLoading();
+					firefox.loading();
 
 					if(firefox.get().findElement(By.id("sendFleet")).getAttribute("class").trim().endsWith("on")) {
 						firefox.get().findElement(By.id("sendFleet")).click();

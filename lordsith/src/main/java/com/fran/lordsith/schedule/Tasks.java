@@ -1,4 +1,4 @@
-package com.fran.lordsith.controller;
+package com.fran.lordsith.schedule;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,7 @@ import com.fran.lordsith.services.LoginService;
 
 
 @Component
-public class Home {
+public class Tasks {
 	
 	@Autowired @Lazy
 	private CommanderService commanderService;
@@ -20,7 +20,7 @@ public class Home {
 	@Autowired @Lazy
 	private LoginService loginService;
 	
-	Logger log = LoggerFactory.getLogger(Home.class);
+	Logger log = LoggerFactory.getLogger(Tasks.class);
 
 	@Scheduled(cron = "3 */15 6-21 * * *")
 	public void daily() throws InterruptedException {

@@ -41,9 +41,8 @@ public class LoginService {
 	}
 
 	public void extractPoints() throws InterruptedException {
-		firefox.get().findElement(By.id("bar")).findElements(By.tagName("li")).get(1).findElement(By.tagName("a")).click();
-		firefox.shortLoading();
-		points = Long.parseLong(firefox.get().findElements(By.className("score")).get(1).getText().replaceAll("\\.", ""));
+		firefox.longLoading();
+		points = Long.parseLong(firefox.get().findElement(By.id("scoreContentField")).findElement(By.tagName("a")).getText().split(" ")[0].replaceAll("\\.", ""));
 	}
 	
 	public boolean isLogged() {

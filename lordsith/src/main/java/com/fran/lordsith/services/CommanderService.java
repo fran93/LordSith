@@ -31,7 +31,7 @@ public class CommanderService {
 	@Autowired @Lazy
 	private FirefoxClient firefox;
 	
-	Logger logger = LoggerFactory.getLogger(CommanderService.class);
+	Logger log = LoggerFactory.getLogger(CommanderService.class);
 	
 	public void command() throws InterruptedException {
 		if(!loginService.isLogged()) {
@@ -42,16 +42,20 @@ public class CommanderService {
 		List<String> planetIds = new ArrayList<>();
 		firefox.get().findElement(By.id("planetList")).findElements(By.className("smallplanet")).forEach(planet -> planetIds.add(planet.getAttribute("id")));
 		
-		for(String id: planetIds) {
-			firefox.get().findElement(By.id(id)).click();	
+		for(int i=0; i<planetIds.size(); i++) {
+			firefox.get().findElement(By.id(planetIds.get(i))).click();	
 			expeditionService.sendExpedition(loginService.getPoints());
+			
 			if(buildingService.buildMinesOrFacilities() && researchService.research()) {
 				hangarService.buildExpeditionFleet(loginService.getPoints());
+				if(i==0) {
+					hangarService.buildPathfinderFleet(loginService.getPoints());
+				}
 			}
 			firefox.shortLoading();
 		}
 		
-		logger.info("That's all");
+		log.info("That's all");
 	}
 	
 }

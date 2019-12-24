@@ -21,30 +21,30 @@ public class HangarService {
 	@Autowired @Lazy
 	private ExpeditionService expeditionService;
 	
-	Logger logger = LoggerFactory.getLogger(HangarService.class);
+	Logger log = LoggerFactory.getLogger(HangarService.class);
 
 	public void buildExpeditionFleet(long points) throws InterruptedException {
 		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.SCHIFFSWERFT.getId()).click();
 		firefox.shortLoading();
 		
-		int desiredCargos = expeditionService.calculateNumberOfCargos(points)/2;
+		int desiredShips = expeditionService.calculateNumberOfCargos(points)/2;
 		int amountCargos = Integer.parseInt(firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.GROSSER_TRANSPORTER.getId()+"]")).findElement(By.className("amount")).getAttribute("data-value"));
 		int amountPath = Integer.parseInt(firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.PATHFINDER.getId()+"]")).findElement(By.className("amount")).getAttribute("data-value"));
 		
-		if(amountCargos < desiredCargos) {
+		if(amountCargos < desiredShips) {
 			WebElement cargoElement = firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.GROSSER_TRANSPORTER.getId()+"]"));
 			if(cargoElement.getAttribute("data-status").equals(StatusEnum.ON.getValue())) { 
 				cargoElement.click();
 				firefox.shortLoading();
 				
-				int amountToBuild = desiredCargos - amountCargos;
+				int amountToBuild = desiredShips - amountCargos;
 				firefox.get().findElement(By.id("build_amount")).sendKeys(String.valueOf(amountToBuild));
 				firefox.loading();
 
 				firefox.get().findElement(By.className("upgrade")).click();
 				firefox.shortLoading();
 				
-				logger.info("I order to build " + amountToBuild + " " + TechnologyEnum.GROSSER_TRANSPORTER.name());
+				log.info("I order to build " + amountToBuild + " " + TechnologyEnum.GROSSER_TRANSPORTER.name());
 			}
 		}
 		
@@ -55,13 +55,37 @@ public class HangarService {
 				firefox.shortLoading();
 
 				firefox.get().findElement(By.id("build_amount")).sendKeys("1");
-				firefox.shortLoading();
+				firefox.loading();
 
 				firefox.get().findElement(By.className("upgrade")).click();
 				firefox.shortLoading();
+				
+				log.info("I order to build a " + TechnologyEnum.PATHFINDER.name());
 			}
 		}
 		
+	}
+	
+	public void buildPathfinderFleet(long points) throws InterruptedException {
+		int desiredShips = expeditionService.calculateNumberOfCargos(points)/2;
+		int amountPath = Integer.parseInt(firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.PATHFINDER.getId()+"]")).findElement(By.className("amount")).getAttribute("data-value"));
+		
+		if(amountPath < desiredShips) {
+			WebElement pathElement = firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.PATHFINDER.getId()+"]"));
+			if(pathElement.getAttribute("data-status").equals(StatusEnum.ON.getValue())) { 
+				pathElement.click();
+				firefox.shortLoading();
+
+				int amountToBuild = desiredShips - amountPath;
+				firefox.get().findElement(By.id("build_amount")).sendKeys(String.valueOf(amountToBuild));
+				firefox.loading();
+
+				firefox.get().findElement(By.className("upgrade")).click();
+				firefox.shortLoading();
+				
+				log.info("I order to build " + amountToBuild + " " + TechnologyEnum.PATHFINDER.name());
+			}
+		}
 	}
 	
 }
