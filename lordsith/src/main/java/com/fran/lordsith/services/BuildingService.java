@@ -35,7 +35,7 @@ public class BuildingService {
 		ArrayList<Technology> facilities = new ArrayList<>();
 		AtomicBoolean building = new AtomicBoolean(false);
 		
-		firefox.shortLoading();
+		firefox.loading();
 		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
 		firefox.shortLoading();
 		

@@ -38,11 +38,11 @@ public class FirefoxClient {
 	}
 	
 	public void loading() throws InterruptedException {
-		Thread.sleep(2000);
+		Thread.sleep(3000);
 	}
 	
 	public void longLoading() throws InterruptedException {
-		Thread.sleep(3000);
+		Thread.sleep(6000);
 	}
 	
 	public void closeTab() throws InterruptedException {
