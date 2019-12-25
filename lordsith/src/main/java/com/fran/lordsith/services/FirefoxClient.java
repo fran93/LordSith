@@ -55,6 +55,11 @@ public class FirefoxClient {
 		});
 		longLoading();
 	}
+	
+	public void restart() {
+		driver.close();
+		init();
+	}
 
 
 }

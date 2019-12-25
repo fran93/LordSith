@@ -49,7 +49,7 @@ public class ExpeditionService {
 			&& firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.GROSSER_TRANSPORTER.getId()+"]")).getAttribute("data-status").equals("on")) {
 
 			firefox.get().findElement(By.name("transporterLarge")).sendKeys(String.valueOf(calculateNumberOfCargos(points)));
-			firefox.shortLoading();
+			firefox.loading();
 
 			if(firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.PATHFINDER.getId()+"]")).getAttribute("data-status").equals("on")) {
 				firefox.get().findElement(By.name("explorer")).sendKeys("1");

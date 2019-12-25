@@ -38,13 +38,7 @@ public class BuildingService {
 		firefox.loading();
 		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
 		firefox.shortLoading();
-		
-		double energy = Double.parseDouble(firefox.get().findElement(By.id("resources_energy")).getAttribute("data-raw"));
-		double metallStorage = processStorage(firefox.get().findElement(By.id("metal_box")).getAttribute("title"));
-		double kristallStorage = processStorage(firefox.get().findElement(By.id("crystal_box")).getAttribute("title"));
-		double deuteriumStorage = processStorage(firefox.get().findElement(By.id("deuterium_box")).getAttribute("title"));
-		Resources storage = new Resources(metallStorage, kristallStorage, deuteriumStorage, energy); 
-		
+
 		parseMines(mines, powerPlants, storages, building);
 		
 		if(!building.get()) {
@@ -52,10 +46,25 @@ public class BuildingService {
 			firefox.shortLoading();
 		
 			parseFacilities(facilities, building);
-			chooseWhatToBuild(mines, powerPlants, storages, facilities, building, energy, storage);
+			chooseWhatToBuild(mines, powerPlants, storages, facilities, building, parseResources(), parseStorage());
 		}
 		
 		return building.get();
+	}
+	
+	private Resources parseStorage() {
+		double metallStorage = processStorage(firefox.get().findElement(By.id("metal_box")).getAttribute("title"));
+		double kristallStorage = processStorage(firefox.get().findElement(By.id("crystal_box")).getAttribute("title"));
+		double deuteriumStorage = processStorage(firefox.get().findElement(By.id("deuterium_box")).getAttribute("title"));
+		return new Resources(metallStorage, kristallStorage, deuteriumStorage, 0);
+	}
+	
+	private Resources parseResources() {
+		double energy = Double.parseDouble(firefox.get().findElement(By.id("resources_energy")).getAttribute("data-raw"));
+		double metall = Double.parseDouble(firefox.get().findElement(By.id("resources_metal")).getAttribute("data-raw"));
+		double kristall = Double.parseDouble(firefox.get().findElement(By.id("resources_crystal")).getAttribute("data-raw"));
+		double deuterium = Double.parseDouble(firefox.get().findElement(By.id("resources_deuterium")).getAttribute("data-raw"));
+		return new Resources(metall, kristall, deuterium, energy);
 	}
 
 	private void parseFacilities(ArrayList<Technology> facilities, AtomicBoolean building) {
@@ -66,8 +75,9 @@ public class BuildingService {
 				building.set(true);
 
 			if(!status.equals(StatusEnum.OFF.getValue())) {
-				if (id == TechnologyEnum.RAUMSCHIFFSWERFT.getId() || id == TechnologyEnum.RAKETENSILO.getId() || id == TechnologyEnum.NANITENFABRIK.getId() || id == TechnologyEnum.TERRAFORMER.getId() || 
+				if (id == TechnologyEnum.RAKETENSILO.getId() || id == TechnologyEnum.NANITENFABRIK.getId() || id == TechnologyEnum.TERRAFORMER.getId() || 	
 					(id == TechnologyEnum.FORSCHUNGSLABOR.getId() && status.equals(StatusEnum.ON.getValue())) || 
+					(id == TechnologyEnum.RAUMSCHIFFSWERFT.getId() && status.equals(StatusEnum.ON.getValue()) && Integer.parseInt(technology.findElement(By.className("level")).getAttribute("data-value")) < 12) ||
 					(id == TechnologyEnum.ROBOTERFABRIK.getId() && Integer.parseInt(technology.findElement(By.className("level")).getAttribute("data-value")) < 10)) {
 					parseTechnology(facilities, technology, id, status);
 				}
@@ -95,28 +105,43 @@ public class BuildingService {
 		});
 	}
 
-	private void chooseWhatToBuild(ArrayList<Technology> mines, ArrayList<Technology> powerPlants, ArrayList<Technology> storages, ArrayList<Technology> facilities, 
-		AtomicBoolean building, double energy, Resources storage) throws InterruptedException {
+	private void chooseWhatToBuild(ArrayList<Technology> mines, ArrayList<Technology> powerPlants, ArrayList<Technology> storages, ArrayList<Technology> facilities, AtomicBoolean building, 
+		Resources resources, Resources storage) throws InterruptedException {
 		if(!building.get()) {
-			if(energy < 0) {
+			if(storage.getDeuterium() < resources.getDeuterium()) {
+				resourcesOverflow(storages, building, TechnologyEnum.DEUTERIUMTANK.getId());
+			} else if(storage.getKristall() < resources.getKristall()) {
+				resourcesOverflow(storages, building, TechnologyEnum.KRISTALLSPEICHER.getId());
+			} else if(storage.getMetall() < resources.getMetall()) {
+				resourcesOverflow(storages, building, TechnologyEnum.METALLSPEICHER.getId());
+			} else if(resources.getEnergie() < 0) {
 				firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
 				firefox.shortLoading();
 				
 				powerPlants.sort(Comparator.comparingDouble(Technology::getTotalCost));
-				upTechnology(powerPlants.get(0), storage, storages, building);
+				upTechnology(powerPlants.get(0), building);
 			} else {
 				mines.sort(Comparator.comparingDouble(Technology::getTotalCost));		
 				facilities.sort(Comparator.comparingDouble(Technology::getTotalCost));	
 				if(!facilities.isEmpty() && facilities.get(0).getTotalCost() * 2 < mines.get(0).getTotalCost()) {
-					upTechnology(facilities.get(0), storage, storages, building);
+					upTechnology(facilities.get(0), building);
 				} else {
 					firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
 					firefox.shortLoading();
 					
-					upTechnology(mines.get(0), storage, storages, building);
+					upTechnology(mines.get(0), building);
 				}	
 			}
 		}
+	}
+
+	private void resourcesOverflow(ArrayList<Technology> storages, AtomicBoolean building, int id) throws InterruptedException {
+		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
+		firefox.shortLoading();
+		
+		Optional<Technology> optional = storages.stream().filter(ss -> ss.getId() == id).findFirst();
+		if(optional.isPresent()) 
+			upTechnology(optional.get(), building);
 	}
 
 	private void parseTechnology(ArrayList<Technology> mines, WebElement technology, int id, String status) {
@@ -126,33 +151,11 @@ public class BuildingService {
 		mines.add(techno);
 	}
 	
-	private void upTechnology(Technology tech, Resources storage, ArrayList<Technology> storages, AtomicBoolean building) throws InterruptedException {
-		if(tech.getCost().getMetall() > storage.getMetall()) {
-			Optional<Technology> optional = storages.stream().filter(ss -> ss.getId() == TechnologyEnum.METALLSPEICHER.getId()).findFirst();
-			if(optional.isPresent()) 
-				tech = optional.get();
-		} else if(tech.getCost().getKristall() > storage.getKristall()) {
-			Optional<Technology> optional = storages.stream().filter(ss -> ss.getId() == TechnologyEnum.KRISTALLSPEICHER.getId()).findFirst();
-			if(optional.isPresent()) 
-				tech = optional.get();
-		} else if(tech.getCost().getDeuterium() > storage.getDeuterium()) {
-			Optional<Technology> optional = storages.stream().filter(ss -> ss.getId() == TechnologyEnum.DEUTERIUMTANK.getId()).findFirst();
-			if(optional.isPresent()) 
-				tech = optional.get();
-		}
-
-		if(tech.getStatus().equals(StatusEnum.ON.getValue())) {
-			upTechnology(tech);
-			building.set(true);
-		}
-	}
-	
-	private void upTechnology(Technology tech) throws InterruptedException {			
-		logger.info("I order to work on >>>>> " + TechnologyEnum.getById(tech.getId()).name() + " at current level >>>>> " + tech.getLevel());
-		
+	private void upTechnology(Technology tech, AtomicBoolean building) throws InterruptedException {
 		if(tech.getStatus().equals(StatusEnum.ON.getValue())) {
 			firefox.get().findElement(By.xpath("//li[@data-technology="+tech.getId()+"]")).findElement(By.tagName("button")).click();
 			firefox.shortLoading();
+			building.set(true);
 		}
 	}
 

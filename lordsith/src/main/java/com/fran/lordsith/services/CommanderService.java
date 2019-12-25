@@ -33,7 +33,16 @@ public class CommanderService {
 	
 	Logger log = LoggerFactory.getLogger(CommanderService.class);
 	
+	private int exhaustion = 0;
+	
 	public void command() throws InterruptedException {
+		if(exhaustion >=4) {
+			log.info("Bring me a new team!");
+			firefox.restart();
+		} else {
+			exhaustion++;
+		}
+		
 		if(!loginService.isLogged()) {
 			loginService.login();
 		}

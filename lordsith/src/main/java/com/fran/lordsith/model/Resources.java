@@ -32,28 +32,35 @@ public class Resources {
 		this.deuterium = deuterium;
 		this.energie = energie;
 	}
-	
+
 	public double getMetall() {
 		return metall;
 	}
+
 	public void setMetall(double metall) {
 		this.metall = metall;
 	}
+
 	public double getKristall() {
 		return kristall;
 	}
+
 	public void setKristall(double kristall) {
 		this.kristall = kristall;
 	}
+
 	public double getDeuterium() {
 		return deuterium;
 	}
+
 	public void setDeuterium(double deuterium) {
 		this.deuterium = deuterium;
 	}
+
 	public double getEnergie() {
 		return energie;
 	}
+
 	public void setEnergie(double energie) {
 		this.energie = energie;
 	}
