@@ -5,13 +5,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class DefenseService {
 	/*
-	 * 960 Misils
-	 * 960 Small lasers
-	 * 96 Big lassers
-	 * 96 Ionics
-	 * 48 Gauss
-	 * 24 Plasmas
-	 * 
+	 * 1920 Misils
+	 * 1920 Small lasers
+	 * 192 Big lassers
+	 * 192 Ionics
+	 * 96 Gauss
+	 * 48 Plasmas
 	 */
 	
 	public long calculateNumberOfDefense(int baseNumber, long points) {

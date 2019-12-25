@@ -38,7 +38,13 @@ public enum TechnologyEnum {
 	ASTROPHYSIK(124, TypeEnum.TECHNOLOGY, new Resources(4000,8000,4000),2),
 	GROSSER_TRANSPORTER(203, TypeEnum.SPACESHIPS, new Resources(6000,6000),1),
 	SPIONAGESONDE(210, TypeEnum.SPACESHIPS, new Resources(6000,6000),1),
-	PATHFINDER(219, TypeEnum.SPACESHIPS, new Resources(8000,15000,8000),1);
+	PATHFINDER(219, TypeEnum.SPACESHIPS, new Resources(8000,15000,8000),1),
+	RAKETENWERFER(402, TypeEnum.DEFENSE, new Resources(2000), 1),
+	LEICHTESLASERGESCHUTZ(402, TypeEnum.DEFENSE, new Resources(1500, 500), 1),
+	SCHWERESLASERGESCHUTZ(403, TypeEnum.DEFENSE, new Resources(6000, 2000), 1),
+	GAUSSKANONE(404, TypeEnum.DEFENSE, new Resources(20000, 15000,2000), 1),
+	IONENGESCHUZ(405, TypeEnum.DEFENSE, new Resources(5000,3000),1),
+	PLASMAWERFER(406, TypeEnum.DEFENSE, new Resources(50000,50000,30000), 1);
 
 	private int id;
 	private Resources cost;

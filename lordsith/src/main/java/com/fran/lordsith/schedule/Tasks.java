@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.fran.lordsith.services.CommanderService;
-import com.fran.lordsith.services.FirefoxClient;
 import com.fran.lordsith.services.LoginService;
 
 
@@ -21,9 +20,6 @@ public class Tasks {
 	@Autowired @Lazy
 	private LoginService loginService;
 	
-	@Autowired @Lazy
-	private FirefoxClient firefox;
-	
 	Logger log = LoggerFactory.getLogger(Tasks.class);
 
 	@Scheduled(cron = "3 */15 6-21 * * *")
@@ -35,14 +31,14 @@ public class Tasks {
 	@Scheduled(cron = "0 0 0 * * *")
 	public void midnight() throws InterruptedException {
 		log.info("Midnight");
-		firefox.restart();
+		commanderService.maxExhaustion();
 		commanderService.command();
 	}
 	
 	@Scheduled(cron = "0 0 3 * * *")
 	public void devilTime() throws InterruptedException {
 		log.info("DevilTime");
-		firefox.restart();
+		commanderService.maxExhaustion();
 		commanderService.command();
 	}
 

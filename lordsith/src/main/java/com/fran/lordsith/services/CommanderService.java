@@ -36,9 +36,10 @@ public class CommanderService {
 	private int exhaustion = 0;
 	
 	public void command() throws InterruptedException {
-		if(exhaustion >=4) {
+		if(exhaustion >= 4) {
 			log.info("Bring me a new team!");
 			firefox.restart();
+			exhaustion=0;
 		} else {
 			exhaustion++;
 		}
@@ -67,4 +68,7 @@ public class CommanderService {
 		log.info("That's all");
 	}
 	
+	public void maxExhaustion() {
+		exhaustion = 10;
+	}
 }
