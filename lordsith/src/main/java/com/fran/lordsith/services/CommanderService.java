@@ -31,6 +31,9 @@ public class CommanderService {
 	@Autowired @Lazy
 	private FirefoxClient firefox;
 	
+	@Autowired @Lazy
+	private DefenseService defenseService;
+	
 	Logger log = LoggerFactory.getLogger(CommanderService.class);
 	
 	private int exhaustion = 0;
@@ -61,6 +64,7 @@ public class CommanderService {
 				if(i==0) {
 					hangarService.buildPathfinderFleet(loginService.getPoints());
 				}
+				defenseService.buildDefenses(i, loginService.getPoints());
 			}
 			firefox.shortLoading();
 		}

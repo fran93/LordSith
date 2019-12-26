@@ -6,6 +6,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.interactions.Actions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ public class FirefoxClient {
 		FirefoxOptions options = new FirefoxOptions();
 		options.setHeadless(headlessMode);
 		driver = new FirefoxDriver(options);
+		driver.manage().window().maximize();
 	}
 
 	public WebDriver get() {
@@ -31,6 +33,10 @@ public class FirefoxClient {
 	public void executeJavascript(String script) {
 		JavascriptExecutor js =  (JavascriptExecutor)driver;
 		js.executeScript(script, new Object[0]);
+	}
+	
+	public Actions getActions() {
+		return new Actions(driver);
 	}
 	
 	public void shortLoading() throws InterruptedException {
