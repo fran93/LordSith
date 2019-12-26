@@ -11,15 +11,18 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.fran.lordsith.enums.MenuEnum;
+import com.fran.lordsith.enums.StatusEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
 
 @Service
-public class ExpeditionService {
+public class ManageFleetService {
 
 	@Autowired @Lazy
 	private FirefoxClient firefox;
 	
-	Logger logger = LoggerFactory.getLogger(ExpeditionService.class);
+	Logger log = LoggerFactory.getLogger(ManageFleetService.class);
+	
+	private static final String LI_DATA_TECHNOLOGY = "//li[@data-technology=";
 	
 	public int calculateNumberOfCargos(long points) {
 		if(points < 100000) {
@@ -45,39 +48,52 @@ public class ExpeditionService {
 		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.FLOTTE.getId()).click();
 		firefox.shortLoading();
 				
-		if(isExpeditionAvailable() && firefox.get().findElements(By.className("icon_warning")).isEmpty() 
-			&& firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.GROSSER_TRANSPORTER.getId()+"]")).getAttribute("data-status").equals("on")) {
-
+		if(isExpeditionAvailable() && isThereAFleet() && isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId())) {
 			firefox.get().findElement(By.name("transporterLarge")).sendKeys(String.valueOf(calculateNumberOfCargos(points)));
 			firefox.loading();
 
-			if(firefox.get().findElement(By.xpath("//li[@data-technology="+TechnologyEnum.PATHFINDER.getId()+"]")).getAttribute("data-status").equals("on")) {
+			if(isStatusOn(TechnologyEnum.PATHFINDER.getId())) {
 				firefox.get().findElement(By.name("explorer")).sendKeys("1");
 				firefox.loading();
 			}
 			
-			if(firefox.get().findElement(By.id("continueToFleet2")).getAttribute("class").trim().endsWith("on")) {
-				firefox.get().findElement(By.id("continueToFleet2")).click();
-				firefox.loading();
+			if(canContinue("continueToFleet2")) {
+				weiterWeiter("continueToFleet2");
 				
 				firefox.get().findElement(By.id("position")).sendKeys("16");
 				firefox.loading();
 				
-				if(firefox.get().findElement(By.id("continueToFleet3")).getAttribute("class").trim().endsWith("on")) {
-					firefox.get().findElement(By.id("continueToFleet3")).click();
-					firefox.loading();
+				if(canContinue("continueToFleet3")) {
+					weiterWeiter("continueToFleet3");
 
-					if(firefox.get().findElement(By.id("sendFleet")).getAttribute("class").trim().endsWith("on")) {
-						firefox.get().findElement(By.id("sendFleet")).click();
-						firefox.shortLoading();
+					if(canContinue("sendFleet")) {
+						weiterWeiter("sendFleet");
 						
-						logger.info("I order to send an expedition!");
+						log.info("I order to send an expedition!");
 					}
 				}
 			}
 			
 
 		}
+	}
+
+	private boolean canContinue(String id) {
+		return firefox.get().findElement(By.id(id)).getAttribute("class").trim().endsWith("on");
+	}
+	
+	private void weiterWeiter(String id) throws InterruptedException {
+		firefox.executeJavascript("$('#"+id+"').click();");
+		firefox.loading();
+	}
+
+	private boolean isThereAFleet() {
+		return firefox.get().findElements(By.className("icon_warning")).isEmpty();
+	}
+	
+	
+	private boolean isStatusOn(int id) {
+		return firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY+id+"]")).getAttribute("data-status").equals(StatusEnum.ON.getValue());
 	}
 	
 	private boolean isExpeditionAvailable() {
@@ -94,5 +110,6 @@ public class ExpeditionService {
 		
 		return currentSlots < maxSlots && currentExpeditions < maxExpeditions;
 	}
+
 	
 }

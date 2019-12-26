@@ -23,7 +23,7 @@ public class CommanderService {
 	private ResearchService researchService;
 	
 	@Autowired @Lazy
-	private ExpeditionService expeditionService;
+	private ManageFleetService expeditionService;
 	
 	@Autowired @Lazy
 	private HangarService hangarService;

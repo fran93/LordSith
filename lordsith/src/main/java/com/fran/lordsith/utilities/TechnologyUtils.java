@@ -23,10 +23,10 @@ public class TechnologyUtils {
 	
 	private static void calculateCost(Technology techno, int currentLevel, double factorMultiplier) {
 		if(currentLevel < techno.getLevel()) {
-			techno.getCost().setMetall(Double.valueOf(techno.getCost().getMetall() * factorMultiplier).longValue());
-			techno.getCost().setKristall(Double.valueOf(techno.getCost().getKristall() * factorMultiplier).longValue());
-			techno.getCost().setDeuterium(Double.valueOf(techno.getCost().getDeuterium() * factorMultiplier).longValue());
-			techno.getCost().setEnergie(Double.valueOf(techno.getCost().getEnergie() * factorMultiplier).longValue());
+			techno.getCost().setMetall(techno.getCost().getMetall() * factorMultiplier);
+			techno.getCost().setKristall(techno.getCost().getKristall() * factorMultiplier);
+			techno.getCost().setDeuterium(techno.getCost().getDeuterium() * factorMultiplier);
+			techno.getCost().setEnergie(techno.getCost().getEnergie() * factorMultiplier);
 			currentLevel++;
 			calculateCost(techno, currentLevel, factorMultiplier);
 		}
