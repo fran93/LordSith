@@ -40,7 +40,7 @@ public enum TechnologyEnum {
 	SPIONAGESONDE(210, TypeEnum.SPACESHIPS, new Resources(6000,6000),1),
 	ZERSTORER(213, TypeEnum.SPACESHIPS, new Resources(60000,5000,15000),1),
 	PATHFINDER(219, TypeEnum.SPACESHIPS, new Resources(8000,15000,8000),1),
-	RAKETENWERFER(402, TypeEnum.DEFENSE, new Resources(2000), 1),
+	RAKETENWERFER(401, TypeEnum.DEFENSE, new Resources(2000), 1),
 	LEICHTESLASERGESCHUTZ(402, TypeEnum.DEFENSE, new Resources(1500, 500), 1),
 	SCHWERESLASERGESCHUTZ(403, TypeEnum.DEFENSE, new Resources(6000, 2000), 1),
 	GAUSSKANONE(404, TypeEnum.DEFENSE, new Resources(20000, 15000,2000), 1),
