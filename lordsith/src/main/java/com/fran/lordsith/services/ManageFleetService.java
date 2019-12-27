@@ -26,21 +26,21 @@ public class ManageFleetService {
 	
 	public int calculateNumberOfCargos(long points) {
 		if(points < 100000) {
-			return 42;
+			return 300;
 		} else if(points < 1000000) {
-			return 125; 
+			return 700; 
 		} else if(points < 5000000) {
-			return 150; 
+			return 1000; 
 		} else if(points < 25000000) {
-			return 200; 
+			return 1400; 
 		} else if(points < 50000000) {
-			return 250; 
+			return 1800; 
 		} else if(points < 75000000) {
-			return 300; 
+			return 2100; 
 		} else if(points < 100000000) {
-			return 350; 
+			return 2400; 
 		} else {
-			return 400;
+			return 2900;
 		}
 	}
 	
@@ -54,6 +54,11 @@ public class ManageFleetService {
 
 			if(isStatusOn(TechnologyEnum.PATHFINDER.getId())) {
 				firefox.get().findElement(By.name("explorer")).sendKeys("1");
+				firefox.loading();
+			}
+			
+			if(isStatusOn(TechnologyEnum.ZERSTORER.getId())) {
+				firefox.get().findElement(By.name("destroyer")).sendKeys("1");
 				firefox.loading();
 			}
 			
@@ -76,6 +81,16 @@ public class ManageFleetService {
 			
 
 		}
+	}
+	
+	public void hunting() {	
+		int currentSystem = Integer.parseInt(firefox.get().findElement(By.id("system_input")).getAttribute("value"));
+		String [] slotValue = firefox.get().findElement(By.id("slotValue")).getText().split("/");
+		int freeSlots = Integer.parseInt(slotValue[1]) - Integer.parseInt(slotValue[0]);
+		//TODO move in the galaxy
+		//TODO recicle	expeditionDebrisSlotBox
+		//TODO attack
+		//TODO spy
 	}
 
 	private boolean canContinue(String id) {

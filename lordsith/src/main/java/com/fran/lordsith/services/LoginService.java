@@ -42,7 +42,10 @@ public class LoginService {
 
 	public void extractPoints() throws InterruptedException {
 		firefox.longLoading();
-		points = Long.parseLong(firefox.get().findElement(By.id("scoreContentField")).getText().split(" ")[0].replaceAll("\\.", ""));
+		String scoreContentField = firefox.get().findElement(By.id("scoreContentField")).getText();
+		if(!scoreContentField.isEmpty()) {
+			points = Long.parseLong(scoreContentField.split(" ")[0].replaceAll("\\.", ""));
+		}
 	}
 	
 	public boolean isLogged() {

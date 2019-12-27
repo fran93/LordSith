@@ -31,18 +31,23 @@ public class HangarService {
 		int desiredShips = expeditionService.calculateNumberOfCargos(points)/2;
 		long amountCargos = getAmount(TechnologyEnum.GROSSER_TRANSPORTER.getId());
 		long amountPath = getAmount(TechnologyEnum.PATHFINDER.getId());
+		long amountZerstorer = getAmount(TechnologyEnum.ZERSTORER.getId());
 		
 		if(isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId()) && amountCargos < desiredShips) {
 			build(TechnologyEnum.GROSSER_TRANSPORTER, desiredShips - amountCargos);
 		}
 		
 		if(isStatusOn(TechnologyEnum.PATHFINDER.getId()) && amountPath == 0) {
-			build(TechnologyEnum.PATHFINDER, 0);
+			build(TechnologyEnum.PATHFINDER, 1);
+		}
+		
+		if(isStatusOn(TechnologyEnum.ZERSTORER.getId()) && amountZerstorer == 0) {
+			build(TechnologyEnum.ZERSTORER, 1);
 		}
 	}
 	
 	public void buildPathfinderFleet(long points) throws InterruptedException {
-		int desiredShips = expeditionService.calculateNumberOfCargos(points)/2;
+		int desiredShips = expeditionService.calculateNumberOfCargos(points)/10;
 		long amountPath = getAmount(TechnologyEnum.PATHFINDER.getId());
 		
 		if(isStatusOn(TechnologyEnum.PATHFINDER.getId()) && amountPath < desiredShips) {

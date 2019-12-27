@@ -38,6 +38,10 @@ public class CommanderService {
 	
 	private int exhaustion = 0;
 	
+	/**
+	 * Bugs to fix here:
+	 * @throws InterruptedException
+	 */
 	public void command() throws InterruptedException {
 		if(exhaustion >= 4) {
 			log.info("Bring me a new team!");
