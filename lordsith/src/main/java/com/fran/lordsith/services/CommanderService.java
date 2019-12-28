@@ -63,7 +63,7 @@ public class CommanderService {
 			firefox.get().findElement(By.id(planetIds.get(i))).click();	
 			expeditionService.sendExpedition(loginService.getPoints());
 			if(isMainPlanet(i)) {
-				expeditionService.hunting();
+				expeditionService.scan();
 			}
 			
 			if(buildingService.buildMinesOrFacilities() && researchService.research()) {
