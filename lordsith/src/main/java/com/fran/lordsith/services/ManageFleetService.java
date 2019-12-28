@@ -235,7 +235,7 @@ public class ManageFleetService {
 	}
 	
 	private int numberOfShips(int id) {
-		return Integer.parseInt(firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY+id+"]")).findElement(By.className("amunt")).getAttribute("data-value"));
+		return Integer.parseInt(firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY+id+"]")).findElement(By.className("amount")).getAttribute("data-value"));
 	}
 	
 	private boolean isExpeditionAvailable() {
