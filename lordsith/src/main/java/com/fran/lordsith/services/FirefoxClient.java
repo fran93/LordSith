@@ -4,6 +4,7 @@ import javax.annotation.PostConstruct;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.interactions.Actions;
@@ -30,9 +31,9 @@ public class FirefoxClient {
 		return driver;
 	}
 	
-	public void executeJavascript(String script) {
-		JavascriptExecutor js =  (JavascriptExecutor)driver;
-		js.executeScript(script, new Object[0]);
+	public void jsClick(WebElement element) {
+		JavascriptExecutor executor =  (JavascriptExecutor)driver;
+		executor.executeScript("arguments[0].click();", element);
 	}
 	
 	public Actions getActions() {

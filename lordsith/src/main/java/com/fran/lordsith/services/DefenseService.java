@@ -89,7 +89,7 @@ public class DefenseService {
 		firefox.get().findElement(By.id("build_amount")).sendKeys(String.valueOf(quantity));
 		firefox.loading();
 		
-		firefox.get().findElement(By.className("upgrade")).click();
+		firefox.jsClick(firefox.get().findElement(By.className("upgrade")));
 		firefox.shortLoading();
 		
 		log.info("I order to build " + quantity + " " + defense.name());

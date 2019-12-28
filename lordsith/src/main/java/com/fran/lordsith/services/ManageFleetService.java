@@ -52,7 +52,7 @@ public class ManageFleetService {
 		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.FLOTTE.getId()).click();
 		firefox.shortLoading();
 				
-		if(isExpeditionAvailable() && isThereAFleet() && isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId())) {
+		if(isExpeditionAvailable() && isThereAFleet() && isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId()) && numberOfShips(TechnologyEnum.GROSSER_TRANSPORTER.getId()) > calculateNumberOfCargos(points)/2) {
 			firefox.get().findElement(By.name("transporterLarge")).sendKeys(String.valueOf(calculateNumberOfCargos(points)));
 			firefox.loading();
 
@@ -221,7 +221,7 @@ public class ManageFleetService {
 	}
 	
 	private void weiterWeiter(String id) throws InterruptedException {
-		firefox.executeJavascript("$('#"+id+"').click();");
+		firefox.jsClick(firefox.get().findElement(By.id(id)));
 		firefox.loading();
 	}
 
@@ -232,6 +232,10 @@ public class ManageFleetService {
 	
 	private boolean isStatusOn(int id) {
 		return firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY+id+"]")).getAttribute("data-status").equals(StatusEnum.ON.getValue());
+	}
+	
+	private int numberOfShips(int id) {
+		return Integer.parseInt(firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY+id+"]")).findElement(By.className("amunt")).getAttribute("data-value"));
 	}
 	
 	private boolean isExpeditionAvailable() {
