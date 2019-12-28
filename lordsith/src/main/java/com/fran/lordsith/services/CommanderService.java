@@ -62,10 +62,13 @@ public class CommanderService {
 		for(int i=0; i<planetIds.size(); i++) {
 			firefox.get().findElement(By.id(planetIds.get(i))).click();	
 			expeditionService.sendExpedition(loginService.getPoints());
+			if(isMainPlanet(i)) {
+				expeditionService.hunting();
+			}
 			
 			if(buildingService.buildMinesOrFacilities() && researchService.research()) {
 				hangarService.buildExpeditionFleet(loginService.getPoints());
-				if(i==0) {
+				if(isMainPlanet(i)) {
 					hangarService.buildPathfinderFleet(loginService.getPoints());
 				}
 				defenseService.buildDefenses(i, loginService.getPoints());
@@ -73,7 +76,18 @@ public class CommanderService {
 			firefox.shortLoading();
 		}
 		
+		returnToMainPlanet(planetIds);	
+		expeditionService.hunting();
+		
 		log.info("That's all");
+	}
+
+	private void returnToMainPlanet(List<String> planetIds) {
+		firefox.get().findElement(By.id(planetIds.get(0))).click();
+	}
+	
+	private boolean isMainPlanet(int i) {
+		return i==0;
 	}
 	
 	public void maxExhaustion() {

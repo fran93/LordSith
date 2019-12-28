@@ -1,5 +1,6 @@
 package com.fran.lordsith.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -23,6 +24,9 @@ public class ManageFleetService {
 	Logger log = LoggerFactory.getLogger(ManageFleetService.class);
 	
 	private static final String LI_DATA_TECHNOLOGY = "//li[@data-technology=";
+	private static final int MIN_CARGOS_TO_ATTACK = 10;
+	private int leftSystem;
+	private int rightSystem;
 	
 	public int calculateNumberOfCargos(long points) {
 		if(points < 100000) {
@@ -78,19 +82,138 @@ public class ManageFleetService {
 					}
 				}
 			}
-			
-
 		}
 	}
 	
-	public void hunting() {	
-		int currentSystem = Integer.parseInt(firefox.get().findElement(By.id("system_input")).getAttribute("value"));
+	public void hunting() throws InterruptedException {	
+		openMessages();
+		processMessages();
+		
+		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.GALAXIE.getId()).click();
+		firefox.shortLoading();
+		
+		int planetSystem = getCurrentSystem();
+		
+		while(getGalaxyFreeSlots() > 0) {
+			if(!(rightSystem > 0 && planetSystem == getCurrentSystem())) {
+				spy();
+			}
+			
+			if(rightSystem > 100 && leftSystem > 100) {
+				goToSystem(planetSystem);
+				rightSystem = 0;
+				leftSystem = 0;
+			} else if(rightSystem > 100) {
+				goLeft(planetSystem);
+			} else if(leftSystem > 100) {
+				goRight(planetSystem);
+			} else if(rightSystem == 0) {
+				goRight(planetSystem);
+			} else if(leftSystem >= rightSystem) {
+				goRight(planetSystem);
+			} else {
+				goLeft(planetSystem);
+			}
+		}
+		
+	}
+
+	private void goRight(int planetSystem) throws InterruptedException {
+		rightSystem++;
+		goToSystem(planetSystem + rightSystem);
+	}
+
+	private void goLeft(int planetSystem) throws InterruptedException {
+		leftSystem++;
+		goToSystem(planetSystem - leftSystem);
+	}
+	
+	private void goToSystem(int system) throws InterruptedException {
+		if(system > 499) {
+			system -= 499;
+		}
+		firefox.get().findElement(By.id("system_input")).sendKeys(String.valueOf(system));
+		firefox.get().findElement(By.id("system_input")).submit();
+		firefox.loading();
+	}
+
+	private int getCurrentSystem() {
+		return Integer.parseInt(firefox.get().findElement(By.id("system_input")).getAttribute("value"));
+	}
+
+	private void spy() throws InterruptedException {
+		for(WebElement inactive : firefox.get().findElements(By.className("inactive_filter"))) {
+			inactive.findElement(By.className("espionage")).click();
+			log.info("I order to spy!");
+			firefox.loading();
+		}
+	}
+
+	private int getGalaxyFreeSlots() {
 		String [] slotValue = firefox.get().findElement(By.id("slotValue")).getText().split("/");
-		int freeSlots = Integer.parseInt(slotValue[1]) - Integer.parseInt(slotValue[0]);
-		//TODO move in the galaxy
-		//TODO recicle	expeditionDebrisSlotBox
-		//TODO attack
-		//TODO spy
+		return Integer.parseInt(slotValue[1]) - Integer.parseInt(slotValue[0]);
+	}
+
+	private void processMessages() throws InterruptedException {
+		List<String> messagesIds = new ArrayList<>();
+		firefox.get().findElement(By.id("ui-id-16")).findElements(By.className("msg")).forEach(msg -> messagesIds.add(msg.getAttribute("data-msg-id")));
+	
+		for(String id: messagesIds) {	
+			WebElement message = firefox.get().findElement(By.xpath("//li[@data-msg-id="+id+"]"));
+			List<WebElement> rows = message.findElements(By.className("compacting"));
+			if(rows.size() >= 5) {
+				int necesaryFleet = getNecesaryFleet(rows);
+				String defenses = rows.get(4).findElement(By.className("tooltipRight")).getText().split(":")[1];
+
+				if(defenses.trim().equals("0") && necesaryFleet >= MIN_CARGOS_TO_ATTACK) {
+					message.findElement(By.className("icon_attack")).click();
+					firefox.loading();
+					
+					if(isFleetAvailable()) {
+						sendAttack(id, necesaryFleet);	
+					}
+				} else {
+					message.findElement(By.className("icon_refuse")).click();
+					log.info("I order to discard that objetive!");
+					firefox.loading();
+				}
+			}
+		}
+	}
+
+	private void sendAttack(String id, int necesaryFleet) throws InterruptedException {
+		firefox.get().findElement(By.name("transporterSmall")).sendKeys(String.valueOf(necesaryFleet));
+		firefox.shortLoading();
+		
+		if(canContinue("continueToFleet2")) {
+			weiterWeiter("continueToFleet2");							
+			if(canContinue("continueToFleet3")) {
+				weiterWeiter("continueToFleet3");
+				if(canContinue("sendFleet")) {
+					weiterWeiter("sendFleet");
+					
+					log.info("I order to send an attack!");
+					
+					openMessages();
+					
+					firefox.get().findElement(By.xpath("//li[@data-msg-id="+id+"]")).findElement(By.className("icon_refuse")).click();
+					firefox.loading();
+				}
+			}
+		}
+	}
+
+	private int getNecesaryFleet(List<WebElement> rows) {
+		StringBuilder title = new StringBuilder(rows.get(2).findElement(By.className("tooltipClose")).getAttribute("title"));	
+		title.delete(0, title.indexOf("am202="));
+		title.delete(0, 6);
+		title.delete(title.indexOf("\""), title.length());
+		return Integer.parseInt(title.toString());
+	}
+
+	private void openMessages() throws InterruptedException {
+		firefox.get().findElement(By.className("messages")).click();
+		firefox.shortLoading();
 	}
 
 	private boolean canContinue(String id) {
@@ -113,17 +236,24 @@ public class ManageFleetService {
 	
 	private boolean isExpeditionAvailable() {
 		List<WebElement> slotElements = firefox.get().findElement(By.id("slots")).findElements(By.className("fleft"));
-		String rawSlots = slotElements.get(0).getText();
 		String rawExpe = slotElements.get(1).getText();
-		String splitedSlots = rawSlots.split(":")[1].trim();
 		String splitedExpeditions = rawExpe.split(":")[1].trim();
-		
-		int currentSlots = Integer.parseInt(splitedSlots.split("/")[0]);
-		int maxSlots = Integer.parseInt(splitedSlots.split("/")[1]);
+
 		int currentExpeditions = Integer.parseInt(splitedExpeditions.split("/")[0]);
 		int maxExpeditions = Integer.parseInt(splitedExpeditions.split("/")[1]);
 		
-		return currentSlots < maxSlots && currentExpeditions < maxExpeditions;
+		return isFleetAvailable() && currentExpeditions < maxExpeditions;
+	}
+	
+	private boolean isFleetAvailable() {
+		List<WebElement> slotElements = firefox.get().findElement(By.id("slots")).findElements(By.className("fleft"));
+		String rawSlots = slotElements.get(0).getText();
+		String splitedSlots = rawSlots.split(":")[1].trim();
+		
+		int currentSlots = Integer.parseInt(splitedSlots.split("/")[0]);
+		int maxSlots = Integer.parseInt(splitedSlots.split("/")[1]);
+		
+		return currentSlots < maxSlots;
 	}
 
 	

@@ -8,7 +8,8 @@ public enum MenuEnum {
 	FORSCHUNG(5),
 	SCHIFFSWERFT(6),
 	VERTEIDIGUNG(7),
-	FLOTTE(8);
+	FLOTTE(8),
+	GALAXIE(9);
 	
 	private int id;
 	
