@@ -87,7 +87,7 @@ public class DefenseService {
 	
 	private boolean isStatusOn(int id) {
 		WebElement defense  = firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY+id+"]"));
-		return defense.getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !defense.findElements(By.className("targetamount")).isEmpty();
+		return defense.getAttribute("data-status").equals(StatusEnum.ON.getValue()) && defense.findElements(By.className("targetamount")).isEmpty();
 	}
 	
 	private void build(TechnologyEnum defense) throws InterruptedException {

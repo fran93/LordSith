@@ -62,7 +62,7 @@ public class HangarService {
 	
 	private boolean isStatusOn(int id) {
 		WebElement ship  = firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY+id+"]"));
-		return ship.getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !ship.findElements(By.className("targetamount")).isEmpty();
+		return ship.getAttribute("data-status").equals(StatusEnum.ON.getValue()) && ship.findElements(By.className("targetamount")).isEmpty();
 	}
 	
 	private void build(TechnologyEnum tech, long quantity) throws InterruptedException {
