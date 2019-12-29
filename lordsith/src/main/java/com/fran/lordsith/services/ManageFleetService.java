@@ -132,11 +132,13 @@ public class ManageFleetService {
 	    firefox.shortLoading();
 	    WebElement debris = firefox.get().findElement(By.id("debris16"));
 	    String debrisRecyclers = debris.findElement(By.className("debris-recyclers")).getText();
-	    int requiredRecycles = Integer.parseInt(debrisRecyclers.split(":")[1].trim());
-	    if (requiredRecycles >= 5) {
-		debris.findElement(By.tagName("a")).click();
-		log.info("I order to recycle that debris field");
-		firefox.shortLoading();
+	    if(!debrisRecyclers.trim().isEmpty()) {
+    	    	int requiredRecycles = Integer.parseInt(debrisRecyclers.split(":")[1].trim());
+    	    	if (requiredRecycles >= 5) {
+    	    	    debris.findElement(By.tagName("a")).click();
+    	    	    log.info("I order to recycle that debris field");
+    	    	    firefox.shortLoading();
+    	    	}
 	    }
 	}
     }
