@@ -79,7 +79,7 @@ public class HangarService {
 
 	if (!firefox.get().findElements(By.className("upgrade")).isEmpty()) {
 	    firefox.jsClick(firefox.get().findElement(By.className("upgrade")));
-	    firefox.shortLoading();
+	    firefox.loading();
 	}
 
 	log.info("I order to build " + quantity + " " + tech.name());
