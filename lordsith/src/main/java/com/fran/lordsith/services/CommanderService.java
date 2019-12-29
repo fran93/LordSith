@@ -60,6 +60,7 @@ public class CommanderService {
 		firefox.get().findElement(By.id("planetList")).findElements(By.className("smallplanet")).forEach(planet -> planetIds.add(planet.getAttribute("id")));
 		
 		for(int i=0; i<planetIds.size(); i++) {
+		    	firefox.shortLoading();
 			firefox.get().findElement(By.id(planetIds.get(i))).click();	
 			expeditionService.sendExpedition(loginService.getPoints());
 			if(isMainPlanet(i)) {
