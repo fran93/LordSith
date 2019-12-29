@@ -36,8 +36,9 @@ public class FirefoxClient {
 		executor.executeScript("arguments[0].click();", element);
 	}
 	
-	public Actions getActions() {
-		return new Actions(driver);
+	public void mouseOver(WebElement element) {
+		Actions mouseHover = new Actions(driver);
+		mouseHover.moveToElement(element).click().build().perform();
 	}
 	
 	public void shortLoading() throws InterruptedException {

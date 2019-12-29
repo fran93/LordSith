@@ -1,6 +1,7 @@
 package com.fran.lordsith.services;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +80,8 @@ public class DefenseService {
 	}
 	
 	private boolean isStatusOn(int id) {
-		return firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY+id+"]")).getAttribute("data-status").equals(StatusEnum.ON.getValue());
+		WebElement defense  = firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY+id+"]"));
+		return defense.getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !defense.findElements(By.className("targetamount")).isEmpty();
 	}
 	
 	private void build(TechnologyEnum defense, long quantity) throws InterruptedException {

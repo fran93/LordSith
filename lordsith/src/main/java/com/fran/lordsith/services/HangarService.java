@@ -1,6 +1,7 @@
 package com.fran.lordsith.services;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,8 @@ public class HangarService {
 	}
 	
 	private boolean isStatusOn(int id) {
-		return firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY+id+"]")).getAttribute("data-status").equals(StatusEnum.ON.getValue());
+		WebElement ship  = firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY+id+"]"));
+		return ship.getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !ship.findElements(By.className("targetamount")).isEmpty();
 	}
 	
 	private void build(TechnologyEnum tech, long quantity) throws InterruptedException {
