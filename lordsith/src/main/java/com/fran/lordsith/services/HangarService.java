@@ -67,7 +67,7 @@ public class HangarService {
 	boolean isInQueue = firefox.get().findElements(By.className("queuePic")).stream().anyMatch(pic -> pic.getAttribute("alt").trim().endsWith("_"+id));
 	
 	WebElement defense = firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + id + "]"));
-	return defense.getAttribute("data-status").equals(StatusEnum.ON.getValue()) && isInQueue;
+	return defense.getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !isInQueue;
     }
 
     private void build(TechnologyEnum tech, long quantity) throws InterruptedException {
