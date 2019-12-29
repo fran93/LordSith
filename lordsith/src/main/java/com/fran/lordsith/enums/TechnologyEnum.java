@@ -45,7 +45,10 @@ public enum TechnologyEnum {
 	SCHWERESLASERGESCHUTZ(403, TypeEnum.DEFENSE, new Resources(6000, 2000), 1),
 	GAUSSKANONE(404, TypeEnum.DEFENSE, new Resources(20000, 15000,2000), 1),
 	IONENGESCHUZ(405, TypeEnum.DEFENSE, new Resources(5000,3000),1),
-	PLASMAWERFER(406, TypeEnum.DEFENSE, new Resources(50000,50000,30000), 1);
+	PLASMAWERFER(406, TypeEnum.DEFENSE, new Resources(50000,50000,30000), 1),
+	KLEINE_SCHILDKUPPEL(407, TypeEnum.DEFENSE, new Resources(10000,10000), 1),
+	GROSSE_SCHILDKUPPEL(408, TypeEnum.DEFENSE, new Resources(50000,50000), 1),
+	ABFANGRAKETE(502, TypeEnum.DEFENSE, new Resources(8000,0,2000), 1);
 
 	private int id;
 	private Resources cost;

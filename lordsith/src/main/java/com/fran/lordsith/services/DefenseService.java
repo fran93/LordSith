@@ -60,18 +60,24 @@ public class DefenseService {
 		long amountPlasmaWerfer = getAmount(TechnologyEnum.PLASMAWERFER.getId());
 		
 		if(isStatusOn(TechnologyEnum.RAKETENWERFER.getId()) && desiredRaketenwerfer > amountRaketenwerfer) {
-			build(TechnologyEnum.RAKETENWERFER, desiredRaketenwerfer - amountRaketenwerfer);
+		    build(TechnologyEnum.RAKETENWERFER, desiredRaketenwerfer - amountRaketenwerfer);
 		} else if(isStatusOn(TechnologyEnum.LEICHTESLASERGESCHUTZ.getId()) && desiredLeichtesLaser > amountLeichtesLaser) {
-			build(TechnologyEnum.LEICHTESLASERGESCHUTZ, desiredLeichtesLaser - amountLeichtesLaser);
+		    build(TechnologyEnum.LEICHTESLASERGESCHUTZ, desiredLeichtesLaser - amountLeichtesLaser);
 		} else if(isStatusOn(TechnologyEnum.SCHWERESLASERGESCHUTZ.getId()) && desiredSchweresLaser > amountSchweresLaser) {
-			build(TechnologyEnum.SCHWERESLASERGESCHUTZ, desiredSchweresLaser - amountSchweresLaser);
+		    build(TechnologyEnum.SCHWERESLASERGESCHUTZ, desiredSchweresLaser - amountSchweresLaser);
 		} else if(isStatusOn(TechnologyEnum.IONENGESCHUZ.getId()) && desiredIonenGeschuz > amountIonenGeschuz) {
-			build(TechnologyEnum.IONENGESCHUZ, desiredIonenGeschuz - amountIonenGeschuz);
+		    build(TechnologyEnum.IONENGESCHUZ, desiredIonenGeschuz - amountIonenGeschuz);
 		} else if(isStatusOn(TechnologyEnum.GAUSSKANONE.getId()) && desiredGaussKanone > amountGaussKanone) {
-			build(TechnologyEnum.GAUSSKANONE, desiredGaussKanone - amountGaussKanone);
+		    build(TechnologyEnum.GAUSSKANONE, desiredGaussKanone - amountGaussKanone);
 		} else if(isStatusOn(TechnologyEnum.PLASMAWERFER.getId()) && desiredPlasmaWerfer > amountPlasmaWerfer) {
-			build(TechnologyEnum.PLASMAWERFER, desiredPlasmaWerfer - amountPlasmaWerfer);
-		} 
+		    build(TechnologyEnum.PLASMAWERFER, desiredPlasmaWerfer - amountPlasmaWerfer);
+		} else if(isStatusOn(TechnologyEnum.KLEINE_SCHILDKUPPEL.getId())) {
+		    build(TechnologyEnum.KLEINE_SCHILDKUPPEL);
+		} else if(isStatusOn(TechnologyEnum.GROSSE_SCHILDKUPPEL.getId())) {
+		    build(TechnologyEnum.GROSSE_SCHILDKUPPEL);
+		} else if(isStatusOn(TechnologyEnum.ABFANGRAKETE.getId())) {
+		    build(TechnologyEnum.ABFANGRAKETE, 5);
+		}
 		
 	}
 	
@@ -82,6 +88,16 @@ public class DefenseService {
 	private boolean isStatusOn(int id) {
 		WebElement defense  = firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY+id+"]"));
 		return defense.getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !defense.findElements(By.className("targetamount")).isEmpty();
+	}
+	
+	private void build(TechnologyEnum defense) throws InterruptedException {
+		firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY+defense.getId()+"]")).click();
+		firefox.shortLoading();
+
+		firefox.jsClick(firefox.get().findElement(By.className("upgrade")));
+		firefox.shortLoading();
+		
+		log.info("I order to build " + defense.name());
 	}
 	
 	private void build(TechnologyEnum defense, long quantity) throws InterruptedException {
