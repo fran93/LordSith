@@ -64,7 +64,7 @@ public class HangarService {
     }
 
     private boolean isStatusOn(int id) {
-	boolean isInQueue = firefox.get().findElements(By.className("queuePic")).stream().noneMatch(pic -> pic.getAttribute("alt").trim().endsWith("_"+id));
+	boolean isInQueue = firefox.get().findElements(By.className("queuePic")).stream().anyMatch(pic -> pic.getAttribute("alt").trim().endsWith("_"+id));
 	
 	WebElement defense = firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + id + "]"));
 	return defense.getAttribute("data-status").equals(StatusEnum.ON.getValue()) && isInQueue;
