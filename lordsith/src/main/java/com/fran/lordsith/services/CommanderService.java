@@ -23,7 +23,7 @@ public class CommanderService {
 	private ResearchService researchService;
 	
 	@Autowired @Lazy
-	private ManageFleetService expeditionService;
+	private ManageFleetService manageFleetService;
 	
 	@Autowired @Lazy
 	private HangarService hangarService;
@@ -33,6 +33,9 @@ public class CommanderService {
 	
 	@Autowired @Lazy
 	private DefenseService defenseService;
+	
+	@Autowired @Lazy
+	private HandlerService handlerService;
 	
 	Logger log = LoggerFactory.getLogger(CommanderService.class);
 	
@@ -62,15 +65,18 @@ public class CommanderService {
 		for(int i=0; i<planetIds.size(); i++) {
 		    	firefox.shortLoading();
 			firefox.get().findElement(By.id(planetIds.get(i))).click();	
-			expeditionService.sendExpedition(loginService.getPoints());
+			manageFleetService.sendExpedition(loginService.getPoints());
+			
 			if(isMainPlanet(i)) {
-				expeditionService.scan();
+			    manageFleetService.scan();
 			}
+			handlerService.scrapFleet();
 			
 			if(buildingService.buildMinesOrFacilities() && researchService.research()) {
 				hangarService.buildExpeditionFleet(loginService.getPoints());
 				if(isMainPlanet(i)) {
 					hangarService.buildPathfinderFleet(loginService.getPoints());
+					hangarService.buildHuntingFleet();
 				}
 				defenseService.buildDefenses(i, loginService.getPoints());
 			}
@@ -78,7 +84,7 @@ public class CommanderService {
 		}
 		
 		returnToMainPlanet(planetIds);	
-		expeditionService.hunting();
+		manageFleetService.hunting();
 		
 		log.info("That's all");
 	}

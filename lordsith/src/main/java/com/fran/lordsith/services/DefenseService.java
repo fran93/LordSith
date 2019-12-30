@@ -16,8 +16,8 @@ import com.fran.lordsith.enums.TechnologyEnum;
 public class DefenseService {
 
     private static final String LI_DATA_TECHNOLOGY = "//li[@data-technology=";
-    private static final int BASE_RAKETENWERFER = 1920;
-    private static final int BASE_LEICHTESLASERGESCHUTZ = 1920;
+    private static final int BASE_RAKETENWERFER = 9600;
+    private static final int BASE_LEICHTESLASERGESCHUTZ = 9600;
     private static final int BASE_SCHWERESLASERGESCHUTZ = 192;
     private static final int BASE_IONENGESCHUZ = 192;
     private static final int BASE_GAUSSKANONE = 96;
@@ -32,10 +32,12 @@ public class DefenseService {
     public long calculateNumberOfDefense(int baseNumber, long points) {
 	if (points < 50000) {
 	    return 0;
-	} else if (points < 500000) {
+	} else if (points < 100000) {
 	    return (long) (baseNumber * 0.25);
-	} else if (points < 1000000) {
+	} else if (points < 500000) {
 	    return (long) (baseNumber * 0.50);
+	} else if (points < 1000000) {
+	    return (long) (baseNumber * 0.75);
 	} else {
 	    return (points / 1000000) * baseNumber;
 	}

@@ -57,6 +57,23 @@ public class HangarService {
 	    build(TechnologyEnum.PATHFINDER, desiredShips - amountPath);
 	}
     }
+    
+    public void buildHuntingFleet() throws InterruptedException {
+	long amountSpionageSonde = getAmount(TechnologyEnum.SPIONAGESONDE.getId());
+	int desiredShips = 25;
+	
+	if (isStatusOn(TechnologyEnum.SPIONAGESONDE.getId()) && amountSpionageSonde < desiredShips) {
+	    build(TechnologyEnum.SPIONAGESONDE, desiredShips - amountSpionageSonde);
+	}
+	
+	
+	long amountKleiner = getAmount(TechnologyEnum.KLEINER_TRANSPORTER.getId());
+	desiredShips = 50;
+	
+	if (isStatusOn(TechnologyEnum.KLEINER_TRANSPORTER.getId()) && amountKleiner < desiredShips) {
+	    build(TechnologyEnum.KLEINER_TRANSPORTER, desiredShips - amountKleiner);
+	}
+    }
 
     private long getAmount(int id) {
 	return Long.parseLong(firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + id + "]"))
