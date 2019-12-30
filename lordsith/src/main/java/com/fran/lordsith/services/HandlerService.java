@@ -33,6 +33,9 @@ public class HandlerService {
 	
 	if(!firefox.get().findElement(By.id("js_scrapScrapIT")).getAttribute("class").contains("disabled")) {
 	    firefox.get().findElement(By.id("js_scrapScrapIT")).click();
+	    firefox.loading();
+	    
+	    firefox.get().findElement(By.className("yes")).click();
 	    firefox.shortLoading();
 	    
 	    log.info("Scraping fleet");
