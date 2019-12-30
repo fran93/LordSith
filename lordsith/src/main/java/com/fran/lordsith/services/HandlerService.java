@@ -19,7 +19,7 @@ public class HandlerService {
     Logger log = LoggerFactory.getLogger(HandlerService.class);
     
     public void scrapFleet() throws InterruptedException {
-	firefox.get().findElements(By.className("menubutton")).get(MenuEnum.SCHIFFSWERFT.getId()).click();
+	firefox.get().findElements(By.className("menubutton")).get(MenuEnum.HANDLER.getId()).click();
 	firefox.shortLoading();
 	
 	firefox.get().findElement(By.id("js_traderScrap")).click();
