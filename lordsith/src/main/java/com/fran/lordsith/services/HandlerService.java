@@ -23,12 +23,12 @@ public class HandlerService {
 	firefox.shortLoading();
 	
 	firefox.get().findElement(By.id("js_traderScrap")).click();
-	firefox.shortLoading();
+	firefox.loading();
 	
-	firefox.get().findElement(By.id("button204")).click();
-	firefox.get().findElement(By.id("button205")).click();
-	firefox.get().findElement(By.id("button207")).click();
-	firefox.get().findElement(By.id("button211")).click();
+	clickScrap("button204");
+	clickScrap("button205");
+	clickScrap("button207");
+	clickScrap("button211");
 	firefox.shortLoading();
 	
 	if(!firefox.get().findElement(By.id("js_scrapScrapIT")).getAttribute("class").contains("disabled")) {
@@ -39,6 +39,12 @@ public class HandlerService {
 	    firefox.shortLoading();
 	    
 	    log.info("Scraping fleet");
+	}
+    }
+    
+    private void clickScrap(String id) {
+	if(firefox.get().findElement(By.id(id)).getAttribute("class").endsWith("on")){
+	    firefox.get().findElement(By.id(id)).click();
 	}
     }
 }
