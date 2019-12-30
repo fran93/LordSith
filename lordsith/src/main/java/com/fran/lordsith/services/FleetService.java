@@ -16,13 +16,13 @@ import com.fran.lordsith.enums.StatusEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
 
 @Service
-public class ManageFleetService {
+public class FleetService {
 
     @Autowired
     @Lazy
     private FirefoxClient firefox;
 
-    Logger log = LoggerFactory.getLogger(ManageFleetService.class);
+    Logger log = LoggerFactory.getLogger(FleetService.class);
 
     private static final String LI_DATA_TECHNOLOGY = "//li[@data-technology=";
     private static final int MIN_CARGOS_TO_ATTACK = 10;
@@ -134,7 +134,7 @@ public class ManageFleetService {
 	    String debrisRecyclers = debris.findElement(By.className("debris-recyclers")).getText();
 	    if(!debrisRecyclers.trim().isEmpty()) {
     	    	int requiredRecycles = Integer.parseInt(debrisRecyclers.split(":")[1].trim());
-    	    	if (requiredRecycles >= 5) {
+    	    	if (requiredRecycles >= 5 && !debris.findElements(By.tagName("a")).isEmpty()) {
     	    	    debris.findElement(By.tagName("a")).click();
     	    	    log.info("I order to recycle that debris field");
     	    	    firefox.shortLoading();

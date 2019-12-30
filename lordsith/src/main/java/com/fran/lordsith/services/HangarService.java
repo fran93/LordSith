@@ -21,7 +21,7 @@ public class HangarService {
 
     @Autowired
     @Lazy
-    private ManageFleetService expeditionService;
+    private FleetService expeditionService;
 
     private static final String LI_DATA_TECHNOLOGY = "//li[@data-technology=";
 
