@@ -43,6 +43,9 @@ public class CommanderService {
 	
 	/**
 	 * Bugs to fix here:
+	 * org.openqa.selenium.NoSuchElementException: Unable to locate element: #slotValue
+	 * Unable to locate element: //li[@data-technology=213]
+	 * Unable to locate element: //li[@data-msg-id=6423453]	
 	 * @throws InterruptedException
 	 */
 	public void command() throws InterruptedException {

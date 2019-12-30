@@ -16,12 +16,12 @@ import com.fran.lordsith.enums.TechnologyEnum;
 public class DefenseService {
 
     private static final String LI_DATA_TECHNOLOGY = "//li[@data-technology=";
-    private static final int BASE_RAKETENWERFER = 9600;
-    private static final int BASE_LEICHTESLASERGESCHUTZ = 9600;
-    private static final int BASE_SCHWERESLASERGESCHUTZ = 192;
-    private static final int BASE_IONENGESCHUZ = 192;
-    private static final int BASE_GAUSSKANONE = 96;
-    private static final int BASE_PLASMAWERFER = 48;
+    private static final int BASE_RAKETENWERFER = 10000;
+    private static final int BASE_LEICHTESLASERGESCHUTZ = 10000;
+    private static final int BASE_SCHWERESLASERGESCHUTZ = 1000;
+    private static final int BASE_IONENGESCHUZ = 1000;
+    private static final int BASE_GAUSSKANONE = 500;
+    private static final int BASE_PLASMAWERFER = 250;
 
     @Autowired
     @Lazy
