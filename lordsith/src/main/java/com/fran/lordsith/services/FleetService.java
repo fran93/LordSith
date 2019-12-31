@@ -27,6 +27,7 @@ public class FleetService {
     private static final String LI_DATA_TECHNOLOGY = "//li[@data-technology=";
     private static final int MIN_CARGOS_TO_ATTACK = 10;
     private static final int MAX_SPY_REPORTS = 10;
+    private static final int ATTACK_SYSTEM_RANGE = 150;
     private int leftSystem;
     private int rightSystem;
 
@@ -107,13 +108,13 @@ public class FleetService {
 		reportCount += spy();
 	    }
 
-	    if (rightSystem > 100 && leftSystem > 100) {
+	    if (rightSystem > ATTACK_SYSTEM_RANGE && leftSystem > ATTACK_SYSTEM_RANGE) {
 		goToSystem(planetSystem);
 		rightSystem = 0;
 		leftSystem = 0;
-	    } else if (rightSystem > 100) {
+	    } else if (rightSystem > ATTACK_SYSTEM_RANGE) {
 		goLeft(planetSystem);
-	    } else if (leftSystem > 100) {
+	    } else if (leftSystem > ATTACK_SYSTEM_RANGE) {
 		goRight(planetSystem);
 	    } else if (rightSystem == 0) {
 		goRight(planetSystem);

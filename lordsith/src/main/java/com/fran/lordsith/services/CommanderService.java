@@ -74,6 +74,9 @@ public class CommanderService {
 			    manageFleetService.scan();
 			}
 			handlerService.scrapFleet();
+			if(isMainPlanet(i)) {
+			    //FIXME handlerService.importExport();
+			}
 			
 			if(buildingService.buildMinesOrFacilities() && researchService.research()) {
 				hangarService.buildExpeditionFleet(loginService.getPoints());

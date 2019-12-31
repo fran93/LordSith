@@ -77,12 +77,13 @@ public class BuildingService {
 	firefox.get().findElements(By.className("technology")).forEach(technology -> {
 	    int id = Integer.parseInt(technology.getAttribute("data-technology"));
 	    String status = technology.getAttribute("data-status");
-	    if (status.equals(StatusEnum.ACTIVE.getValue()))
+	    if (status.equals(StatusEnum.ACTIVE.getValue())) {
 		building.set(true);
+	    }
 
 	    if (!status.equals(StatusEnum.OFF.getValue())) {
 		if (id == TechnologyEnum.RAKETENSILO.getId() 
-			|| id == TechnologyEnum.TERRAFORMER.getId()
+			|| (id == TechnologyEnum.TERRAFORMER.getId() && status.equals(StatusEnum.ON.getValue()))
 			|| (id == TechnologyEnum.FORSCHUNGSLABOR.getId() && status.equals(StatusEnum.ON.getValue()))
 			|| (id == TechnologyEnum.NANITENFABRIK.getId() && status.equals(StatusEnum.ON.getValue()))
 			|| (id == TechnologyEnum.RAUMSCHIFFSWERFT.getId() && status.equals(StatusEnum.ON.getValue())&& Integer.parseInt(technology.findElement(By.className("level")).getAttribute("data-value")) < 12)
