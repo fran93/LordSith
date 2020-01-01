@@ -1,6 +1,8 @@
 package com.fran.lordsith.services;
 
 import org.openqa.selenium.By;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -12,58 +14,66 @@ import com.fran.lordsith.enums.PagesEnum;
 @Service
 public class LoginService {
 
-	@Value("${ogame.email}")
-	private String email;
-	
-	@Value("${ogame.password}")
-	private String password;
-	
-	@Autowired @Lazy
-	private FirefoxClient firefox;
-	
-	private long points;
-	
-	public void login() throws InterruptedException {
-		firefox.get().get(PagesEnum.LOBBY.getUrl());
-		firefox.shortLoading();
+    @Value("${ogame.email}")
+    private String email;
 
-		if(firefox.get().findElements(By.className("hub-logo")).isEmpty()) {
-			firefox.get().findElement(By.id("loginRegisterTabs")).findElement(By.tagName("span")).click();
-			firefox.get().findElement(By.name("email")).sendKeys(email);
-			firefox.get().findElement(By.name("password")).sendKeys(password);
-			firefox.get().findElement(By.xpath("//button[@type='submit']")).click();
-			firefox.shortLoading();
-		}
+    @Value("${ogame.password}")
+    private String password;
 
-		firefox.get().findElement(By.id("joinGame")).findElement(By.tagName("a")).findElement(By.tagName("button")).click();
-		firefox.get().findElement(By.id("accountlist")).findElement(By.tagName("button")).click();
-		firefox.closeTab();	
+    @Autowired
+    @Lazy
+    private FirefoxClient firefox;
+
+    private long points;
+    
+    Logger log = LoggerFactory.getLogger(LoginService.class);
+
+    public void login() throws InterruptedException {
+	firefox.get().get(PagesEnum.LOBBY.getUrl());
+	firefox.shortLoading();
+
+	if (firefox.get().findElements(By.className("hub-logo")).isEmpty()) {
+	    firefox.get().findElement(By.id("loginRegisterTabs")).findElement(By.tagName("span")).click();
+	    firefox.get().findElement(By.name("email")).sendKeys(email);
+	    firefox.get().findElement(By.name("password")).sendKeys(password);
+	    firefox.get().findElement(By.xpath("//button[@type='submit']")).click();
+	    firefox.shortLoading();
 	}
 
-	public void extractPoints() throws InterruptedException {
-		firefox.longLoading();
-		String scoreContentField = firefox.get().findElement(By.id("scoreContentField")).getText();
-		if(!scoreContentField.isEmpty()) {
-			points = Long.parseLong(scoreContentField.split(" ")[0].replaceAll("\\.", ""));
-		}
-	}
-	
-	public boolean isLogged() {
-		if(firefox.get().getCurrentUrl().contains("page=ingame")) { 
-			firefox.get().findElements(By.className("menubutton")).get(MenuEnum.UBERSICHT.getId()).click();
-		}
-		return firefox.get().getCurrentUrl().contains("page=ingame");
-	}
-	
-	public void logout() {
-		firefox.get().quit();
-	}
+	firefox.get().findElement(By.id("joinGame")).findElement(By.tagName("a")).findElement(By.tagName("button")).click();
+	firefox.get().findElement(By.id("accountlist")).findElement(By.tagName("button")).click();
+	firefox.closeTab();
+    }
 
-	public long getPoints() {
-		return points;
+    public void extractPoints() throws InterruptedException {
+	firefox.longLoading();
+	String scoreContentField = firefox.get().findElement(By.id("scoreContentField")).getText();
+	if (!scoreContentField.isEmpty()) {
+	    points = Long.parseLong(scoreContentField.split(" ")[0].replaceAll("\\.", ""));
 	}
+	log.info("Points: "+points);
+    }
 
-	public void setPoints(long points) {
-		this.points = points;
+    public boolean isLogged() {
+	if (firefox.get().getCurrentUrl().contains("page=ingame")) {
+	    firefox.get().findElements(By.className("menubutton")).get(MenuEnum.UBERSICHT.getId()).click();
 	}
+	return firefox.get().getCurrentUrl().contains("page=ingame");
+    }
+    
+    public boolean hasPoints() {
+	return points > 0;
+    }
+
+    public void logout() {
+	firefox.get().quit();
+    }
+
+    public long getPoints() {
+	return points;
+    }
+
+    public void setPoints(long points) {
+	this.points = points;
+    }
 }
