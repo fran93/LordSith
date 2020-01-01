@@ -9,6 +9,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +28,7 @@ public class FirefoxClient {
 	Logger.getLogger("org.openqa.selenium").setLevel(Level.OFF);
 	FirefoxOptions options = new FirefoxOptions();
 	options.setHeadless(headlessMode);
+	options.setLogLevel(FirefoxDriverLogLevel.FATAL);
 	driver = new FirefoxDriver(options);
 	driver.manage().window().maximize();
     }
