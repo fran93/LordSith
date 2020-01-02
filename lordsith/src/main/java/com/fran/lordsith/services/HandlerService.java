@@ -56,7 +56,7 @@ public class HandlerService {
 	    firefox.get().findElement(By.id("js_traderImportExport")).click();
 	    firefox.shortLoading();
 
-	    if (firefox.get().findElements(By.className("got_item_text")).isEmpty()) {
+	    if (!firefox.get().findElement(By.className("got_item_text")).isDisplayed()) {
 		firefox.get().findElement(By.className("js_sliderMetalMax")).click();
 		firefox.shortLoading();
 		if (!firefox.get().findElement(By.className("pay")).getAttribute("class").contains("disabled")) {
