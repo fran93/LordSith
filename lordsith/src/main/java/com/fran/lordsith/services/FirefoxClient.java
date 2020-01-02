@@ -31,8 +31,11 @@ public class FirefoxClient {
 	options.setHeadless(headlessMode);
 	options.setLogLevel(FirefoxDriverLogLevel.FATAL);
 	driver = new FirefoxDriver(options);
-	driver.manage().window().maximize();
-	driver.manage().window().setSize(new Dimension(1920, 1080));
+	if(headlessMode) {
+	    driver.manage().window().setSize(new Dimension(1920, 1080));
+	} else {
+	    driver.manage().window().maximize();
+	}
     }
 
     public WebDriver get() {
