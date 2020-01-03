@@ -178,7 +178,8 @@ public class FleetService {
 	return inactives.size();
     }
 
-    private int getGalaxyFreeSlots() {
+    private int getGalaxyFreeSlots() throws InterruptedException {
+	firefox.shortLoading();
 	String[] slotValue = firefox.get().findElement(By.id("slotValue")).getText().split("/");
 	return Integer.parseInt(slotValue[1]) - Integer.parseInt(slotValue[0]);
     }

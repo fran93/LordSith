@@ -2,11 +2,13 @@ package com.fran.lordsith.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.openqa.selenium.By;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +47,10 @@ public class CommanderService {
     @Lazy
     private HandlerService handlerService;
 
+    @Autowired
+    @Lazy
+    private MessageSource messageSource;
+
     Logger log = LoggerFactory.getLogger(CommanderService.class);
 
     private int exhaustion = 0;
@@ -55,13 +61,7 @@ public class CommanderService {
      * @throws InterruptedException
      */
     public void command() throws InterruptedException {
-	if (exhaustion >= 4) {
-	    log.info("Bring me a new team!");
-	    firefox.restart();
-	    exhaustion = 0;
-	} else {
-	    exhaustion++;
-	}
+	handleExhaustion();
 
 	if (!loginService.isLogged()) {
 	    loginService.login();
@@ -74,10 +74,10 @@ public class CommanderService {
 	for (int i = 0; i < planetIds.size(); i++) {
 	    firefox.shortLoading();
 	    firefox.get().findElement(By.id(planetIds.get(i))).click();
-	    if(loginService.hasPoints()) {
+	    if (loginService.hasPoints()) {
 		manageFleetService.sendExpedition(loginService.getPoints());
 	    }
-	    
+
 	    if (isMainPlanet(i)) {
 		manageFleetService.scan();
 	    }
@@ -100,7 +100,17 @@ public class CommanderService {
 	returnToMainPlanet(planetIds);
 	manageFleetService.hunting();
 
-	log.info("That's all");
+	log.info(messageSource.getMessage("commander.done", null, Locale.ENGLISH));
+    }
+
+    private void handleExhaustion() {
+	if (exhaustion >= 4) {
+	    log.info(messageSource.getMessage("commander.new.team", null, Locale.ENGLISH));
+	    firefox.restart();
+	    exhaustion = 0;
+	} else {
+	    exhaustion++;
+	}
     }
 
     private void returnToMainPlanet(List<String> planetIds) {

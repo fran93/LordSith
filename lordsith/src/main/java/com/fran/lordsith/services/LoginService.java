@@ -1,10 +1,13 @@
 package com.fran.lordsith.services;
 
+import java.util.Locale;
+
 import org.openqa.selenium.By;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,10 @@ public class LoginService {
     @Autowired
     @Lazy
     private FirefoxClient firefox;
+    
+    @Autowired
+    @Lazy
+    private MessageSource messageSource;
 
     private long points;
     
@@ -51,7 +58,7 @@ public class LoginService {
 	if (!scoreContentField.isEmpty()) {
 	    points = Long.parseLong(scoreContentField.split(" ")[0].replaceAll("\\.", ""));
 	}
-	log.info("Points: "+points);
+	log.info(messageSource.getMessage("login.points", new Object[] {points}, Locale.ENGLISH));
     }
 
     public boolean isLogged() {
