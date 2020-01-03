@@ -57,8 +57,7 @@ public class FleetService {
 
 	if (isExpeditionAvailable() && isThereAFleet() && isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId())
 		&& numberOfShips(TechnologyEnum.GROSSER_TRANSPORTER.getId()) > calculateNumberOfCargos(points) / 2) {
-	    firefox.get().findElement(By.name("transporterLarge"))
-		    .sendKeys(String.valueOf(calculateNumberOfCargos(points)));
+	    firefox.get().findElement(By.name("transporterLarge")).sendKeys(String.valueOf(calculateNumberOfCargos(points)));
 	    firefox.loading();
 
 	    if (isStatusOn(TechnologyEnum.PATHFINDER.getId())) {
@@ -133,13 +132,13 @@ public class FleetService {
 	    firefox.shortLoading();
 	    WebElement debris = firefox.get().findElement(By.id("debris16"));
 	    String debrisRecyclers = debris.findElement(By.className("debris-recyclers")).getText();
-	    if(!debrisRecyclers.trim().isEmpty()) {
-    	    	int requiredRecycles = Integer.parseInt(debrisRecyclers.split(":")[1].trim());
-    	    	if (requiredRecycles >= 5 && !debris.findElements(By.tagName("a")).isEmpty()) {
-    	    	    debris.findElement(By.tagName("a")).click();
-    	    	    log.info("I order to recycle that debris field");
-    	    	    firefox.shortLoading();
-    	    	}
+	    if (!debrisRecyclers.trim().isEmpty()) {
+		int requiredRecycles = Integer.parseInt(debrisRecyclers.split(":")[1].trim());
+		if (requiredRecycles >= 5 && !debris.findElements(By.tagName("a")).isEmpty()) {
+		    debris.findElement(By.tagName("a")).click();
+		    log.info("I order to recycle that debris field");
+		    firefox.shortLoading();
+		}
 	    }
 	}
     }
@@ -186,8 +185,7 @@ public class FleetService {
 
     private void processMessages() throws InterruptedException {
 	List<String> messagesIds = new ArrayList<>();
-	firefox.get().findElement(By.id("ui-id-16")).findElements(By.className("msg"))
-		.forEach(msg -> messagesIds.add(msg.getAttribute("data-msg-id")));
+	firefox.get().findElement(By.id("ui-id-16")).findElements(By.className("msg")).forEach(msg -> messagesIds.add(msg.getAttribute("data-msg-id")));
 
 	for (String id : messagesIds) {
 	    WebElement message = firefox.get().findElement(By.xpath("//li[@data-msg-id=" + id + "]"));
@@ -231,6 +229,9 @@ public class FleetService {
 		    firefox.loading();
 		}
 	    }
+	} else {
+	    openMessages();
+	    firefox.shortLoading();
 	}
     }
 
