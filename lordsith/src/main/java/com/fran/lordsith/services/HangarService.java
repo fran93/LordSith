@@ -1,10 +1,13 @@
 package com.fran.lordsith.services;
 
+import java.util.Locale;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,10 @@ public class HangarService {
     @Autowired
     @Lazy
     private FleetService expeditionService;
+    
+    @Autowired
+    @Lazy
+    private MessageSource messageSource;
 
     private static final String LI_DATA_TECHNOLOGY = "//li[@data-technology=";
 
@@ -57,32 +64,30 @@ public class HangarService {
 	    build(TechnologyEnum.PATHFINDER, desiredShips - amountPath);
 	}
     }
-    
+
     public void buildHuntingFleet() throws InterruptedException {
 	long amountSpionageSonde = getAmount(TechnologyEnum.SPIONAGESONDE.getId());
 	int desiredShips = 25;
-	
+
 	if (isStatusOn(TechnologyEnum.SPIONAGESONDE.getId()) && amountSpionageSonde < desiredShips) {
 	    build(TechnologyEnum.SPIONAGESONDE, desiredShips - amountSpionageSonde);
 	}
-	
-	
+
 	long amountKleiner = getAmount(TechnologyEnum.KLEINER_TRANSPORTER.getId());
 	desiredShips = 50;
-	
+
 	if (isStatusOn(TechnologyEnum.KLEINER_TRANSPORTER.getId()) && amountKleiner < desiredShips) {
 	    build(TechnologyEnum.KLEINER_TRANSPORTER, desiredShips - amountKleiner);
 	}
     }
 
     private long getAmount(int id) {
-	return Long.parseLong(firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + id + "]"))
-		.findElement(By.className("amount")).getAttribute("data-value"));
+	return Long.parseLong(firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + id + "]")).findElement(By.className("amount")).getAttribute("data-value"));
     }
 
     private boolean isStatusOn(int id) {
-	boolean isInQueue = firefox.get().findElements(By.className("queuePic")).stream().anyMatch(pic -> pic.getAttribute("alt").trim().endsWith("_"+id));
-	
+	boolean isInQueue = firefox.get().findElements(By.className("queuePic")).stream().anyMatch(pic -> pic.getAttribute("alt").trim().endsWith("_" + id));
+
 	WebElement defense = firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + id + "]"));
 	return defense.getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !isInQueue;
     }
@@ -99,7 +104,7 @@ public class HangarService {
 	    firefox.loading();
 	}
 
-	log.info("I order to build " + quantity + " " + tech.name());
+	log.info(messageSource.getMessage("generic.build", new Object[] { quantity, tech.name() }, Locale.ENGLISH));
     }
 
 }

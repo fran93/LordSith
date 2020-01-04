@@ -1,9 +1,12 @@
 package com.fran.lordsith.services;
 
+import java.util.Locale;
+
 import org.openqa.selenium.By;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -12,9 +15,15 @@ import com.fran.lordsith.enums.MenuEnum;
 @Service
 public class HandlerService {
 
+    private static final String CLASS = "class";
+
     @Autowired
     @Lazy
     private FirefoxClient firefox;
+    
+    @Autowired
+    @Lazy
+    private MessageSource messageSource;
 
     Logger log = LoggerFactory.getLogger(HandlerService.class);
 
@@ -31,19 +40,19 @@ public class HandlerService {
 	clickScrap("button211");
 	firefox.shortLoading();
 
-	if (!firefox.get().findElement(By.id("js_scrapScrapIT")).getAttribute("class").contains("disabled")) {
+	if (!firefox.get().findElement(By.id("js_scrapScrapIT")).getAttribute(CLASS).contains("disabled")) {
 	    firefox.get().findElement(By.id("js_scrapScrapIT")).click();
 	    firefox.loading();
 
 	    firefox.get().findElement(By.className("yes")).click();
 	    firefox.shortLoading();
 
-	    log.info("Scraping fleet");
+	    log.info(messageSource.getMessage("handler.scrap", null, Locale.ENGLISH));
 	}
     }
 
     private void clickScrap(String id) {
-	if (firefox.get().findElement(By.id(id)).getAttribute("class").endsWith("on")) {
+	if (firefox.get().findElement(By.id(id)).getAttribute(CLASS).endsWith("on")) {
 	    firefox.get().findElement(By.id(id)).click();
 	}
     }
@@ -59,7 +68,7 @@ public class HandlerService {
 	    if (!firefox.get().findElement(By.className("got_item_text")).isDisplayed()) {
 		firefox.get().findElement(By.className("js_sliderMetalMax")).click();
 		firefox.shortLoading();
-		if (!firefox.get().findElement(By.className("pay")).getAttribute("class").contains("disabled")) {
+		if (!firefox.get().findElement(By.className("pay")).getAttribute(CLASS).contains("disabled")) {
 		    firefox.get().findElement(By.className("pay")).click();
 		    firefox.shortLoading();
 

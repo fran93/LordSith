@@ -2,12 +2,14 @@ package com.fran.lordsith.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -18,16 +20,25 @@ import com.fran.lordsith.enums.TechnologyEnum;
 @Service
 public class FleetService {
 
-    @Autowired
-    @Lazy
-    private FirefoxClient firefox;
-
-    Logger log = LoggerFactory.getLogger(FleetService.class);
-
+    private static final String SEND_FLEET = "sendFleet";
+    private static final String CONTINUE_TO_FLEET3 = "continueToFleet3";
+    private static final String CONTINUE_TO_FLEET2 = "continueToFleet2";
+    private static final String SYSTEM_INPUT = "system_input";
     private static final String LI_DATA_TECHNOLOGY = "//li[@data-technology=";
     private static final int MIN_CARGOS_TO_ATTACK = 10;
     private static final int MAX_SPY_REPORTS = 10;
     private static final int ATTACK_SYSTEM_RANGE = 150;
+    
+    @Autowired
+    @Lazy
+    private FirefoxClient firefox;
+    
+    @Autowired
+    @Lazy
+    private MessageSource messageSource;
+
+    Logger log = LoggerFactory.getLogger(FleetService.class);
+
     private int leftSystem;
     private int rightSystem;
 
@@ -70,19 +81,19 @@ public class FleetService {
 		firefox.loading();
 	    }
 
-	    if (canContinue("continueToFleet2")) {
-		weiterWeiter("continueToFleet2");
+	    if (canContinue(CONTINUE_TO_FLEET2)) {
+		weiterWeiter(CONTINUE_TO_FLEET2);
 
 		firefox.get().findElement(By.id("position")).sendKeys("16");
 		firefox.loading();
 
-		if (canContinue("continueToFleet3")) {
-		    weiterWeiter("continueToFleet3");
+		if (canContinue(CONTINUE_TO_FLEET3)) {
+		    weiterWeiter(CONTINUE_TO_FLEET3);
 
-		    if (canContinue("sendFleet")) {
-			weiterWeiter("sendFleet");
+		    if (canContinue(SEND_FLEET)) {
+			weiterWeiter(SEND_FLEET);
 
-			log.info("I order to send an expedition!");
+			log.info(messageSource.getMessage("fleet.expedition", null, Locale.ENGLISH));
 		    }
 		}
 	    }
@@ -136,8 +147,9 @@ public class FleetService {
 		int requiredRecycles = Integer.parseInt(debrisRecyclers.split(":")[1].trim());
 		if (requiredRecycles >= 5 && !debris.findElements(By.tagName("a")).isEmpty()) {
 		    debris.findElement(By.tagName("a")).click();
-		    log.info("I order to recycle that debris field");
 		    firefox.shortLoading();
+		    
+		    log.info(messageSource.getMessage("fleet.recycle", null, Locale.ENGLISH));
 		}
 	    }
 	}
@@ -157,21 +169,22 @@ public class FleetService {
 	if (system > 499) {
 	    system -= 499;
 	}
-	firefox.get().findElement(By.id("system_input")).sendKeys(String.valueOf(system));
-	firefox.get().findElement(By.id("system_input")).submit();
+	firefox.get().findElement(By.id(SYSTEM_INPUT)).sendKeys(String.valueOf(system));
+	firefox.get().findElement(By.id(SYSTEM_INPUT)).submit();
 	firefox.loading();
     }
 
     private int getCurrentSystem() {
-	return Integer.parseInt(firefox.get().findElement(By.id("system_input")).getAttribute("value"));
+	return Integer.parseInt(firefox.get().findElement(By.id(SYSTEM_INPUT)).getAttribute("value"));
     }
 
     private int spy() throws InterruptedException {
 	List<WebElement> inactives = firefox.get().findElements(By.className("inactive_filter"));
 	for (WebElement inactive : inactives) {
 	    inactive.findElement(By.className("espionage")).click();
-	    log.info("I order to spy on system " + getCurrentSystem());
 	    firefox.loading();
+	    
+	    log.info(messageSource.getMessage("fleet.spy", new Object[] {getCurrentSystem()}, Locale.ENGLISH));
 	}
 
 	return inactives.size();
@@ -203,8 +216,9 @@ public class FleetService {
 		    }
 		} else {
 		    message.findElement(By.className("icon_refuse")).click();
-		    log.info("I order to discard that objetive!");
 		    firefox.loading();
+		    
+		    log.info(messageSource.getMessage("fleet.discard", null, Locale.ENGLISH));
 		}
 	    }
 	}
@@ -214,14 +228,14 @@ public class FleetService {
 	firefox.get().findElement(By.name("transporterSmall")).sendKeys(String.valueOf(necesaryFleet));
 	firefox.shortLoading();
 
-	if (canContinue("continueToFleet2")) {
-	    weiterWeiter("continueToFleet2");
-	    if (canContinue("continueToFleet3")) {
-		weiterWeiter("continueToFleet3");
-		if (canContinue("sendFleet")) {
-		    weiterWeiter("sendFleet");
+	if (canContinue(CONTINUE_TO_FLEET2)) {
+	    weiterWeiter(CONTINUE_TO_FLEET2);
+	    if (canContinue(CONTINUE_TO_FLEET3)) {
+		weiterWeiter(CONTINUE_TO_FLEET3);
+		if (canContinue(SEND_FLEET)) {
+		    weiterWeiter(SEND_FLEET);
 
-		    log.info("I order to send an attack!");
+		    log.info(messageSource.getMessage("fleet.attack", null, Locale.ENGLISH));
 
 		    openMessages();
 
