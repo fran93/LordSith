@@ -2,6 +2,7 @@ package com.fran.lordsith.services;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -10,6 +11,7 @@ import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +25,21 @@ import com.fran.lordsith.utilities.TechnologyUtils;
 @Service
 public class BuildingService {
 
+    private static final String DATA_VALUE = "data-value";
+    private static final String LEVEL = "level";
+    private static final String DATA_RAW = "data-raw";
+    private static final String TITLE = "title";
+    private static final String MENUBUTTON = "menubutton";
+
     @Autowired
     @Lazy
     private FirefoxClient firefox;
 
-    Logger logger = LoggerFactory.getLogger(BuildingService.class);
+    @Autowired
+    @Lazy
+    private MessageSource messageSource;
+
+    Logger log = LoggerFactory.getLogger(BuildingService.class);
 
     public boolean buildMinesOrFacilities() throws InterruptedException {
 	ArrayList<Technology> mines = new ArrayList<>();
@@ -37,13 +49,13 @@ public class BuildingService {
 	AtomicBoolean building = new AtomicBoolean(false);
 
 	firefox.loading();
-	firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
+	firefox.get().findElements(By.className(MENUBUTTON)).get(MenuEnum.VERSORGUNG.getId()).click();
 	firefox.shortLoading();
 
 	parseMines(mines, powerPlants, storages, building);
 
 	if (!building.get()) {
-	    firefox.get().findElements(By.className("menubutton")).get(MenuEnum.ANLAGEN.getId()).click();
+	    firefox.get().findElements(By.className(MENUBUTTON)).get(MenuEnum.ANLAGEN.getId()).click();
 	    firefox.shortLoading();
 
 	    parseFacilities(facilities, building);
@@ -54,22 +66,17 @@ public class BuildingService {
     }
 
     private Resources parseStorage() {
-	double metallStorage = processStorage(firefox.get().findElement(By.id("metal_box")).getAttribute("title"));
-	double kristallStorage = processStorage(firefox.get().findElement(By.id("crystal_box")).getAttribute("title"));
-	double deuteriumStorage = processStorage(
-		firefox.get().findElement(By.id("deuterium_box")).getAttribute("title"));
+	double metallStorage = processStorage(firefox.get().findElement(By.id("metal_box")).getAttribute(TITLE));
+	double kristallStorage = processStorage(firefox.get().findElement(By.id("crystal_box")).getAttribute(TITLE));
+	double deuteriumStorage = processStorage(firefox.get().findElement(By.id("deuterium_box")).getAttribute(TITLE));
 	return new Resources(metallStorage, kristallStorage, deuteriumStorage, 0);
     }
 
     private Resources parseResources() {
-	double energy = Double
-		.parseDouble(firefox.get().findElement(By.id("resources_energy")).getAttribute("data-raw"));
-	double metall = Double
-		.parseDouble(firefox.get().findElement(By.id("resources_metal")).getAttribute("data-raw"));
-	double kristall = Double
-		.parseDouble(firefox.get().findElement(By.id("resources_crystal")).getAttribute("data-raw"));
-	double deuterium = Double
-		.parseDouble(firefox.get().findElement(By.id("resources_deuterium")).getAttribute("data-raw"));
+	double energy = Double.parseDouble(firefox.get().findElement(By.id("resources_energy")).getAttribute(DATA_RAW));
+	double metall = Double.parseDouble(firefox.get().findElement(By.id("resources_metal")).getAttribute(DATA_RAW));
+	double kristall = Double.parseDouble(firefox.get().findElement(By.id("resources_crystal")).getAttribute(DATA_RAW));
+	double deuterium = Double.parseDouble(firefox.get().findElement(By.id("resources_deuterium")).getAttribute(DATA_RAW));
 	return new Resources(metall, kristall, deuterium, energy);
     }
 
@@ -81,26 +88,26 @@ public class BuildingService {
 		building.set(true);
 	    }
 
-	    if (!status.equals(StatusEnum.OFF.getValue())) {
-		if (id == TechnologyEnum.RAKETENSILO.getId() 
-			|| (id == TechnologyEnum.TERRAFORMER.getId() && status.equals(StatusEnum.ON.getValue()))
-			|| (id == TechnologyEnum.FORSCHUNGSLABOR.getId() && status.equals(StatusEnum.ON.getValue()))
-			|| (id == TechnologyEnum.NANITENFABRIK.getId() && status.equals(StatusEnum.ON.getValue()))
-			|| (id == TechnologyEnum.RAUMSCHIFFSWERFT.getId() && status.equals(StatusEnum.ON.getValue())&& Integer.parseInt(technology.findElement(By.className("level")).getAttribute("data-value")) < 12)
-			|| (id == TechnologyEnum.ROBOTERFABRIK.getId() && Integer.parseInt(technology.findElement(By.className("level")).getAttribute("data-value")) < 10)) {
-		    parseTechnology(facilities, technology, id, status);
-		}
+	    if ((id == TechnologyEnum.RAKETENSILO.getId() && !status.equals(StatusEnum.OFF.getValue())) || (id == TechnologyEnum.TERRAFORMER.getId() && status.equals(StatusEnum.ON.getValue()))
+		    || (id == TechnologyEnum.FORSCHUNGSLABOR.getId() && status.equals(StatusEnum.ON.getValue()))
+		    || (id == TechnologyEnum.NANITENFABRIK.getId() && status.equals(StatusEnum.ON.getValue()))
+		    || (id == TechnologyEnum.RAUMSCHIFFSWERFT.getId() && status.equals(StatusEnum.ON.getValue())
+			    && Integer.parseInt(technology.findElement(By.className(LEVEL)).getAttribute(DATA_VALUE)) < 12)
+		    || (id == TechnologyEnum.ROBOTERFABRIK.getId() && !status.equals(StatusEnum.OFF.getValue())
+			    && Integer.parseInt(technology.findElement(By.className(LEVEL)).getAttribute(DATA_VALUE)) < 10)) {
+		parseTechnology(facilities, technology, id, status);
 	    }
+
 	});
     }
 
-    private void parseMines(ArrayList<Technology> mines, ArrayList<Technology> powerPlants,
-	    ArrayList<Technology> storages, AtomicBoolean building) {
+    private void parseMines(ArrayList<Technology> mines, ArrayList<Technology> powerPlants, ArrayList<Technology> storages, AtomicBoolean building) {
 	firefox.get().findElements(By.className("technology")).forEach(technology -> {
 	    int id = Integer.parseInt(technology.getAttribute("data-technology"));
 	    String status = technology.getAttribute("data-status");
-	    if (status.equals(StatusEnum.ACTIVE.getValue()))
+	    if (status.equals(StatusEnum.ACTIVE.getValue())) {
 		building.set(true);
+	    }
 
 	    if (id <= TechnologyEnum.DEUTERIUMSYNTHETISIERER.getId()) {
 		parseTechnology(mines, technology, id, status);
@@ -114,12 +121,11 @@ public class BuildingService {
 	});
     }
 
-    private void chooseWhatToBuild(ArrayList<Technology> mines, ArrayList<Technology> powerPlants,
-	    ArrayList<Technology> storages, ArrayList<Technology> facilities, AtomicBoolean building,
+    private void chooseWhatToBuild(ArrayList<Technology> mines, ArrayList<Technology> powerPlants, ArrayList<Technology> storages, ArrayList<Technology> facilities, AtomicBoolean building,
 	    Resources resources, Resources storage) throws InterruptedException {
 	if (!building.get()) {
 	    Optional<Technology> naniten = facilities.stream().filter(facility -> facility.getId() == TechnologyEnum.NANITENFABRIK.getId()).findFirst();
-	    if(naniten.isPresent()) {
+	    if (naniten.isPresent()) {
 		upTechnology(naniten.get(), building);
 	    } else if (storage.getDeuterium() < resources.getDeuterium()) {
 		resourcesOverflow(storages, building, TechnologyEnum.DEUTERIUMTANK.getId());
@@ -128,7 +134,7 @@ public class BuildingService {
 	    } else if (storage.getMetall() < resources.getMetall()) {
 		resourcesOverflow(storages, building, TechnologyEnum.METALLSPEICHER.getId());
 	    } else if (resources.getEnergie() < 0) {
-		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
+		firefox.get().findElements(By.className(MENUBUTTON)).get(MenuEnum.VERSORGUNG.getId()).click();
 		firefox.shortLoading();
 
 		powerPlants.sort(Comparator.comparingDouble(Technology::getTotalCost));
@@ -139,7 +145,7 @@ public class BuildingService {
 		if (!facilities.isEmpty() && facilities.get(0).getTotalCost() * 2 < mines.get(0).getTotalCost()) {
 		    upTechnology(facilities.get(0), building);
 		} else {
-		    firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
+		    firefox.get().findElements(By.className(MENUBUTTON)).get(MenuEnum.VERSORGUNG.getId()).click();
 		    firefox.shortLoading();
 
 		    upTechnology(mines.get(0), building);
@@ -148,9 +154,8 @@ public class BuildingService {
 	}
     }
 
-    private void resourcesOverflow(ArrayList<Technology> storages, AtomicBoolean building, int id)
-	    throws InterruptedException {
-	firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERSORGUNG.getId()).click();
+    private void resourcesOverflow(ArrayList<Technology> storages, AtomicBoolean building, int id) throws InterruptedException {
+	firefox.get().findElements(By.className(MENUBUTTON)).get(MenuEnum.VERSORGUNG.getId()).click();
 	firefox.shortLoading();
 
 	Optional<Technology> optional = storages.stream().filter(ss -> ss.getId() == id).findFirst();
@@ -159,7 +164,7 @@ public class BuildingService {
     }
 
     private void parseTechnology(ArrayList<Technology> mines, WebElement technology, int id, String status) {
-	int level = Integer.parseInt(technology.findElement(By.className("level")).getAttribute("data-value"));
+	int level = Integer.parseInt(technology.findElement(By.className(LEVEL)).getAttribute(DATA_VALUE));
 	Technology techno = new Technology(id, level, status);
 	TechnologyUtils.calculateCost(techno);
 	mines.add(techno);
@@ -167,10 +172,11 @@ public class BuildingService {
 
     private void upTechnology(Technology tech, AtomicBoolean building) throws InterruptedException {
 	if (tech.getStatus().equals(StatusEnum.ON.getValue())) {
-	    firefox.get().findElement(By.xpath("//li[@data-technology=" + tech.getId() + "]"))
-		    .findElement(By.tagName("button")).click();
+	    firefox.get().findElement(By.xpath("//li[@data-technology=" + tech.getId() + "]")).findElement(By.tagName("button")).click();
 	    firefox.shortLoading();
 	    building.set(true);
+
+	    log.info(messageSource.getMessage("building.build", new Object[] { TechnologyEnum.getById(tech.getId()).name(), tech.getLevel() }, Locale.ENGLISH));
 	}
     }
 
