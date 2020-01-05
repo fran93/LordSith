@@ -225,6 +225,9 @@ public class FleetService {
 
 		    if (isFleetAvailable()) {
 			sendAttack(id, necesaryFleet);
+		    } else {
+			openMessages();
+			firefox.shortLoading();
 		    }
 		} else {
 		    message.findElement(By.className("icon_refuse")).click();
@@ -255,9 +258,6 @@ public class FleetService {
 		    firefox.loading();
 		}
 	    }
-	} else {
-	    openMessages();
-	    firefox.shortLoading();
 	}
     }
 
@@ -339,7 +339,7 @@ public class FleetService {
 	    firefox.get().findElement(By.id("shortcuts")).findElements(By.className("glow")).get(0).click();
 	    firefox.shortLoading();
 	    Optional<WebElement> dropDown = firefox.get().findElements(By.className("dropdownList")).stream().filter(WebElement::isDisplayed).findFirst();
-	    if(dropDown.isPresent()) {
+	    if (dropDown.isPresent()) {
 		dropDown.get().findElements(By.tagName("li")).get(1).click();
 		firefox.shortLoading();
 	    }
