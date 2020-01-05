@@ -47,9 +47,9 @@ public class HandlerService {
 	if (points > 0) {
 	    firefox.get().findElement(By.className("forward")).click();
 	    firefox.shortLoading();
-	    int current = Integer.parseInt(firefox.get().findElement(By.id("button203")).findElement(By.className("amount")).getText());
-	    int base = fleetService.calculateNumberOfCargos(points);
-	    int desired = current - (base + base /2);
+	    long current = Long.parseLong(firefox.get().findElement(By.id("button203")).findElement(By.className("amount")).getText().replaceAll("\\.", ""));
+	    long base = fleetService.calculateNumberOfCargos(points);
+	    long desired = current - (base + base /2);
 	    
 	    if(desired > 0) {
 		firefox.get().findElement(By.id("ship_203")).sendKeys(String.valueOf(desired));
