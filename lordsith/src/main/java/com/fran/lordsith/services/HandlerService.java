@@ -47,13 +47,16 @@ public class HandlerService {
 	if (points > 0) {
 	    firefox.get().findElement(By.className("forward")).click();
 	    firefox.shortLoading();
-	    long current = Long.parseLong(firefox.get().findElement(By.id("button203")).findElement(By.className("amount")).getText().replaceAll("\\.", ""));
-	    long base = fleetService.calculateNumberOfCargos(points);
-	    long desired = current - (base + base /2);
-	    
-	    if(desired > 0) {
-		firefox.get().findElement(By.id("ship_203")).sendKeys(String.valueOf(desired));
-		firefox.shortLoading();
+	    String rawAmount = firefox.get().findElement(By.id("button203")).findElement(By.className("amount")).getText().replaceAll("\\.", "");
+	    if(!rawAmount.trim().isEmpty()) {
+		long current = Long.parseLong(rawAmount);
+		long base = fleetService.calculateNumberOfCargos(points);
+		long desired = current - (base + base / 2);
+
+		if (desired > 0) {
+		    firefox.get().findElement(By.id("ship_203")).sendKeys(String.valueOf(desired));
+		    firefox.shortLoading();
+		}
 	    }
 	}
 
