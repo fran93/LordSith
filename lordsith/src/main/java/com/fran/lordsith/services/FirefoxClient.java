@@ -76,7 +76,6 @@ public class FirefoxClient {
     }
 
     public void restart() {
-	driver.close();
 	init();
     }
 
