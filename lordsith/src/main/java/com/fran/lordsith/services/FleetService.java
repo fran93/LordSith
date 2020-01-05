@@ -3,6 +3,7 @@ package com.fran.lordsith.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -337,9 +338,11 @@ public class FleetService {
 	    weiterWeiter(CONTINUE_TO_FLEET2);
 	    firefox.get().findElement(By.id("shortcuts")).findElements(By.className("glow")).get(0).click();
 	    firefox.shortLoading();
-	    firefox.get().findElement(By.id("dropdown308")).findElements(By.tagName("li")).get(1).click();
-	    firefox.shortLoading();
-
+	    Optional<WebElement> dropDown = firefox.get().findElements(By.className("dropdownList")).stream().filter(WebElement::isDisplayed).findFirst();
+	    if(dropDown.isPresent()) {
+		dropDown.get().findElements(By.tagName("li")).get(1).click();
+		firefox.shortLoading();
+	    }
 	    if (canContinue(CONTINUE_TO_FLEET3)) {
 		weiterWeiter(CONTINUE_TO_FLEET3);
 
