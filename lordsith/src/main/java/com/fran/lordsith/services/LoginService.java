@@ -3,6 +3,7 @@ package com.fran.lordsith.services;
 import java.util.Locale;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchWindowException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +27,13 @@ public class LoginService {
     @Autowired
     @Lazy
     private FirefoxClient firefox;
-    
+
     @Autowired
     @Lazy
     private MessageSource messageSource;
 
     private long points;
-    
+
     Logger log = LoggerFactory.getLogger(LoginService.class);
 
     public void login() throws InterruptedException {
@@ -58,22 +59,28 @@ public class LoginService {
 	if (!scoreContentField.isEmpty()) {
 	    points = Long.parseLong(scoreContentField.split(" ")[0].replaceAll("\\.", ""));
 	}
-	log.info(messageSource.getMessage("login.points", new Object[] {points}, Locale.ENGLISH));
+	log.info(messageSource.getMessage("login.points", new Object[] { points }, Locale.ENGLISH));
     }
 
     public boolean isLogged() {
-	if (firefox.get().getCurrentUrl().contains("page=ingame")) {
-	    firefox.get().findElements(By.className("menubutton")).get(MenuEnum.UBERSICHT.getId()).click();
+	try {
+	    if (firefox.get().getCurrentUrl().contains("page=ingame")) {
+		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.UBERSICHT.getId()).click();
+	    }
+	} catch (NoSuchWindowException ex) {
+	    firefox.restart();
+	    log.info(messageSource.getMessage("commander.new.team", null, Locale.ENGLISH));
 	}
 	return firefox.get().getCurrentUrl().contains("page=ingame");
     }
-    
+
     public boolean hasPoints() {
 	return points > 0;
     }
 
-    public void logout() {
-	firefox.get().quit();
+    public void logout() throws InterruptedException {
+	firefox.get().findElement(By.id("bar")).findElements(By.tagName("li")).get(7).click();
+	firefox.shortLoading();
     }
 
     public long getPoints() {

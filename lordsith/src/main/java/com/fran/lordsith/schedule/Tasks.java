@@ -25,13 +25,11 @@ public class Tasks {
 	
 	@Scheduled(cron = "0 0 0 * * *")
 	public void midnight() throws InterruptedException {
-		commanderService.maxExhaustion();
 		commanderService.command();
 	}
 	
 	@Scheduled(cron = "0 0 3 * * *")
 	public void devilTime() throws InterruptedException {
-		commanderService.maxExhaustion();
 		commanderService.command();
 	}
 

@@ -20,14 +20,18 @@ public class HandlerService {
     @Autowired
     @Lazy
     private FirefoxClient firefox;
-    
+
     @Autowired
     @Lazy
     private MessageSource messageSource;
 
+    @Autowired
+    @Lazy
+    private FleetService fleetService;
+
     Logger log = LoggerFactory.getLogger(HandlerService.class);
 
-    public void scrapFleet() throws InterruptedException {
+    public void scrapFleet(long points) throws InterruptedException {
 	firefox.get().findElements(By.className("menubutton")).get(MenuEnum.HANDLER.getId()).click();
 	firefox.shortLoading();
 
@@ -39,6 +43,19 @@ public class HandlerService {
 	clickScrap("button207");
 	clickScrap("button211");
 	firefox.shortLoading();
+
+	if (points > 0) {
+	    firefox.get().findElement(By.className("forward")).click();
+	    firefox.shortLoading();
+	    int current = Integer.parseInt(firefox.get().findElement(By.id("button203")).findElement(By.className("amount")).getText());
+	    int base = fleetService.calculateNumberOfCargos(points);
+	    int desired = current - (base + base /2);
+	    
+	    if(desired > 0) {
+		firefox.get().findElement(By.id("ship_203")).sendKeys(String.valueOf(desired));
+		firefox.shortLoading();
+	    }
+	}
 
 	if (!firefox.get().findElement(By.id("js_scrapScrapIT")).getAttribute(CLASS).contains("disabled")) {
 	    firefox.get().findElement(By.id("js_scrapScrapIT")).click();
@@ -59,7 +76,7 @@ public class HandlerService {
 
     public void importExport() throws InterruptedException {
 	firefox.shortLoading();
-	if(!firefox.get().findElements(By.className("back_to_overview")).isEmpty()) {
+	if (!firefox.get().findElements(By.className("back_to_overview")).isEmpty()) {
 	    firefox.get().findElement(By.className("back_to_overview")).click();
 	    firefox.loading();
 	    firefox.get().findElement(By.id("js_traderImportExport")).click();

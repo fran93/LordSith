@@ -53,16 +53,12 @@ public class CommanderService {
 
     Logger log = LoggerFactory.getLogger(CommanderService.class);
 
-    private int exhaustion = 0;
-
     /**
      * Bugs to fix here:
      * 
      * @throws InterruptedException
      */
     public void command() throws InterruptedException {
-	handleExhaustion();
-
 	if (!loginService.isLogged()) {
 	    loginService.login();
 	}
@@ -72,45 +68,45 @@ public class CommanderService {
 	firefox.get().findElement(By.id("planetList")).findElements(By.className("smallplanet")).forEach(planet -> planetIds.add(planet.getAttribute("id")));
 
 	for (int i = 0; i < planetIds.size(); i++) {
-	    firefox.shortLoading();
-	    firefox.get().findElement(By.id(planetIds.get(i))).click();
-	    if (loginService.hasPoints()) {
-		manageFleetService.sendExpedition(loginService.getPoints());
-	    }
-
-	    if (isMainPlanet(i)) {
-		manageFleetService.scan();
-	    }
-	    handlerService.scrapFleet();
-	    if (isMainPlanet(i)) {
-		handlerService.importExport();
-	    }
-
-	    if (buildingService.buildMinesOrFacilities() && researchService.research()) {
-		hangarService.buildExpeditionFleet(loginService.getPoints());
-		if (isMainPlanet(i)) {
-		    hangarService.buildPathfinderFleet(loginService.getPoints());
-		    hangarService.buildHuntingFleet();
-		}
-		defenseService.buildDefenses(i, loginService.getPoints());
-	    }
-	    firefox.shortLoading();
+	    managePlanets(planetIds, i);
 	}
 
 	returnToMainPlanet(planetIds);
 	manageFleetService.hunting();
 
+	loginService.logout();
 	log.info(messageSource.getMessage("commander.done", null, Locale.ENGLISH));
     }
 
-    private void handleExhaustion() {
-	if (exhaustion >= 4) {
-	    log.info(messageSource.getMessage("commander.new.team", null, Locale.ENGLISH));
-	    firefox.restart();
-	    exhaustion = 0;
-	} else {
-	    exhaustion++;
+    private void managePlanets(List<String> planetIds, int i) throws InterruptedException {
+	firefox.shortLoading();
+	firefox.get().findElement(By.id(planetIds.get(i))).click();
+
+	handlerService.scrapFleet(loginService.getPoints());
+	if (isMainPlanet(i)) {
+	    handlerService.importExport();
 	}
+
+	if (loginService.hasPoints()) {
+	    manageFleetService.sendExpedition(loginService.getPoints());
+	    if (!isMainPlanet(i)) {
+		manageFleetService.transportResources();
+	    }
+	}
+
+	if (isMainPlanet(i)) {
+	    manageFleetService.scan();
+	}
+
+	if (buildingService.buildMinesOrFacilities() && researchService.research()) {
+	    hangarService.buildExpeditionFleet(loginService.getPoints());
+	    if (isMainPlanet(i)) {
+		hangarService.buildPathfinderFleet(loginService.getPoints());
+		hangarService.buildHuntingFleet();
+	    }
+	    defenseService.buildDefenses(i, loginService.getPoints());
+	}
+	firefox.shortLoading();
     }
 
     private void returnToMainPlanet(List<String> planetIds) {
@@ -121,7 +117,4 @@ public class CommanderService {
 	return i == 0;
     }
 
-    public void maxExhaustion() {
-	exhaustion = 10;
-    }
 }

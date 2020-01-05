@@ -16,10 +16,17 @@ import org.springframework.stereotype.Service;
 import com.fran.lordsith.enums.MenuEnum;
 import com.fran.lordsith.enums.StatusEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
+import com.fran.lordsith.model.Resources;
 
 @Service
 public class FleetService {
 
+    private static final int MINIMUM_METALL = 1000000;
+    private static final int MINIMUM_DEUTERIUM = 500000;
+    private static final int MINIMUM_KRISTALL = 500000;
+    private static final int MINIMUM_RESOURCES = 1000000;
+    private static final int MINIMUM_TRANSPORT = 500;
+    private static final String MENUBUTTON = "menubutton";
     private static final String SEND_FLEET = "sendFleet";
     private static final String CONTINUE_TO_FLEET3 = "continueToFleet3";
     private static final String CONTINUE_TO_FLEET2 = "continueToFleet2";
@@ -28,14 +35,18 @@ public class FleetService {
     private static final int MIN_CARGOS_TO_ATTACK = 10;
     private static final int MAX_SPY_REPORTS = 10;
     private static final int ATTACK_SYSTEM_RANGE = 150;
-    
+
     @Autowired
     @Lazy
     private FirefoxClient firefox;
-    
+
     @Autowired
     @Lazy
     private MessageSource messageSource;
+
+    @Autowired
+    @Lazy
+    private BuildingService buildingService;
 
     Logger log = LoggerFactory.getLogger(FleetService.class);
 
@@ -63,7 +74,7 @@ public class FleetService {
     }
 
     public void sendExpedition(long points) throws InterruptedException {
-	firefox.get().findElements(By.className("menubutton")).get(MenuEnum.FLOTTE.getId()).click();
+	firefox.get().findElements(By.className(MENUBUTTON)).get(MenuEnum.FLOTTE.getId()).click();
 	firefox.shortLoading();
 
 	if (isExpeditionAvailable() && isThereAFleet() && isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId())
@@ -106,7 +117,7 @@ public class FleetService {
     }
 
     public void scan() throws InterruptedException {
-	firefox.get().findElements(By.className("menubutton")).get(MenuEnum.GALAXIE.getId()).click();
+	firefox.get().findElements(By.className(MENUBUTTON)).get(MenuEnum.GALAXIE.getId()).click();
 	firefox.shortLoading();
 
 	int planetSystem = getCurrentSystem();
@@ -148,7 +159,7 @@ public class FleetService {
 		if (requiredRecycles >= 5 && !debris.findElements(By.tagName("a")).isEmpty()) {
 		    debris.findElement(By.tagName("a")).click();
 		    firefox.shortLoading();
-		    
+
 		    log.info(messageSource.getMessage("fleet.recycle", null, Locale.ENGLISH));
 		}
 	    }
@@ -183,8 +194,8 @@ public class FleetService {
 	for (WebElement inactive : inactives) {
 	    inactive.findElement(By.className("espionage")).click();
 	    firefox.loading();
-	    
-	    log.info(messageSource.getMessage("fleet.spy", new Object[] {getCurrentSystem()}, Locale.ENGLISH));
+
+	    log.info(messageSource.getMessage("fleet.spy", new Object[] { getCurrentSystem() }, Locale.ENGLISH));
 	}
 
 	return inactives.size();
@@ -217,7 +228,7 @@ public class FleetService {
 		} else {
 		    message.findElement(By.className("icon_refuse")).click();
 		    firefox.loading();
-		    
+
 		    log.info(messageSource.getMessage("fleet.discard", null, Locale.ENGLISH));
 		}
 	    }
@@ -303,6 +314,65 @@ public class FleetService {
 	int maxSlots = Integer.parseInt(splitedSlots.split("/")[1]);
 
 	return currentSlots < maxSlots;
+    }
+
+    public void transportResources() throws InterruptedException {
+	firefox.get().findElements(By.className(MENUBUTTON)).get(MenuEnum.FLOTTE.getId()).click();
+	firefox.shortLoading();
+
+	if (isThereAFleet() && isFleetAvailable() && numberOfShips(TechnologyEnum.KLEINER_TRANSPORTER.getId()) >= MINIMUM_TRANSPORT) {
+	    Resources amountToTransport = getAmountToTransport();
+
+	    if (amountToTransport.getMetall() > 0 || amountToTransport.getKristall() > 0 || amountToTransport.getDeuterium() > 0) {
+		transportResources(amountToTransport);
+	    }
+	}
+    }
+
+    private void transportResources(Resources amountToTransport) throws InterruptedException {
+	firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + TechnologyEnum.KLEINER_TRANSPORTER.getId() + "]")).findElement(By.className("sprite_small")).click();
+	firefox.shortLoading();
+
+	if (canContinue(CONTINUE_TO_FLEET2)) {
+	    weiterWeiter(CONTINUE_TO_FLEET2);
+	    firefox.get().findElement(By.id("shortcuts")).findElements(By.className("glow")).get(0).click();
+	    firefox.shortLoading();
+	    firefox.get().findElement(By.id("dropdown308")).findElements(By.tagName("li")).get(1).click();
+	    firefox.shortLoading();
+
+	    if (canContinue(CONTINUE_TO_FLEET3)) {
+		weiterWeiter(CONTINUE_TO_FLEET3);
+
+		firefox.get().findElement(By.id("missionButton3")).click();
+		firefox.shortLoading();
+
+		firefox.get().findElement(By.id("crystal")).sendKeys(String.valueOf(amountToTransport.getKristall()));
+		firefox.get().findElement(By.id("deuterium")).sendKeys(String.valueOf(amountToTransport.getDeuterium()));
+		firefox.get().findElement(By.id("metal")).sendKeys(String.valueOf(amountToTransport.getMetall()));
+		firefox.shortLoading();
+
+		if (canContinue(SEND_FLEET)) {
+		    weiterWeiter(SEND_FLEET);
+
+		    log.info(messageSource.getMessage("fleet.transport", null, Locale.ENGLISH));
+		}
+	    }
+	}
+    }
+
+    private Resources getAmountToTransport() {
+	Resources resources = buildingService.parseResources();
+	Resources amountToTransport = new Resources(0);
+	if (resources.getKristall() > MINIMUM_RESOURCES && resources.getKristall() > resources.getMetall() * 2) {
+	    amountToTransport.setKristall(resources.getKristall() - MINIMUM_KRISTALL);
+	}
+	if (resources.getDeuterium() > MINIMUM_RESOURCES && resources.getDeuterium() > resources.getKristall() * 2) {
+	    amountToTransport.setDeuterium(resources.getDeuterium() - MINIMUM_DEUTERIUM);
+	}
+	if (resources.getMetall() > MINIMUM_RESOURCES && resources.getMetall() > resources.getKristall() * 5) {
+	    amountToTransport.setMetall(resources.getMetall() - MINIMUM_METALL);
+	}
+	return amountToTransport;
     }
 
 }

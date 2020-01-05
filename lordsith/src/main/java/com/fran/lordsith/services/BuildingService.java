@@ -72,7 +72,7 @@ public class BuildingService {
 	return new Resources(metallStorage, kristallStorage, deuteriumStorage, 0);
     }
 
-    private Resources parseResources() {
+    public Resources parseResources() {
 	double energy = Double.parseDouble(firefox.get().findElement(By.id("resources_energy")).getAttribute(DATA_RAW));
 	double metall = Double.parseDouble(firefox.get().findElement(By.id("resources_metal")).getAttribute(DATA_RAW));
 	double kristall = Double.parseDouble(firefox.get().findElement(By.id("resources_crystal")).getAttribute(DATA_RAW));
