@@ -87,7 +87,7 @@ public class HandlerService {
 	    firefox.get().findElement(By.className("back_to_overview")).click();
 	    firefox.loading();
 	    firefox.get().findElement(By.id("js_traderImportExport")).click();
-	    firefox.shortLoading();
+	    firefox.loading();
 
 	    if (!firefox.get().findElement(By.className("got_item_text")).isDisplayed()) {
 		firefox.get().findElement(By.className("js_sliderMetalMax")).click();
