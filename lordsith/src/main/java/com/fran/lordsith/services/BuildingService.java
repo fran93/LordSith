@@ -25,6 +25,7 @@ import com.fran.lordsith.utilities.TechnologyUtils;
 @Service
 public class BuildingService {
 
+    private static final String DATA_STATUS = "data-status";
     private static final String DATA_VALUE = "data-value";
     private static final String LEVEL = "level";
     private static final String DATA_RAW = "data-raw";
@@ -42,6 +43,14 @@ public class BuildingService {
     @Autowired
     @Lazy
     private MessageSource messageSource;
+
+    @Autowired
+    @Lazy
+    private PlanetService planetService;
+
+    @Autowired
+    @Lazy
+    private HangarService hangarService;
 
     Logger log = LoggerFactory.getLogger(BuildingService.class);
 
@@ -87,13 +96,12 @@ public class BuildingService {
     private void parseFacilities(ArrayList<Technology> facilities, AtomicBoolean building) {
 	firefox.get().findElements(By.className("technology")).forEach(technology -> {
 	    int id = Integer.parseInt(technology.getAttribute("data-technology"));
-	    String status = technology.getAttribute("data-status");
+	    String status = technology.getAttribute(DATA_STATUS);
 	    if (status.equals(StatusEnum.ACTIVE.getValue())) {
 		building.set(true);
 	    }
 
-	    if ((id == TechnologyEnum.RAKETENSILO.getId() && !status.equals(StatusEnum.OFF.getValue())) || (id == TechnologyEnum.TERRAFORMER.getId() && status.equals(StatusEnum.ON.getValue()))
-		    || (id == TechnologyEnum.FORSCHUNGSLABOR.getId() && status.equals(StatusEnum.ON.getValue()))
+	    if ((id == TechnologyEnum.RAKETENSILO.getId() && !status.equals(StatusEnum.OFF.getValue())) || (id == TechnologyEnum.FORSCHUNGSLABOR.getId() && status.equals(StatusEnum.ON.getValue()))
 		    || (id == TechnologyEnum.NANITENFABRIK.getId() && status.equals(StatusEnum.ON.getValue()))
 		    || (id == TechnologyEnum.RAUMSCHIFFSWERFT.getId() && status.equals(StatusEnum.ON.getValue())
 			    && Integer.parseInt(technology.findElement(By.className(LEVEL)).getAttribute(DATA_VALUE)) < MAX_RAUMSCHIFFSWERFT_LEVEL)
@@ -108,7 +116,7 @@ public class BuildingService {
     private void parseMines(ArrayList<Technology> mines, ArrayList<Technology> powerPlants, ArrayList<Technology> storages, AtomicBoolean building) {
 	firefox.get().findElements(By.className("technology")).forEach(technology -> {
 	    int id = Integer.parseInt(technology.getAttribute("data-technology"));
-	    String status = technology.getAttribute("data-status");
+	    String status = technology.getAttribute(DATA_STATUS);
 	    if (status.equals(StatusEnum.ACTIVE.getValue())) {
 		building.set(true);
 	    }
@@ -127,7 +135,10 @@ public class BuildingService {
 
     private void chooseWhatToBuild(ArrayList<Technology> mines, ArrayList<Technology> powerPlants, ArrayList<Technology> storages, ArrayList<Technology> facilities, AtomicBoolean building,
 	    Resources resources, Resources storage) throws InterruptedException {
-	if (!building.get()) {
+
+	if (!planetService.hasFreeFields()) {
+	    buildTerraformer(building, resources);
+	} else if (!building.get()) {
 	    Optional<Technology> naniten = facilities.stream().filter(facility -> facility.getId() == TechnologyEnum.NANITENFABRIK.getId()).findFirst();
 	    if (naniten.isPresent()) {
 		upTechnology(naniten.get(), building);
@@ -153,6 +164,25 @@ public class BuildingService {
 		    firefox.shortLoading();
 
 		    upTechnology(mines.get(0), building);
+		}
+	    }
+	}
+    }
+
+    private void buildTerraformer(AtomicBoolean building, Resources resources) throws InterruptedException {
+	WebElement terraformer = firefox.get().findElement(By.xpath("//li[@data-technology= " + TechnologyEnum.TERRAFORMER.getId() + "]"));
+	int level = Integer.parseInt(terraformer.findElement(By.className(LEVEL)).getAttribute(DATA_VALUE));
+	String status = terraformer.getAttribute(DATA_STATUS);
+	Technology techno = new Technology(TechnologyEnum.TERRAFORMER.getId(), level, status);
+	TechnologyUtils.calculateCost(techno);
+
+	if (planetService.hasFields()) {
+	    if (status.equals(StatusEnum.ON.getValue())) {
+		upTechnology(techno, building);
+	    } else {
+		building.set(true);
+		if (resources.getEnergie() < techno.getCost().getEnergie()) {
+		    hangarService.buildSolarSatelliteFleet();
 		}
 	    }
 	}

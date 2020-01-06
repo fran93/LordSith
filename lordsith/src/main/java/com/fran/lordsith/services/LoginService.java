@@ -32,8 +32,6 @@ public class LoginService {
     @Lazy
     private MessageSource messageSource;
 
-    private long points;
-
     Logger log = LoggerFactory.getLogger(LoginService.class);
 
     public void login() throws InterruptedException {
@@ -53,15 +51,6 @@ public class LoginService {
 	firefox.closeTab();
     }
 
-    public void extractPoints() throws InterruptedException {
-	firefox.longLoading();
-	String scoreContentField = firefox.get().findElement(By.id("scoreContentField")).getText();
-	if (!scoreContentField.isEmpty()) {
-	    points = Long.parseLong(scoreContentField.split(" ")[0].replaceAll("\\.", ""));
-	}
-	log.info(messageSource.getMessage("login.points", new Object[] { points }, Locale.ENGLISH));
-    }
-
     public boolean isLogged() {
 	try {
 	    if (firefox.get().getCurrentUrl().contains("page=ingame")) {
@@ -74,20 +63,9 @@ public class LoginService {
 	return firefox.get().getCurrentUrl().contains("page=ingame");
     }
 
-    public boolean hasPoints() {
-	return points > 0;
-    }
-
     public void logout() throws InterruptedException {
 	firefox.get().findElement(By.id("bar")).findElements(By.tagName("li")).get(7).click();
 	firefox.shortLoading();
     }
 
-    public long getPoints() {
-	return points;
-    }
-
-    public void setPoints(long points) {
-	this.points = points;
-    }
 }

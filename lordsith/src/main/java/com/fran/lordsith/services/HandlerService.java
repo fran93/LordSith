@@ -28,10 +28,14 @@ public class HandlerService {
     @Autowired
     @Lazy
     private FleetService fleetService;
+    
+    @Autowired
+    @Lazy
+    private PlanetService planetService;
 
     Logger log = LoggerFactory.getLogger(HandlerService.class);
 
-    public void scrapFleet(long points) throws InterruptedException {
+    public void scrapFleet() throws InterruptedException {
 	firefox.get().findElements(By.className("menubutton")).get(MenuEnum.HANDLER.getId()).click();
 	firefox.shortLoading();
 
@@ -44,13 +48,13 @@ public class HandlerService {
 	clickScrap("button211");
 	firefox.shortLoading();
 
-	if (points > 0) {
+	if (planetService.hasPoints()) {
 	    firefox.get().findElement(By.className("forward")).click();
 	    firefox.shortLoading();
 	    String rawAmount = firefox.get().findElement(By.id("button203")).findElement(By.className("amount")).getText().replaceAll("\\.", "");
 	    if(!rawAmount.trim().isEmpty()) {
 		long current = Long.parseLong(rawAmount);
-		long base = fleetService.calculateNumberOfCargos(points);
+		long base = fleetService.calculateNumberOfCargos(planetService.getPoints());
 		long desired = current - (base + base / 2);
 
 		if (desired > 0) {

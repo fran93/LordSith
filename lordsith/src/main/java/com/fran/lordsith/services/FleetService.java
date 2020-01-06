@@ -49,6 +49,10 @@ public class FleetService {
     @Lazy
     private BuildingService buildingService;
 
+    @Autowired
+    @Lazy
+    private PlanetService planetService;
+
     Logger log = LoggerFactory.getLogger(FleetService.class);
 
     private int leftSystem;
@@ -74,38 +78,40 @@ public class FleetService {
 	}
     }
 
-    public void sendExpedition(long points) throws InterruptedException {
-	firefox.get().findElements(By.className(MENUBUTTON)).get(MenuEnum.FLOTTE.getId()).click();
-	firefox.shortLoading();
+    public void sendExpedition() throws InterruptedException {
+	if (planetService.hasPoints()) {
+	    firefox.get().findElements(By.className(MENUBUTTON)).get(MenuEnum.FLOTTE.getId()).click();
+	    firefox.shortLoading();
 
-	if (isExpeditionAvailable() && isThereAFleet() && isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId())
-		&& numberOfShips(TechnologyEnum.GROSSER_TRANSPORTER.getId()) > calculateNumberOfCargos(points) / 2) {
-	    firefox.get().findElement(By.name("transporterLarge")).sendKeys(String.valueOf(calculateNumberOfCargos(points)));
-	    firefox.loading();
-
-	    if (isStatusOn(TechnologyEnum.PATHFINDER.getId())) {
-		firefox.get().findElement(By.name("explorer")).sendKeys("1");
-		firefox.loading();
-	    }
-
-	    if (isStatusOn(TechnologyEnum.ZERSTORER.getId())) {
-		firefox.get().findElement(By.name("destroyer")).sendKeys("1");
-		firefox.loading();
-	    }
-
-	    if (canContinue(CONTINUE_TO_FLEET2)) {
-		weiterWeiter(CONTINUE_TO_FLEET2);
-
-		firefox.get().findElement(By.id("position")).sendKeys("16");
+	    if (isExpeditionAvailable() && isThereAFleet() && isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId())
+		    && numberOfShips(TechnologyEnum.GROSSER_TRANSPORTER.getId()) > calculateNumberOfCargos(planetService.getPoints()) / 2) {
+		firefox.get().findElement(By.name("transporterLarge")).sendKeys(String.valueOf(calculateNumberOfCargos(planetService.getPoints())));
 		firefox.loading();
 
-		if (canContinue(CONTINUE_TO_FLEET3)) {
-		    weiterWeiter(CONTINUE_TO_FLEET3);
+		if (isStatusOn(TechnologyEnum.PATHFINDER.getId())) {
+		    firefox.get().findElement(By.name("explorer")).sendKeys("1");
+		    firefox.loading();
+		}
 
-		    if (canContinue(SEND_FLEET)) {
-			weiterWeiter(SEND_FLEET);
+		if (isStatusOn(TechnologyEnum.ZERSTORER.getId())) {
+		    firefox.get().findElement(By.name("destroyer")).sendKeys("1");
+		    firefox.loading();
+		}
 
-			log.info(messageSource.getMessage("fleet.expedition", null, Locale.ENGLISH));
+		if (canContinue(CONTINUE_TO_FLEET2)) {
+		    weiterWeiter(CONTINUE_TO_FLEET2);
+
+		    firefox.get().findElement(By.id("position")).sendKeys("16");
+		    firefox.loading();
+
+		    if (canContinue(CONTINUE_TO_FLEET3)) {
+			weiterWeiter(CONTINUE_TO_FLEET3);
+
+			if (canContinue(SEND_FLEET)) {
+			    weiterWeiter(SEND_FLEET);
+
+			    log.info(messageSource.getMessage("fleet.expedition", null, Locale.ENGLISH));
+			}
 		    }
 		}
 	    }

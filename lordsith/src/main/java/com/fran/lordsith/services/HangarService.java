@@ -28,17 +28,21 @@ public class HangarService {
     
     @Autowired
     @Lazy
+    private PlanetService planetService;
+    
+    @Autowired
+    @Lazy
     private MessageSource messageSource;
 
     private static final String LI_DATA_TECHNOLOGY = "//li[@data-technology=";
 
     Logger log = LoggerFactory.getLogger(HangarService.class);
 
-    public void buildExpeditionFleet(long points) throws InterruptedException {
+    public void buildExpeditionFleet() throws InterruptedException {
 	firefox.get().findElements(By.className("menubutton")).get(MenuEnum.SCHIFFSWERFT.getId()).click();
 	firefox.shortLoading();
 
-	int desiredShips = expeditionService.calculateNumberOfCargos(points) / 2;
+	int desiredShips = expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 2;
 	long amountCargos = getAmount(TechnologyEnum.GROSSER_TRANSPORTER.getId());
 	long amountPath = getAmount(TechnologyEnum.PATHFINDER.getId());
 	long amountZerstorer = getAmount(TechnologyEnum.ZERSTORER.getId());
@@ -55,9 +59,18 @@ public class HangarService {
 	    build(TechnologyEnum.ZERSTORER, 1);
 	}
     }
+    
+    public void buildSolarSatelliteFleet() throws InterruptedException {
+	firefox.get().findElements(By.className("menubutton")).get(MenuEnum.SCHIFFSWERFT.getId()).click();
+	firefox.shortLoading();
+	
+	if (isStatusOn(TechnologyEnum.SOLARSATELLIT.getId())) {
+	    build(TechnologyEnum.SOLARSATELLIT, 100);
+	}
+    }
 
-    public void buildPathfinderFleet(long points) throws InterruptedException {
-	int desiredShips = expeditionService.calculateNumberOfCargos(points) / 10;
+    public void buildPathfinderFleet() throws InterruptedException {
+	int desiredShips = expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 10;
 	long amountPath = getAmount(TechnologyEnum.PATHFINDER.getId());
 
 	if (isStatusOn(TechnologyEnum.PATHFINDER.getId()) && amountPath < desiredShips) {

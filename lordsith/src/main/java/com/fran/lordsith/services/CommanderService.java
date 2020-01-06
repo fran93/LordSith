@@ -1,10 +1,8 @@
 package com.fran.lordsith.services;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.openqa.selenium.By;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +47,10 @@ public class CommanderService {
 
     @Autowired
     @Lazy
+    private PlanetService planetService;
+
+    @Autowired
+    @Lazy
     private MessageSource messageSource;
 
     Logger log = LoggerFactory.getLogger(CommanderService.class);
@@ -62,10 +64,8 @@ public class CommanderService {
 	if (!loginService.isLogged()) {
 	    loginService.login();
 	}
-	loginService.extractPoints();
 
-	List<String> planetIds = new ArrayList<>();
-	firefox.get().findElement(By.id("planetList")).findElements(By.className("smallplanet")).forEach(planet -> planetIds.add(planet.getAttribute("id")));
+	List<String> planetIds = planetService.getPlanetList();
 
 	for (int i = 0; i < planetIds.size(); i++) {
 	    managePlanets(planetIds, i);
@@ -79,19 +79,16 @@ public class CommanderService {
     }
 
     private void managePlanets(List<String> planetIds, int i) throws InterruptedException {
-	firefox.shortLoading();
-	firefox.get().findElement(By.id(planetIds.get(i))).click();
+	planetService.nextPlanet(planetIds.get(i));
 
-	handlerService.scrapFleet(loginService.getPoints());
+	handlerService.scrapFleet();
 	if (isMainPlanet(i)) {
 	    handlerService.importExport();
 	}
 
-	if (loginService.hasPoints()) {
-	    manageFleetService.sendExpedition(loginService.getPoints());
-	    if (!isMainPlanet(i)) {
-		manageFleetService.transportResources();
-	    }
+	manageFleetService.sendExpedition();
+	if (!isMainPlanet(i)) {
+	    manageFleetService.transportResources();
 	}
 
 	if (isMainPlanet(i)) {
@@ -99,18 +96,18 @@ public class CommanderService {
 	}
 
 	if (buildingService.buildMinesOrFacilities() && researchService.research()) {
-	    hangarService.buildExpeditionFleet(loginService.getPoints());
+	    hangarService.buildExpeditionFleet();
 	    if (isMainPlanet(i)) {
-		hangarService.buildPathfinderFleet(loginService.getPoints());
+		hangarService.buildPathfinderFleet();
 		hangarService.buildHuntingFleet();
 	    }
-	    defenseService.buildDefenses(i, loginService.getPoints());
+	    defenseService.buildDefenses(isMainPlanet(i));
 	}
 	firefox.shortLoading();
     }
 
-    private void returnToMainPlanet(List<String> planetIds) {
-	firefox.get().findElement(By.id(planetIds.get(0))).click();
+    private void returnToMainPlanet(List<String> planetIds) throws InterruptedException {
+	planetService.nextPlanet(planetIds.get(0));
     }
 
     private boolean isMainPlanet(int i) {

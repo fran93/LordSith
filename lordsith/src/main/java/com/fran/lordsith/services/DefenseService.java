@@ -34,6 +34,10 @@ public class DefenseService {
     @Autowired
     @Lazy
     private FirefoxClient firefox;
+    
+    @Autowired
+    @Lazy
+    private PlanetService planetService;
 
     @Autowired
     @Lazy
@@ -55,11 +59,11 @@ public class DefenseService {
 	}
     }
 
-    public void buildDefenses(int position, long points) throws InterruptedException {
+    public void buildDefenses(boolean isMainPlanet) throws InterruptedException {
 	firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERTEIDIGUNG.getId()).click();
 	firefox.shortLoading();
 
-	int adjust = position == 0 ? 1 : 10;
+	int adjust = isMainPlanet? 1 : 10;
 	
 	List<Defense> defenses = new ArrayList<>();
 	defenses.add(new Defense(BASE_RAKETENWERFER, TechnologyEnum.RAKETENWERFER, false));
@@ -72,7 +76,7 @@ public class DefenseService {
 	defenses.add(new Defense(1, TechnologyEnum.GROSSE_SCHILDKUPPEL, true));
 	defenses.add(new Defense(1, TechnologyEnum.ABFANGRAKETE, true));
 	
-	defenses.forEach(defense -> defense.setAmountToBuild((calculateNumberOfDefense(defense.getBaseAmount(), points) / adjust) - getAmount(defense.getTechnology().getId())));
+	defenses.forEach(defense -> defense.setAmountToBuild((calculateNumberOfDefense(defense.getBaseAmount(), planetService.getPoints()) / adjust) - getAmount(defense.getTechnology().getId())));
 	Optional<Defense> defenseToBuild = defenses.stream().filter(defense -> isStatusOn(defense.getTechnology().getId()) && defense.getAmountToBuild() > 0).findFirst();
 	if(defenseToBuild.isPresent()) {
 	    if(defenseToBuild.get().isUnique()) {
