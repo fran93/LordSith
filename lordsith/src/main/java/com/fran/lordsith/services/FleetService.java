@@ -22,11 +22,11 @@ import com.fran.lordsith.model.Resources;
 @Service
 public class FleetService {
 
-    private static final int MINIMUM_METALL = 1000000;
-    private static final int MINIMUM_DEUTERIUM = 500000;
-    private static final int MINIMUM_KRISTALL = 500000;
-    private static final int MINIMUM_RESOURCES = 1000000;
-    private static final int MINIMUM_TRANSPORT = 500;
+    private static final double MINIMUM_METALL = 1000000;
+    private static final double MINIMUM_DEUTERIUM = 500000;
+    private static final double MINIMUM_KRISTALL = 500000;
+    private static final double MINIMUM_RESOURCES = 1000000;
+    private static final double MINIMUM_TRANSPORT = 500;
     private static final String MENUBUTTON = "menubutton";
     private static final String SEND_FLEET = "sendFleet";
     private static final String CONTINUE_TO_FLEET3 = "continueToFleet3";
@@ -373,13 +373,13 @@ public class FleetService {
 	Resources resources = buildingService.parseResources();
 	Resources amountToTransport = new Resources(0);
 	if (resources.getKristall() > MINIMUM_RESOURCES && resources.getKristall() > resources.getMetall() * 2) {
-	    amountToTransport.setKristall(resources.getKristall() - MINIMUM_KRISTALL);
+	    amountToTransport.setKristall((resources.getKristall() - MINIMUM_KRISTALL));
 	}
 	if (resources.getDeuterium() > MINIMUM_RESOURCES && resources.getDeuterium() > resources.getKristall() * 2) {
-	    amountToTransport.setDeuterium(resources.getDeuterium() - MINIMUM_DEUTERIUM);
+	    amountToTransport.setDeuterium((resources.getDeuterium() - MINIMUM_DEUTERIUM));
 	}
 	if (resources.getMetall() > MINIMUM_RESOURCES && resources.getMetall() > resources.getKristall() * 5) {
-	    amountToTransport.setMetall(resources.getMetall() - MINIMUM_METALL);
+	    amountToTransport.setMetall((resources.getMetall() - MINIMUM_METALL));
 	}
 	return amountToTransport;
     }
