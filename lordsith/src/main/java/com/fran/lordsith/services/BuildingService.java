@@ -30,6 +30,10 @@ public class BuildingService {
     private static final String DATA_RAW = "data-raw";
     private static final String TITLE = "title";
     private static final String MENUBUTTON = "menubutton";
+    private static final int FACILITIES_COST_MULTIPLIER = 3;
+    private static final int MAX_SOLARKRAFTWERK_LEVEL = 26;
+    private static final int MAX_ROBOTERFABRIK_LEVEL = 10;
+    private static final int MAX_RAUMSCHIFFSWERFT_LEVEL = 12;
 
     @Autowired
     @Lazy
@@ -92,9 +96,9 @@ public class BuildingService {
 		    || (id == TechnologyEnum.FORSCHUNGSLABOR.getId() && status.equals(StatusEnum.ON.getValue()))
 		    || (id == TechnologyEnum.NANITENFABRIK.getId() && status.equals(StatusEnum.ON.getValue()))
 		    || (id == TechnologyEnum.RAUMSCHIFFSWERFT.getId() && status.equals(StatusEnum.ON.getValue())
-			    && Integer.parseInt(technology.findElement(By.className(LEVEL)).getAttribute(DATA_VALUE)) < 12)
+			    && Integer.parseInt(technology.findElement(By.className(LEVEL)).getAttribute(DATA_VALUE)) < MAX_RAUMSCHIFFSWERFT_LEVEL)
 		    || (id == TechnologyEnum.ROBOTERFABRIK.getId() && !status.equals(StatusEnum.OFF.getValue())
-			    && Integer.parseInt(technology.findElement(By.className(LEVEL)).getAttribute(DATA_VALUE)) < 10)) {
+			    && Integer.parseInt(technology.findElement(By.className(LEVEL)).getAttribute(DATA_VALUE)) < MAX_ROBOTERFABRIK_LEVEL)) {
 		parseTechnology(facilities, technology, id, status);
 	    }
 
@@ -111,7 +115,7 @@ public class BuildingService {
 
 	    if (id <= TechnologyEnum.DEUTERIUMSYNTHETISIERER.getId()) {
 		parseTechnology(mines, technology, id, status);
-	    } else if (id == TechnologyEnum.SOLARKRAFTWERK.getId()) {
+	    } else if (id == TechnologyEnum.SOLARKRAFTWERK.getId() && Integer.parseInt(technology.findElement(By.className(LEVEL)).getAttribute(DATA_VALUE)) < MAX_SOLARKRAFTWERK_LEVEL) {
 		parseTechnology(powerPlants, technology, id, status);
 	    } else if (id == TechnologyEnum.FUSIONKRAFTWERK.getId() && !status.equals(StatusEnum.OFF.getValue())) {
 		parseTechnology(powerPlants, technology, id, status);
@@ -142,7 +146,7 @@ public class BuildingService {
 	    } else {
 		mines.sort(Comparator.comparingDouble(Technology::getTotalCost));
 		facilities.sort(Comparator.comparingDouble(Technology::getTotalCost));
-		if (!facilities.isEmpty() && facilities.get(0).getTotalCost() * 2 < mines.get(0).getTotalCost()) {
+		if (!facilities.isEmpty() && facilities.get(0).getTotalCost() * FACILITIES_COST_MULTIPLIER < mines.get(0).getTotalCost()) {
 		    upTechnology(facilities.get(0), building);
 		} else {
 		    firefox.get().findElements(By.className(MENUBUTTON)).get(MenuEnum.VERSORGUNG.getId()).click();
