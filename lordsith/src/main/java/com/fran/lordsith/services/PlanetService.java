@@ -65,8 +65,10 @@ public class PlanetService {
 
     public void extractFreeFields() {
 	List<WebElement> spans = firefox.get().findElement(By.id("diameterContentField")).findElements(By.tagName("span"));
-	currentFields = Integer.valueOf(spans.get(0).getText());
-	maxFields = Integer.valueOf(spans.get(1).getText());
+	if(!spans.isEmpty()) {
+	    currentFields = Integer.valueOf(spans.get(0).getText());
+	    maxFields = Integer.valueOf(spans.get(1).getText());
+	}
     }
 
     public boolean hasPoints() {
