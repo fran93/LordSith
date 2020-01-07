@@ -72,6 +72,7 @@ public class CommanderService {
 	}
 
 	returnToMainPlanet(planetIds);
+	manageFleetService.scan();
 	manageFleetService.hunting();
 
 	loginService.logout();
@@ -89,10 +90,6 @@ public class CommanderService {
 	manageFleetService.sendExpedition();
 	if (!isMainPlanet(i)) {
 	    manageFleetService.transportResources();
-	}
-
-	if (isMainPlanet(i)) {
-	    manageFleetService.scan();
 	}
 
 	if (buildingService.buildMinesOrFacilities() && researchService.research()) {
