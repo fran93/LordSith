@@ -119,6 +119,7 @@ public class FleetService {
     }
 
     public void hunting() throws InterruptedException {
+	firefox.longestLoading();
 	openMessages();
 	processMessages();
     }

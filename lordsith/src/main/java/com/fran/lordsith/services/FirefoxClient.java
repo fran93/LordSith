@@ -1,5 +1,6 @@
 package com.fran.lordsith.services;
 
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,15 +54,19 @@ public class FirefoxClient {
     }
 
     public void shortLoading() throws InterruptedException {
-	Thread.sleep(1000);
+	TimeUnit.SECONDS.sleep(1);
     }
 
     public void loading() throws InterruptedException {
-	Thread.sleep(3000);
+	TimeUnit.SECONDS.sleep(3);
     }
 
     public void longLoading() throws InterruptedException {
-	Thread.sleep(6000);
+	TimeUnit.SECONDS.sleep(6);
+    }
+    
+    public void longestLoading() throws InterruptedException {
+	TimeUnit.MINUTES.sleep(1);
     }
 
     public void closeTab() throws InterruptedException {
