@@ -131,7 +131,7 @@ public class FleetService {
 	int planetSystem = getCurrentSystem();
 	int reportCount = 0;
 
-	while (getGalaxyFreeSlots() > 0 && reportCount < MAX_SPY_REPORTS) {
+	while (getGalaxyFreeSlots() > 0 && reportCount < MAX_SPY_REPORTS && isSondeAvailable()) {
 	    if (!(rightSystem > 0 && planetSystem == getCurrentSystem())) {
 		recycle();
 		reportCount += spy();
@@ -215,6 +215,11 @@ public class FleetService {
 	return Integer.parseInt(slotValue[1]) - Integer.parseInt(slotValue[0]);
     }
 
+    private boolean isSondeAvailable() throws InterruptedException {
+	firefox.shortLoading();
+	return Integer.parseInt(firefox.get().findElement(By.id("probeValue")).getText().trim()) > 5;
+    }
+
     private void processMessages() throws InterruptedException {
 	List<String> messagesIds = new ArrayList<>();
 	firefox.get().findElement(By.id("ui-id-16")).findElements(By.className("msg")).forEach(msg -> messagesIds.add(msg.getAttribute("data-msg-id")));
@@ -237,10 +242,14 @@ public class FleetService {
 			firefox.shortLoading();
 		    }
 		} else {
+		    if (necesaryFleet >= MIN_CARGOS_TO_ATTACK) {
+			String coordinates = message.findElement(By.className("msg_title")).getText();
+			log.info(messageSource.getMessage("fleet.farm", new Object[] { coordinates, defenses, necesaryFleet }, Locale.ENGLISH));
+		    } else {
+			log.info(messageSource.getMessage("fleet.discard", null, Locale.ENGLISH));
+		    }
 		    message.findElement(By.className("icon_refuse")).click();
 		    firefox.loading();
-
-		    log.info(messageSource.getMessage("fleet.discard", null, Locale.ENGLISH));
 		}
 	    }
 	}

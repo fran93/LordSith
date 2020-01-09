@@ -18,7 +18,7 @@ public class Tasks {
 	@Autowired @Lazy
 	private LoginService loginService;
 
-	@Scheduled(cron = "3 */15 6-21 * * *")
+	@Scheduled(cron = "3 */20 6-21 * * *")
 	public void daily() throws InterruptedException {
 		commanderService.command();
 	}
