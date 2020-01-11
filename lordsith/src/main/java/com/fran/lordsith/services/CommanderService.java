@@ -90,6 +90,7 @@ public class CommanderService {
 	manageFleetService.sendExpedition();
 	if (!isMainPlanet(i)) {
 	    manageFleetService.transportResources();
+	    manageFleetService.deployFleet();
 	}
 
 	if (buildingService.buildMinesOrFacilities() && researchService.research()) {

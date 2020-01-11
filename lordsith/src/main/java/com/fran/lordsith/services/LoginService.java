@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.fran.lordsith.enums.MenuEnum;
-import com.fran.lordsith.enums.PagesEnum;
 
 @Service
 public class LoginService {
@@ -23,6 +22,9 @@ public class LoginService {
 
     @Value("${ogame.password}")
     private String password;
+    
+    @Value("${ogame.url}")
+    private String url;
 
     @Autowired
     @Lazy
@@ -35,7 +37,7 @@ public class LoginService {
     Logger log = LoggerFactory.getLogger(LoginService.class);
 
     public void login() throws InterruptedException {
-	firefox.get().get(PagesEnum.LOBBY.getUrl());
+	firefox.get().get(url);
 	firefox.shortLoading();
 
 	if (firefox.get().findElements(By.className("hub-logo")).isEmpty()) {

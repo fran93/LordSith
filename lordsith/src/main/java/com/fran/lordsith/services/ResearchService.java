@@ -30,6 +30,10 @@ public class ResearchService {
     @Autowired
     @Lazy
     private MessageSource messageSource;
+    
+    @Autowired
+    @Lazy
+    private MenuService menuService;
 
     Logger log = LoggerFactory.getLogger(ResearchService.class);
 
@@ -37,8 +41,7 @@ public class ResearchService {
 	ArrayList<Technology> researchs = new ArrayList<>();
 	AtomicBoolean researching = new AtomicBoolean(false);
 
-	firefox.get().findElements(By.className("menubutton")).get(MenuEnum.FORSCHUNG.getId()).click();
-	firefox.shortLoading();
+	menuService.openPage(MenuEnum.FORSCHUNG);
 
 	firefox.get().findElements(By.className("technology")).forEach(technology -> {
 	    int id = Integer.parseInt(technology.getAttribute("data-technology"));

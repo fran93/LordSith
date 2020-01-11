@@ -32,12 +32,15 @@ public class HandlerService {
     @Autowired
     @Lazy
     private PlanetService planetService;
+    
+    @Autowired
+    @Lazy
+    private MenuService menuService;
 
     Logger log = LoggerFactory.getLogger(HandlerService.class);
 
     public void scrapFleet() throws InterruptedException {
-	firefox.get().findElements(By.className("menubutton")).get(MenuEnum.HANDLER.getId()).click();
-	firefox.shortLoading();
+	menuService.openPage(MenuEnum.HANDLER);
 
 	firefox.get().findElement(By.id("js_traderScrap")).click();
 	firefox.loading();

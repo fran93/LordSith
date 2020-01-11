@@ -30,7 +30,6 @@ public class BuildingService {
     private static final String LEVEL = "level";
     private static final String DATA_RAW = "data-raw";
     private static final String TITLE = "title";
-    private static final String MENUBUTTON = "menubutton";
     private static final int FACILITIES_COST_MULTIPLIER = 3;
     private static final int MAX_SOLARKRAFTWERK_LEVEL = 26;
     private static final int MAX_ROBOTERFABRIK_LEVEL = 10;
@@ -51,6 +50,10 @@ public class BuildingService {
     @Autowired
     @Lazy
     private HangarService hangarService;
+    
+    @Autowired
+    @Lazy
+    private MenuService menuService;
 
     Logger log = LoggerFactory.getLogger(BuildingService.class);
 
@@ -61,15 +64,12 @@ public class BuildingService {
 	ArrayList<Technology> facilities = new ArrayList<>();
 	AtomicBoolean building = new AtomicBoolean(false);
 
-	firefox.loading();
-	firefox.get().findElements(By.className(MENUBUTTON)).get(MenuEnum.VERSORGUNG.getId()).click();
-	firefox.shortLoading();
+	menuService.openPage(MenuEnum.VERSORGUNG);
 
 	parseMines(mines, powerPlants, storages, building);
 
 	if (!building.get()) {
-	    firefox.get().findElements(By.className(MENUBUTTON)).get(MenuEnum.ANLAGEN.getId()).click();
-	    firefox.shortLoading();
+	    menuService.openPage(MenuEnum.ANLAGEN);
 
 	    parseFacilities(facilities, building);
 	    chooseWhatToBuild(mines, powerPlants, storages, facilities, building, parseResources(), parseStorage());
@@ -149,8 +149,7 @@ public class BuildingService {
 	    } else if (storage.getMetall() < resources.getMetall()) {
 		resourcesOverflow(storages, building, TechnologyEnum.METALLSPEICHER.getId());
 	    } else if (resources.getEnergie() < 0) {
-		firefox.get().findElements(By.className(MENUBUTTON)).get(MenuEnum.VERSORGUNG.getId()).click();
-		firefox.shortLoading();
+		menuService.openPage(MenuEnum.VERSORGUNG);
 
 		powerPlants.sort(Comparator.comparingDouble(Technology::getTotalCost));
 		upTechnology(powerPlants.get(0), building);
@@ -160,8 +159,7 @@ public class BuildingService {
 		if (!facilities.isEmpty() && facilities.get(0).getTotalCost() * FACILITIES_COST_MULTIPLIER < mines.get(0).getTotalCost()) {
 		    upTechnology(facilities.get(0), building);
 		} else {
-		    firefox.get().findElements(By.className(MENUBUTTON)).get(MenuEnum.VERSORGUNG.getId()).click();
-		    firefox.shortLoading();
+		    menuService.openPage(MenuEnum.VERSORGUNG);
 
 		    upTechnology(mines.get(0), building);
 		}
@@ -189,8 +187,7 @@ public class BuildingService {
     }
 
     private void resourcesOverflow(ArrayList<Technology> storages, AtomicBoolean building, int id) throws InterruptedException {
-	firefox.get().findElements(By.className(MENUBUTTON)).get(MenuEnum.VERSORGUNG.getId()).click();
-	firefox.shortLoading();
+	menuService.openPage(MenuEnum.VERSORGUNG);
 
 	Optional<Technology> optional = storages.stream().filter(ss -> ss.getId() == id).findFirst();
 	if (optional.isPresent())

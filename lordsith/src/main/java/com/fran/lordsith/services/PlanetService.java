@@ -25,6 +25,10 @@ public class PlanetService {
     @Autowired
     @Lazy
     private MessageSource messageSource;
+    
+    @Autowired
+    @Lazy
+    private MenuService menuService;
 
     private long points;
 
@@ -42,10 +46,7 @@ public class PlanetService {
     }
 
     public void nextPlanet(String id) throws InterruptedException {
-	if (!firefox.get().getCurrentUrl().contains("component=overview")) {
-	    firefox.get().findElements(By.className("menubutton")).get(MenuEnum.UBERSICHT.getId()).click();
-	    firefox.shortLoading();
-	}
+	menuService.openPage(MenuEnum.UBERSICHT);
 	firefox.get().findElement(By.id(id)).click();
 	firefox.loading();
 	extractPoints();

@@ -42,6 +42,10 @@ public class DefenseService {
     @Autowired
     @Lazy
     private MessageSource messageSource;
+    
+    @Autowired
+    @Lazy
+    private MenuService menuService;
 
     Logger log = LoggerFactory.getLogger(DefenseService.class);
 
@@ -60,8 +64,7 @@ public class DefenseService {
     }
 
     public void buildDefenses(boolean isMainPlanet) throws InterruptedException {
-	firefox.get().findElements(By.className("menubutton")).get(MenuEnum.VERTEIDIGUNG.getId()).click();
-	firefox.shortLoading();
+	menuService.openPage(MenuEnum.VERTEIDIGUNG);
 
 	int adjust = isMainPlanet? 1 : 10;
 	

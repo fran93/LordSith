@@ -33,14 +33,17 @@ public class HangarService {
     @Autowired
     @Lazy
     private MessageSource messageSource;
+    
+    @Autowired
+    @Lazy
+    private MenuService menuService;
 
     private static final String LI_DATA_TECHNOLOGY = "//li[@data-technology=";
 
     Logger log = LoggerFactory.getLogger(HangarService.class);
 
     public void buildExpeditionFleet() throws InterruptedException {
-	firefox.get().findElements(By.className("menubutton")).get(MenuEnum.SCHIFFSWERFT.getId()).click();
-	firefox.shortLoading();
+	menuService.openPage(MenuEnum.SCHIFFSWERFT);
 
 	int desiredShips = expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 2;
 	long amountCargos = getAmount(TechnologyEnum.GROSSER_TRANSPORTER.getId());
@@ -61,8 +64,7 @@ public class HangarService {
     }
     
     public void buildSolarSatelliteFleet() throws InterruptedException {
-	firefox.get().findElements(By.className("menubutton")).get(MenuEnum.SCHIFFSWERFT.getId()).click();
-	firefox.shortLoading();
+	menuService.openPage(MenuEnum.SCHIFFSWERFT);
 	
 	if (isStatusOn(TechnologyEnum.SOLARSATELLIT.getId())) {
 	    build(TechnologyEnum.SOLARSATELLIT, 100);
