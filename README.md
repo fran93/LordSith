@@ -6,7 +6,7 @@ An ogame bot using docker.
 -Compile the project using maven: 
 mvn clean install. 
 
-If you want to use it in a machine without graphical interface, use the pro profile:
+If you want to use it on a machine without graphical interface, use the pro profile:
 mvn -Ppro clean install
 
 -Run the project. java -jar LordSith/lordsith/target/lordsith-0.0.1-SNAPSHOT.jar
