@@ -17,6 +17,7 @@ import com.fran.lordsith.enums.MenuEnum;
 @Service
 public class LoginService {
 
+    public static final int MAX_EXHAUSTION = 6;
     @Value("${ogame.email}")
     private String email;
 
@@ -58,7 +59,7 @@ public class LoginService {
 
 	private void handleExhaustion() {
 		exhaustion++;
-		if(exhaustion >= 10) {
+		if(exhaustion >= MAX_EXHAUSTION) {
 			exhaustion = 0;
 			firefox.quit();
 			firefox.restart();
