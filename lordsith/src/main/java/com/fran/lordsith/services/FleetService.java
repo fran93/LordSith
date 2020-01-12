@@ -280,8 +280,10 @@ public class FleetService {
 
                     openMessages();
 
-                    firefox.get().findElement(By.xpath("//li[@data-msg-id=" + id + "]")).findElement(By.className("icon_refuse")).click();
-                    firefox.loading();
+                    if(firefox.get().getCurrentUrl().trim().endsWith("messages")) {
+                        firefox.get().findElement(By.xpath("//li[@data-msg-id=" + id + "]")).findElement(By.className("icon_refuse")).click();
+                        firefox.loading();
+                    }
                 }
             }
         }
@@ -322,25 +324,32 @@ public class FleetService {
     }
 
     private boolean isExpeditionAvailable() {
-        List<WebElement> slotElements = firefox.get().findElement(By.id("slots")).findElements(By.className("fleft"));
-        String rawExpe = slotElements.get(1).getText();
-        String splitedExpeditions = rawExpe.split(":")[1].trim();
+        if(menuService.isOnPage(MenuEnum.FLOTTE)) {
+            List<WebElement> slotElements = firefox.get().findElement(By.id("slots")).findElements(By.className("fleft"));
+            String rawExpe = slotElements.get(1).getText();
+            String splitedExpeditions = rawExpe.split(":")[1].trim();
 
-        int currentExpeditions = Integer.parseInt(splitedExpeditions.split("/")[0]);
-        int maxExpeditions = Integer.parseInt(splitedExpeditions.split("/")[1]);
+            int currentExpeditions = Integer.parseInt(splitedExpeditions.split("/")[0]);
+            int maxExpeditions = Integer.parseInt(splitedExpeditions.split("/")[1]);
 
-        return isFleetAvailable() && currentExpeditions < maxExpeditions;
+            return isFleetAvailable() && currentExpeditions < maxExpeditions;
+        }
+        return false;
     }
 
     private boolean isFleetAvailable() {
-        List<WebElement> slotElements = firefox.get().findElement(By.id("slots")).findElements(By.className("fleft"));
-        String rawSlots = slotElements.get(0).getText();
-        String splitedSlots = rawSlots.split(":")[1].trim();
+        if(menuService.isOnPage(MenuEnum.FLOTTE)) {
+            List<WebElement> slotElements = firefox.get().findElement(By.id("slots")).findElements(By.className("fleft"));
+            String rawSlots = slotElements.get(0).getText();
+            String splitedSlots = rawSlots.split(":")[1].trim();
 
-        int currentSlots = Integer.parseInt(splitedSlots.split("/")[0]);
-        int maxSlots = Integer.parseInt(splitedSlots.split("/")[1]);
+            int currentSlots = Integer.parseInt(splitedSlots.split("/")[0]);
+            int maxSlots = Integer.parseInt(splitedSlots.split("/")[1]);
 
-        return currentSlots < maxSlots;
+            return currentSlots < maxSlots;
+
+        }
+        return false;
     }
 
     public void transportResources() throws InterruptedException {

@@ -57,59 +57,59 @@ public class CommanderService {
 
     /**
      * Bugs to fix here:
-     * 
+     *
      * @throws InterruptedException
      */
     public void command() throws InterruptedException {
-	if (!loginService.isLogged()) {
-	    loginService.login();
-	}
+        if (!loginService.isLogged()) {
+            loginService.login();
+        }
 
-	List<String> planetIds = planetService.getPlanetList();
+        List<String> planetIds = planetService.getPlanetList();
 
-	for (int i = 0; i < planetIds.size(); i++) {
-	    managePlanets(planetIds, i);
-	}
+        for (int i = 0; i < planetIds.size(); i++) {
+            managePlanets(planetIds, i);
+        }
 
-	returnToMainPlanet(planetIds);
-	manageFleetService.scan();
-	manageFleetService.hunting();
+        returnToMainPlanet(planetIds);
+        manageFleetService.scan();
+        manageFleetService.hunting();
 
-	loginService.logout();
-	log.info(messageSource.getMessage("commander.done", null, Locale.ENGLISH));
+        loginService.logout();
+        log.info(messageSource.getMessage("commander.done", null, Locale.ENGLISH));
     }
 
     private void managePlanets(List<String> planetIds, int i) throws InterruptedException {
-	planetService.nextPlanet(planetIds.get(i));
+        planetService.nextPlanet(planetIds.get(i));
 
-	handlerService.scrapFleet();
-	if (isMainPlanet(i)) {
-	    handlerService.importExport();
-	}
+        handlerService.scrapFleet();
+        if (isMainPlanet(i)) {
+            handlerService.importExport();
+        }
 
-	manageFleetService.sendExpedition();
-	if (!isMainPlanet(i)) {
-	    manageFleetService.transportResources();
-	    manageFleetService.deployFleet();
-	}
+        manageFleetService.sendExpedition();
+        if (!isMainPlanet(i)) {
+            manageFleetService.transportResources();
+            manageFleetService.deployFleet();
+        }
 
-	if (buildingService.buildMinesOrFacilities() && researchService.research()) {
-	    hangarService.buildExpeditionFleet();
-	    if (isMainPlanet(i)) {
-		hangarService.buildPathfinderFleet();
-		hangarService.buildHuntingFleet();
-	    }
-	    defenseService.buildDefenses(isMainPlanet(i));
-	}
-	firefox.shortLoading();
+        if (buildingService.buildMinesOrFacilities() && researchService.research()) {
+            hangarService.buildExpeditionFleet();
+            if (isMainPlanet(i)) {
+                hangarService.buildPathfinderFleet();
+                hangarService.buildHuntingFleet();
+            }
+            defenseService.buildDefenses(isMainPlanet(i));
+        }
+        firefox.shortLoading();
     }
 
     private void returnToMainPlanet(List<String> planetIds) throws InterruptedException {
-	planetService.nextPlanet(planetIds.get(0));
+        planetService.nextPlanet(planetIds.get(0));
     }
 
     private boolean isMainPlanet(int i) {
-	return i == 0;
+        return i == 0;
     }
 
 }

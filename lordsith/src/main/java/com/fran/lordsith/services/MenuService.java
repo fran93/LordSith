@@ -13,11 +13,15 @@ public class MenuService {
     @Autowired
     @Lazy
     private FirefoxClient firefox;
-    
+
     public void openPage(MenuEnum menu) throws InterruptedException {
-	if (!firefox.get().getCurrentUrl().trim().endsWith(menu.getComponent())) {
-	    firefox.get().findElements(By.className("menubutton")).get(menu.getId()).click();
-	    firefox.shortLoading();
-	}
+        if (!isOnPage(menu)) {
+            firefox.get().findElements(By.className("menubutton")).get(menu.getId()).click();
+            firefox.shortLoading();
+        }
+    }
+
+    public boolean isOnPage(MenuEnum menu) {
+        return firefox.get().getCurrentUrl().trim().endsWith(menu.getComponent());
     }
 }
