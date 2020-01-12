@@ -22,7 +22,7 @@ public class LoginService {
 
     @Value("${ogame.password}")
     private String password;
-    
+
     @Value("${ogame.url}")
     private String url;
 
@@ -36,38 +36,51 @@ public class LoginService {
 
     Logger log = LoggerFactory.getLogger(LoginService.class);
 
+    private int exhaustion;
+
     public void login() throws InterruptedException {
-	firefox.get().get(url);
-	firefox.shortLoading();
+		handleExhaustion();
+		firefox.get().get(url);
+        firefox.shortLoading();
 
-	if (firefox.get().findElements(By.className("hub-logo")).isEmpty()) {
-	    firefox.get().findElement(By.id("loginRegisterTabs")).findElement(By.tagName("span")).click();
-	    firefox.get().findElement(By.name("email")).sendKeys(email);
-	    firefox.get().findElement(By.name("password")).sendKeys(password);
-	    firefox.get().findElement(By.xpath("//button[@type='submit']")).click();
-	    firefox.shortLoading();
-	}
+        if (firefox.get().findElements(By.className("hub-logo")).isEmpty()) {
+            firefox.get().findElement(By.id("loginRegisterTabs")).findElement(By.tagName("span")).click();
+            firefox.get().findElement(By.name("email")).sendKeys(email);
+            firefox.get().findElement(By.name("password")).sendKeys(password);
+            firefox.get().findElement(By.xpath("//button[@type='submit']")).click();
+            firefox.shortLoading();
+        }
 
-	firefox.get().findElement(By.id("joinGame")).findElement(By.tagName("a")).findElement(By.tagName("button")).click();
-	firefox.get().findElement(By.id("accountlist")).findElement(By.tagName("button")).click();
-	firefox.closeTab();
+        firefox.get().findElement(By.id("joinGame")).findElement(By.tagName("a")).findElement(By.tagName("button")).click();
+        firefox.get().findElement(By.id("accountlist")).findElement(By.tagName("button")).click();
+        firefox.closeTab();
     }
 
-    public boolean isLogged() {
-	try {
-	    if (firefox.get().getCurrentUrl().contains("page=ingame")) {
-		firefox.get().findElements(By.className("menubutton")).get(MenuEnum.UBERSICHT.getId()).click();
-	    }
-	} catch (NoSuchWindowException ex) {
-	    firefox.restart();
-	    log.info(messageSource.getMessage("commander.new.team", null, Locale.ENGLISH));
+	private void handleExhaustion() {
+		exhaustion++;
+		if(exhaustion >= 10) {
+			exhaustion = 0;
+			firefox.quit();
+			firefox.restart();
+			log.info(messageSource.getMessage("commander.new.team", new Object[]{exhaustion}, Locale.ENGLISH));
+		}
 	}
-	return firefox.get().getCurrentUrl().contains("page=ingame");
+
+	public boolean isLogged() {
+        try {
+            if (firefox.get().getCurrentUrl().contains("page=ingame")) {
+                firefox.get().findElements(By.className("menubutton")).get(MenuEnum.UBERSICHT.getId()).click();
+            }
+        } catch (NoSuchWindowException ex) {
+            firefox.restart();
+            log.info(messageSource.getMessage("commander.new.team", new Object[]{exhaustion}, Locale.ENGLISH));
+        }
+        return firefox.get().getCurrentUrl().contains("page=ingame");
     }
 
     public void logout() throws InterruptedException {
-	firefox.get().findElement(By.id("bar")).findElements(By.tagName("li")).get(7).click();
-	firefox.shortLoading();
+        firefox.get().findElement(By.id("bar")).findElements(By.tagName("li")).get(7).click();
+        firefox.shortLoading();
     }
 
 }
