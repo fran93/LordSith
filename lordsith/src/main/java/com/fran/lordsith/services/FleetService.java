@@ -39,23 +39,23 @@ public class FleetService {
 
     @Autowired
     @Lazy
-    private FirefoxClient firefox;
+    FirefoxClient firefox;
 
     @Autowired
     @Lazy
-    private MessageSource messageSource;
+    MessageSource messageSource;
 
     @Autowired
     @Lazy
-    private BuildingService buildingService;
+    BuildingService buildingService;
 
     @Autowired
     @Lazy
-    private PlanetService planetService;
+    PlanetService planetService;
 
     @Autowired
     @Lazy
-    private MenuService menuService;
+    MenuService menuService;
 
     Logger log = LoggerFactory.getLogger(FleetService.class);
 
@@ -92,7 +92,7 @@ public class FleetService {
 
     private void sendExpedition2() throws InterruptedException {
         if (isExpeditionAvailable() && isThereAFleet() && isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId())
-                && numberOfShips(TechnologyEnum.GROSSER_TRANSPORTER.getId()) > calculateNumberOfCargos(planetService.getPoints()) / 2) {
+                && numberOfShips(TechnologyEnum.GROSSER_TRANSPORTER.getId(), getListOfShips()) > calculateNumberOfCargos(planetService.getPoints()) / 2) {
             firefox.get().findElement(By.name("transporterLarge")).sendKeys(String.valueOf(calculateNumberOfCargos(planetService.getPoints())));
             firefox.loading();
 
@@ -319,8 +319,13 @@ public class FleetService {
         return firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + id + "]")).getAttribute("data-status").equals(StatusEnum.ON.getValue());
     }
 
-    private int numberOfShips(int id) {
-        return Integer.parseInt(firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + id + "]")).findElement(By.className("amount")).getAttribute("data-value"));
+    private int numberOfShips(int id, List<WebElement> ships) {
+        Optional<WebElement> theShip = ships.stream().filter(ship -> ship.getAttribute("data-data-technology").equals(String.valueOf(id))).findFirst();
+        return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
+    }
+
+    private List<WebElement> getListOfShips() {
+        return firefox.get().findElements(By.className(".technology"));
     }
 
     private boolean isExpeditionAvailable() {
@@ -355,7 +360,7 @@ public class FleetService {
     public void transportResources() throws InterruptedException {
         menuService.openPage(MenuEnum.FLOTTE);
 
-        if (isThereAFleet() && isFleetAvailable() && numberOfShips(TechnologyEnum.KLEINER_TRANSPORTER.getId()) >= MINIMUM_TRANSPORT) {
+        if (isThereAFleet() && isFleetAvailable() && numberOfShips(TechnologyEnum.KLEINER_TRANSPORTER.getId(), getListOfShips()) >= MINIMUM_TRANSPORT) {
             Resources amountToTransport = getAmountToTransport();
 
             if (amountToTransport.getMetall() > 0 || amountToTransport.getKristall() > 0 || amountToTransport.getDeuterium() > 0) {
@@ -366,11 +371,12 @@ public class FleetService {
 
     public void deployFleet() throws InterruptedException {
         menuService.openPage(MenuEnum.FLOTTE);
-        int countKreuzer = numberOfShips(TechnologyEnum.KREUZER.getId());
-        int countSchlachtKreuzer = numberOfShips(TechnologyEnum.SCHLACHTKREUZER.getId());
-        int countReaper = numberOfShips(TechnologyEnum.REAPER.getId());
-        int countZerstorer = numberOfShips(TechnologyEnum.ZERSTORER.getId());
-        int countPathfinder = numberOfShips(TechnologyEnum.PATHFINDER.getId());
+        List<WebElement> ships = getListOfShips();
+        int countKreuzer = numberOfShips(TechnologyEnum.KREUZER.getId(), ships);
+        int countSchlachtKreuzer = numberOfShips(TechnologyEnum.SCHLACHTKREUZER.getId(), ships);
+        int countReaper = numberOfShips(TechnologyEnum.REAPER.getId(), ships);
+        int countZerstorer = numberOfShips(TechnologyEnum.ZERSTORER.getId(), ships);
+        int countPathfinder = numberOfShips(TechnologyEnum.PATHFINDER.getId(), ships);
 
         if (countKreuzer > MIN_FLEET_TO_DEPLOY || countSchlachtKreuzer > MIN_FLEET_TO_DEPLOY || countZerstorer > MIN_FLEET_TO_DEPLOY || countPathfinder > MIN_FLEET_TO_DEPLOY
                 || countReaper > MIN_FLEET_TO_DEPLOY) {
