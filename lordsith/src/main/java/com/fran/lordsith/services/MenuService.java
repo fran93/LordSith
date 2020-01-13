@@ -1,11 +1,14 @@
 package com.fran.lordsith.services;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.fran.lordsith.enums.MenuEnum;
+
+import java.util.List;
 
 @Service
 public class MenuService {
@@ -16,8 +19,11 @@ public class MenuService {
 
     public void openPage(MenuEnum menu) throws InterruptedException {
         if (!isOnPage(menu)) {
-            firefox.get().findElements(By.className("menubutton")).get(menu.getId()).click();
-            firefox.shortLoading();
+            List<WebElement> buttons = firefox.get().findElements(By.className("menubutton"));
+            if(!buttons.isEmpty()) {
+                buttons.get(menu.getId()).click();
+                firefox.shortLoading();
+            }
         }
     }
 

@@ -243,7 +243,7 @@ public class FleetService {
             String defenses = rows.get(4).findElement(By.className("tooltipRight")).getText().split(":")[1];
 
             if (defenses.trim().equals("0") && necesaryFleet >= MIN_CARGOS_TO_ATTACK) {
-                message.findElement(By.className("icon_attack")).click();
+                firefox.jsClick(message.findElement(By.className("icon_attack")));
                 firefox.loading();
 
                 if (isFleetAvailable()) {
