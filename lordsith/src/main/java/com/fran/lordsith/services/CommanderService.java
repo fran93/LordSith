@@ -93,7 +93,11 @@ public class CommanderService {
             manageFleetService.deployFleet();
         }
 
-        if (buildingService.buildMinesOrFacilities() && researchService.research()) {
+        if (buildingService.buildMinesOrFacilities()) {
+            researchService.research();
+        }
+
+        if(planetService.hasGrowEnough()) {
             hangarService.buildExpeditionFleet();
             if (isMainPlanet(i)) {
                 hangarService.buildPathfinderFleet();

@@ -35,6 +35,8 @@ public class PlanetService {
     private int currentFields;
     private int maxFields;
 
+    private final static int MIN_DEVELOPMENT = 150;
+
     Logger log = LoggerFactory.getLogger(PlanetService.class);
 
     public void extractPoints() throws InterruptedException {
@@ -71,6 +73,10 @@ public class PlanetService {
             currentFields = Integer.valueOf(spans.get(0).getText());
             maxFields = Integer.valueOf(spans.get(1).getText());
         }
+    }
+
+    public boolean hasGrowEnough() {
+        return currentFields > MIN_DEVELOPMENT;
     }
 
     public boolean hasPoints() {
