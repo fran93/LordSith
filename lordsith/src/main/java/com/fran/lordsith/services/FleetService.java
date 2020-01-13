@@ -259,7 +259,7 @@ public class FleetService {
                 } else {
                     log.info(messageSource.getMessage("fleet.discard", null, Locale.ENGLISH));
                 }
-                message.findElement(By.className("icon_refuse")).click();
+                firefox.jsClick(message.findElement(By.className("icon_refuse")));
                 firefox.loading();
             }
         }
