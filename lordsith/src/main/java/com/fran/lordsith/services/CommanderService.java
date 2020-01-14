@@ -15,50 +15,49 @@ public class CommanderService {
 
     @Autowired
     @Lazy
-    private LoginService loginService;
+    LoginService loginService;
 
     @Autowired
     @Lazy
-    private BuildingService buildingService;
+    BuildingService buildingService;
 
     @Autowired
     @Lazy
-    private ResearchService researchService;
+    ResearchService researchService;
 
     @Autowired
     @Lazy
-    private FleetService manageFleetService;
+    FleetService manageFleetService;
 
     @Autowired
     @Lazy
-    private HangarService hangarService;
+    HangarService hangarService;
 
     @Autowired
     @Lazy
-    private FirefoxClient firefox;
+    FirefoxClient firefox;
 
     @Autowired
     @Lazy
-    private DefenseService defenseService;
+    DefenseService defenseService;
 
     @Autowired
     @Lazy
-    private HandlerService handlerService;
+    HandlerService handlerService;
 
     @Autowired
     @Lazy
-    private PlanetService planetService;
+    PlanetService planetService;
 
     @Autowired
     @Lazy
-    private MessageSource messageSource;
+    MessageSource messageSource;
 
     Logger log = LoggerFactory.getLogger(CommanderService.class);
 
     /**
      * Bugs to fix here:
      *
-     * @throws InterruptedException
      */
     public void command() throws InterruptedException {
         if (!loginService.isLogged()) {

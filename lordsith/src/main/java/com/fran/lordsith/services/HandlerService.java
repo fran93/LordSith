@@ -44,36 +44,38 @@ public class HandlerService {
         firefox.get().findElement(By.id("js_traderScrap")).click();
         firefox.loading();
 
-        clickScrap("button204");
-        clickScrap("button205");
-        clickScrap("button207");
-        clickScrap("button211");
-        firefox.shortLoading();
-
-        if (planetService.hasPoints()) {
-            firefox.get().findElement(By.className("forward")).click();
+        if (firefox.get().getCurrentUrl().contains("page=traderScrap")) {
+            clickScrap("button204");
+            clickScrap("button205");
+            clickScrap("button207");
+            clickScrap("button211");
             firefox.shortLoading();
-            String rawAmount = firefox.get().findElement(By.id("button203")).findElement(By.className("amount")).getText().replaceAll("\\.", "");
-            if (!rawAmount.trim().isEmpty()) {
-                long current = Long.parseLong(rawAmount);
-                long base = fleetService.calculateNumberOfCargos(planetService.getPoints());
-                long desired = current - (base + base / 2);
 
-                if (desired > 0) {
-                    firefox.get().findElement(By.id("ship_203")).sendKeys(String.valueOf(desired));
-                    firefox.shortLoading();
+            if (planetService.hasPoints()) {
+                firefox.get().findElement(By.className("forward")).click();
+                firefox.shortLoading();
+                String rawAmount = firefox.get().findElement(By.id("button203")).findElement(By.className("amount")).getText().replaceAll("\\.", "");
+                if (!rawAmount.trim().isEmpty()) {
+                    long current = Long.parseLong(rawAmount);
+                    long base = fleetService.calculateNumberOfCargos(planetService.getPoints());
+                    long desired = current - (base + base / 2);
+
+                    if (desired > 0) {
+                        firefox.get().findElement(By.id("ship_203")).sendKeys(String.valueOf(desired));
+                        firefox.shortLoading();
+                    }
                 }
             }
-        }
 
-        if (!firefox.get().findElement(By.id("js_scrapScrapIT")).getAttribute(CLASS).contains("disabled")) {
-            firefox.get().findElement(By.id("js_scrapScrapIT")).click();
-            firefox.loading();
+            if (!firefox.get().findElement(By.id("js_scrapScrapIT")).getAttribute(CLASS).contains("disabled")) {
+                firefox.get().findElement(By.id("js_scrapScrapIT")).click();
+                firefox.loading();
 
-            firefox.get().findElement(By.className("yes")).click();
-            firefox.shortLoading();
+                firefox.get().findElement(By.className("yes")).click();
+                firefox.shortLoading();
 
-            log.info(messageSource.getMessage("handler.scrap", null, Locale.ENGLISH));
+                log.info(messageSource.getMessage("handler.scrap", null, Locale.ENGLISH));
+            }
         }
     }
 
