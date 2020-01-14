@@ -1,7 +1,6 @@
 package com.fran.lordsith.services;
 
-import java.util.Locale;
-
+import com.fran.lordsith.enums.MenuEnum;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchWindowException;
 import org.slf4j.Logger;
@@ -12,28 +11,28 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.fran.lordsith.enums.MenuEnum;
+import java.util.Locale;
 
 @Service
 public class LoginService {
 
     public static final int MAX_EXHAUSTION = 5;
     @Value("${ogame.email}")
-    private String email;
+    String email;
 
     @Value("${ogame.password}")
-    private String password;
+    String password;
 
     @Value("${ogame.url}")
-    private String url;
+    String url;
 
     @Autowired
     @Lazy
-    private FirefoxClient firefox;
+    FirefoxClient firefox;
 
     @Autowired
     @Lazy
-    private MessageSource messageSource;
+    MessageSource messageSource;
 
     Logger log = LoggerFactory.getLogger(LoginService.class);
 
