@@ -1,10 +1,9 @@
 package com.fran.lordsith.services;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-
+import com.fran.lordsith.enums.MenuEnum;
+import com.fran.lordsith.enums.StatusEnum;
+import com.fran.lordsith.enums.TechnologyEnum;
+import com.fran.lordsith.model.Resources;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -14,10 +13,10 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.fran.lordsith.enums.MenuEnum;
-import com.fran.lordsith.enums.StatusEnum;
-import com.fran.lordsith.enums.TechnologyEnum;
-import com.fran.lordsith.model.Resources;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class FleetService {
@@ -325,7 +324,7 @@ public class FleetService {
     }
 
     private List<WebElement> getListOfShips() {
-        return firefox.get().findElements(By.className(".technology"));
+        return firefox.get().findElements(By.className("technology"));
     }
 
     private boolean isExpeditionAvailable() {

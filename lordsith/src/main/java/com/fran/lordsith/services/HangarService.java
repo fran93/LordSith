@@ -12,7 +12,9 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class HangarService {
@@ -44,10 +46,11 @@ public class HangarService {
 	public void buildExpeditionFleet() throws InterruptedException {
 		menuService.openPage(MenuEnum.SCHIFFSWERFT);
 
+		List<WebElement> ships = getListOfShips();
 		int desiredShips = expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 2;
-		long amountCargos = getAmount(TechnologyEnum.GROSSER_TRANSPORTER.getId());
-		long amountPath = getAmount(TechnologyEnum.PATHFINDER.getId());
-		long amountZerstorer = getAmount(TechnologyEnum.ZERSTORER.getId());
+		long amountCargos = getAmount(TechnologyEnum.GROSSER_TRANSPORTER.getId(), ships);
+		long amountPath = getAmount(TechnologyEnum.PATHFINDER.getId(), ships);
+		long amountZerstorer = getAmount(TechnologyEnum.ZERSTORER.getId(), ships);
 
 		if (isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId()) && amountCargos < desiredShips) {
 			build(TechnologyEnum.GROSSER_TRANSPORTER, desiredShips - amountCargos);
@@ -72,7 +75,7 @@ public class HangarService {
 
 	public void buildDeathStar(boolean isMainPlanet) throws InterruptedException {
 		int desiredShips = isMainPlanet ? 1 : expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 1000000;
-		long amountStars = getAmount(TechnologyEnum.TODESSTERN.getId());
+		long amountStars = getAmount(TechnologyEnum.TODESSTERN.getId(), getListOfShips());
 
 		if (isStatusOn(TechnologyEnum.TODESSTERN.getId()) && amountStars < desiredShips) {
 			build(TechnologyEnum.TODESSTERN, desiredShips - amountStars);
@@ -80,14 +83,14 @@ public class HangarService {
 	}
 
 	public void buildHuntingFleet() throws InterruptedException {
-		long amountSpionageSonde = getAmount(TechnologyEnum.SPIONAGESONDE.getId());
+		long amountSpionageSonde = getAmount(TechnologyEnum.SPIONAGESONDE.getId(), getListOfShips());
 		int desiredShips = 25;
 
 		if (isStatusOn(TechnologyEnum.SPIONAGESONDE.getId()) && amountSpionageSonde < desiredShips) {
 			build(TechnologyEnum.SPIONAGESONDE, desiredShips - amountSpionageSonde);
 		}
 
-		long amountKleiner = getAmount(TechnologyEnum.KLEINER_TRANSPORTER.getId());
+		long amountKleiner = getAmount(TechnologyEnum.KLEINER_TRANSPORTER.getId(), getListOfShips());
 		desiredShips = 50;
 
 		if (isStatusOn(TechnologyEnum.KLEINER_TRANSPORTER.getId()) && amountKleiner < desiredShips) {
@@ -95,18 +98,23 @@ public class HangarService {
 		}
 	}
 
-    private long getAmount(int id) {
-		return Long.parseLong(firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + id + "]")).findElement(By.className("amount")).getAttribute("data-value"));
-    }
+	private int getAmount(int id, List<WebElement> ships) {
+		Optional<WebElement> theShip = ships.stream().filter(ship -> ship.getAttribute("data-data-technology").equals(String.valueOf(id))).findFirst();
+		return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
+	}
 
-    private boolean isStatusOn(int id) {
+	private List<WebElement> getListOfShips() {
+		return firefox.get().findElements(By.className("technology"));
+	}
+
+	private boolean isStatusOn(int id) {
 		boolean isInQueue = firefox.get().findElements(By.className("queuePic")).stream().anyMatch(pic -> pic.getAttribute("alt").trim().endsWith("_" + id));
 
 		WebElement defense = firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + id + "]"));
 		return defense.getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !isInQueue;
 	}
 
-    private void build(TechnologyEnum tech, long quantity) throws InterruptedException {
+	private void build(TechnologyEnum tech, long quantity) throws InterruptedException {
 		firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + tech.getId() + "]")).click();
 		firefox.shortLoading();
 
