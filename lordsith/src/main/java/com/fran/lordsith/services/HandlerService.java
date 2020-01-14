@@ -1,7 +1,6 @@
 package com.fran.lordsith.services;
 
-import java.util.Locale;
-
+import com.fran.lordsith.enums.MenuEnum;
 import org.openqa.selenium.By;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +9,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.fran.lordsith.enums.MenuEnum;
+import java.util.Locale;
 
 @Service
 public class HandlerService {
@@ -19,23 +18,23 @@ public class HandlerService {
 
     @Autowired
     @Lazy
-    private FirefoxClient firefox;
+    FirefoxClient firefox;
 
     @Autowired
     @Lazy
-    private MessageSource messageSource;
+    MessageSource messageSource;
 
     @Autowired
     @Lazy
-    private FleetService fleetService;
+    FleetService fleetService;
 
     @Autowired
     @Lazy
-    private PlanetService planetService;
+    PlanetService planetService;
 
     @Autowired
     @Lazy
-    private MenuService menuService;
+    MenuService menuService;
 
     Logger log = LoggerFactory.getLogger(HandlerService.class);
 
