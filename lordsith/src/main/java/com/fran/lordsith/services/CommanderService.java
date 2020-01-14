@@ -97,12 +97,13 @@ public class CommanderService {
         }
 
         if(planetService.hasGrowEnough()) {
+            defenseService.buildDefenses(isMainPlanet(i));
+            hangarService.buildDeathStar(isMainPlanet(i));
             hangarService.buildExpeditionFleet();
             if (isMainPlanet(i)) {
                 hangarService.buildHuntingFleet();
             }
-            hangarService.buildDeathStar(isMainPlanet(i));
-            defenseService.buildDefenses(isMainPlanet(i));
+
         }
         firefox.shortLoading();
     }
