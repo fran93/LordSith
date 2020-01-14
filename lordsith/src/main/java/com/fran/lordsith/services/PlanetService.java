@@ -1,9 +1,6 @@
 package com.fran.lordsith.services;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
+import com.fran.lordsith.enums.MenuEnum;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -13,7 +10,9 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.fran.lordsith.enums.MenuEnum;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 @Service
 public class PlanetService {
@@ -62,7 +61,9 @@ public class PlanetService {
     public List<String> getPlanetList() throws InterruptedException {
         menuService.openPage(MenuEnum.UBERSICHT);
         List<String> planetIds = new ArrayList<>();
-        firefox.get().findElement(By.id("planetList")).findElements(By.className("smallplanet")).forEach(planet -> planetIds.add(planet.getAttribute("id")));
+        if (menuService.isOnPage(MenuEnum.UBERSICHT)) {
+            firefox.get().findElement(By.id("planetList")).findElements(By.className("smallplanet")).forEach(planet -> planetIds.add(planet.getAttribute("id")));
+        }
 
         return planetIds;
     }
