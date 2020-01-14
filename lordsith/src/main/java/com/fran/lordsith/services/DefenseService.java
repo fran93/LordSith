@@ -4,6 +4,7 @@ import com.fran.lordsith.enums.MenuEnum;
 import com.fran.lordsith.enums.StatusEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
 import com.fran.lordsith.model.Defense;
+import com.fran.lordsith.utilities.TechnologyUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -91,7 +92,7 @@ public class DefenseService {
     }
 
     private int getAmount(int id, List<WebElement> defenses) {
-        Optional<WebElement> theShip = defenses.stream().filter(ship -> ship.getAttribute("data-technology").equals(String.valueOf(id))).findFirst();
+        Optional<WebElement> theShip = TechnologyUtils.getTechnologyById(id, defenses);
         return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
     }
 
