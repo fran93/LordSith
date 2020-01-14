@@ -319,7 +319,7 @@ public class FleetService {
     }
 
     private int numberOfShips(int id, List<WebElement> ships) {
-        Optional<WebElement> theShip = ships.stream().filter(ship -> ship.getAttribute("data-data-technology").equals(String.valueOf(id))).findFirst();
+        Optional<WebElement> theShip = ships.stream().filter(ship -> ship.getAttribute("data-technology").equals(String.valueOf(id))).findFirst();
         return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
     }
 

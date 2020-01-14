@@ -91,7 +91,7 @@ public class DefenseService {
     }
 
     private int getAmount(int id, List<WebElement> defenses) {
-        Optional<WebElement> theShip = defenses.stream().filter(ship -> ship.getAttribute("data-data-technology").equals(String.valueOf(id))).findFirst();
+        Optional<WebElement> theShip = defenses.stream().filter(ship -> ship.getAttribute("data-technology").equals(String.valueOf(id))).findFirst();
         return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
     }
 
