@@ -47,21 +47,20 @@ public class HangarService {
 	public void buildExpeditionFleet() throws InterruptedException {
 		menuService.openPage(MenuEnum.SCHIFFSWERFT);
 
-		List<WebElement> ships = getListOfShips();
 		int desiredShips = expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 2;
-		long amountCargos = getAmount(TechnologyEnum.GROSSER_TRANSPORTER.getId(), ships);
-		long amountPath = getAmount(TechnologyEnum.PATHFINDER.getId(), ships);
-		long amountZerstorer = getAmount(TechnologyEnum.ZERSTORER.getId(), ships);
+		long amountCargos = getAmount(TechnologyEnum.GROSSER_TRANSPORTER.getId());
+		long amountPath = getAmount(TechnologyEnum.PATHFINDER.getId());
+		long amountZerstorer = getAmount(TechnologyEnum.ZERSTORER.getId());
 
-		if (isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId(), ships) && amountCargos < desiredShips) {
+		if (isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId()) && amountCargos < desiredShips) {
 			build(TechnologyEnum.GROSSER_TRANSPORTER, desiredShips - amountCargos);
 		}
 
-		if (isStatusOn(TechnologyEnum.PATHFINDER.getId(), ships) && amountPath == 0) {
+		if (isStatusOn(TechnologyEnum.PATHFINDER.getId()) && amountPath == 0) {
 			build(TechnologyEnum.PATHFINDER, 1);
 		}
 
-		if (isStatusOn(TechnologyEnum.ZERSTORER.getId(), ships) && amountZerstorer == 0) {
+		if (isStatusOn(TechnologyEnum.ZERSTORER.getId()) && amountZerstorer == 0) {
 			build(TechnologyEnum.ZERSTORER, 1);
 		}
 	}
@@ -69,7 +68,7 @@ public class HangarService {
     public void buildSolarSatelliteFleet() throws InterruptedException {
 		menuService.openPage(MenuEnum.SCHIFFSWERFT);
 
-		if (isStatusOn(TechnologyEnum.SOLARSATELLIT.getId(), getListOfShips())) {
+		if (isStatusOn(TechnologyEnum.SOLARSATELLIT.getId())) {
 			build(TechnologyEnum.SOLARSATELLIT, 100);
 		}
 	}
@@ -78,32 +77,31 @@ public class HangarService {
 		menuService.openPage(MenuEnum.SCHIFFSWERFT);
 
 		int desiredShips = isMainPlanet ? expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 1000000 : 1;
-		long amountStars = getAmount(TechnologyEnum.TODESSTERN.getId(), getListOfShips());
+		long amountStars = getAmount(TechnologyEnum.TODESSTERN.getId());
 
-		if (isStatusOn(TechnologyEnum.TODESSTERN.getId(), getListOfShips()) && amountStars < desiredShips) {
+		if (isStatusOn(TechnologyEnum.TODESSTERN.getId()) && amountStars < desiredShips) {
 			build(TechnologyEnum.TODESSTERN, desiredShips - amountStars);
 		}
 	}
 
 	public void buildHuntingFleet() throws InterruptedException {
-		List<WebElement> ships = getListOfShips();
-		long amountSpionageSonde = getAmount(TechnologyEnum.SPIONAGESONDE.getId(), getListOfShips());
+		long amountSpionageSonde = getAmount(TechnologyEnum.SPIONAGESONDE.getId());
 		int desiredShips = 25;
 
-		if (isStatusOn(TechnologyEnum.SPIONAGESONDE.getId(), ships) && amountSpionageSonde < desiredShips) {
+		if (isStatusOn(TechnologyEnum.SPIONAGESONDE.getId()) && amountSpionageSonde < desiredShips) {
 			build(TechnologyEnum.SPIONAGESONDE, desiredShips - amountSpionageSonde);
 		}
 
-		long amountKleiner = getAmount(TechnologyEnum.KLEINER_TRANSPORTER.getId(), getListOfShips());
+		long amountKleiner = getAmount(TechnologyEnum.KLEINER_TRANSPORTER.getId());
 		desiredShips = 50;
 
-		if (isStatusOn(TechnologyEnum.KLEINER_TRANSPORTER.getId(), ships) && amountKleiner < desiredShips) {
+		if (isStatusOn(TechnologyEnum.KLEINER_TRANSPORTER.getId()) && amountKleiner < desiredShips) {
 			build(TechnologyEnum.KLEINER_TRANSPORTER, desiredShips - amountKleiner);
 		}
 	}
 
-	private int getAmount(int id, List<WebElement> ships) {
-		Optional<WebElement> theShip = TechnologyUtils.getTechnologyById(id, ships);
+	private int getAmount(int id) {
+		Optional<WebElement> theShip = TechnologyUtils.getTechnologyById(id, getListOfShips());
 		return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
 	}
 
@@ -111,9 +109,9 @@ public class HangarService {
 		return firefox.get().findElements(By.className("technology"));
 	}
 
-	private boolean isStatusOn(int id, List<WebElement> ships) {
+	private boolean isStatusOn(int id) {
 		boolean isInQueue = firefox.get().findElements(By.className("queuePic")).stream().anyMatch(pic -> pic.getAttribute("alt").trim().endsWith("_" + id));
-		Optional<WebElement> defense = TechnologyUtils.getTechnologyById(id, ships);
+		Optional<WebElement> defense = TechnologyUtils.getTechnologyById(id, getListOfShips());
 
 		return defense.isPresent() && (defense.get().getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !isInQueue);
 	}

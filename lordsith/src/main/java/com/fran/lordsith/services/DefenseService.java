@@ -78,9 +78,8 @@ public class DefenseService {
         defenses.add(new Defense(1, TechnologyEnum.KLEINE_SCHILDKUPPEL, true));
         defenses.add(new Defense(1, TechnologyEnum.GROSSE_SCHILDKUPPEL, true));
         defenses.add(new Defense(1, TechnologyEnum.ABFANGRAKETE, true));
-        List<WebElement> webElements = getListOfDefenses();
 
-        defenses.forEach(defense -> defense.setAmountToBuild((calculateNumberOfDefense(defense.getBaseAmount(), planetService.getPoints()) / adjust) - getAmount(defense.getTechnology().getId(), webElements)));
+        defenses.forEach(defense -> defense.setAmountToBuild((calculateNumberOfDefense(defense.getBaseAmount(), planetService.getPoints()) / adjust) - getAmount(defense.getTechnology().getId())));
         Optional<Defense> defenseToBuild = defenses.stream().filter(defense -> isStatusOn(defense.getTechnology().getId()) && defense.getAmountToBuild() > 0).findFirst();
         if (defenseToBuild.isPresent()) {
             if (defenseToBuild.get().isUnique()) {
@@ -91,8 +90,8 @@ public class DefenseService {
         }
     }
 
-    private int getAmount(int id, List<WebElement> defenses) {
-        Optional<WebElement> theShip = TechnologyUtils.getTechnologyById(id, defenses);
+    private int getAmount(int id) {
+        Optional<WebElement> theShip = TechnologyUtils.getTechnologyById(id, getListOfDefenses());
         return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
     }
 
@@ -102,9 +101,9 @@ public class DefenseService {
 
     private boolean isStatusOn(int id) {
         boolean isInQueue = firefox.get().findElements(By.className("queuePic")).stream().anyMatch(pic -> pic.getAttribute("alt").trim().endsWith("_" + id));
+        Optional<WebElement> defense = TechnologyUtils.getTechnologyById(id, getListOfDefenses());
 
-        WebElement defense = firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + id + "]"));
-        return defense.getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !isInQueue;
+        return defense.isPresent() && (defense.get().getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !isInQueue);
     }
 
     private void build(TechnologyEnum defense) throws InterruptedException {
