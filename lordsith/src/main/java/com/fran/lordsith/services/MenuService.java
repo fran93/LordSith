@@ -1,12 +1,11 @@
 package com.fran.lordsith.services;
 
+import com.fran.lordsith.enums.MenuEnum;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
-import com.fran.lordsith.enums.MenuEnum;
 
 import java.util.List;
 
@@ -28,6 +27,6 @@ public class MenuService {
     }
 
     public boolean isOnPage(MenuEnum menu) {
-        return firefox.get().getCurrentUrl().trim().endsWith(menu.getComponent());
+        return firefox.get().getCurrentUrl().trim().contains(menu.getComponent());
     }
 }
