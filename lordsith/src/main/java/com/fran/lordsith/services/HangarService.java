@@ -70,15 +70,6 @@ public class HangarService {
 		}
 	}
 
-	public void buildPathfinderFleet() throws InterruptedException {
-		int desiredShips = expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 10;
-		long amountPath = getAmount(TechnologyEnum.PATHFINDER.getId());
-
-		if (isStatusOn(TechnologyEnum.PATHFINDER.getId()) && amountPath < desiredShips) {
-			build(TechnologyEnum.PATHFINDER, desiredShips - amountPath);
-		}
-	}
-
 	public void buildDeathStar(boolean isMainPlanet) throws InterruptedException {
 		int desiredShips = isMainPlanet ? 1 : expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 1000000;
 		long amountStars = getAmount(TechnologyEnum.TODESSTERN.getId());

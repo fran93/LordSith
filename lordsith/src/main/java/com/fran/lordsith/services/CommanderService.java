@@ -99,7 +99,6 @@ public class CommanderService {
         if(planetService.hasGrowEnough()) {
             hangarService.buildExpeditionFleet();
             if (isMainPlanet(i)) {
-                hangarService.buildPathfinderFleet();
                 hangarService.buildHuntingFleet();
             }
             hangarService.buildDeathStar(isMainPlanet(i));
