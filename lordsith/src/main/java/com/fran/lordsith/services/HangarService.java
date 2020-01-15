@@ -109,7 +109,8 @@ public class HangarService {
 		return firefox.get().findElements(By.className("technology"));
 	}
 
-	private boolean isStatusOn(int id) {
+	private boolean isStatusOn(int id) throws InterruptedException {
+		firefox.shortLoading();
 		boolean isInQueue = firefox.get().findElements(By.className("queuePic")).stream().anyMatch(pic -> pic.getAttribute("alt").trim().endsWith("_" + id));
 		Optional<WebElement> defense = TechnologyUtils.getTechnologyById(id, getListOfShips());
 

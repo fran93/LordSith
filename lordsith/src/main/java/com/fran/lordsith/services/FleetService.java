@@ -334,8 +334,10 @@ public class FleetService {
         return firefox.get().findElements(By.className("icon_warning")).isEmpty();
     }
 
-    private boolean isStatusOn(int id) {
-        return firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + id + "]")).getAttribute("data-status").equals(StatusEnum.ON.getValue());
+    private boolean isStatusOn(int id) throws InterruptedException {
+        firefox.shortLoading();
+        Optional<WebElement> defense = TechnologyUtils.getTechnologyById(id, getListOfShips());
+        return defense.isPresent() && (defense.get().getAttribute("data-status").equals(StatusEnum.ON.getValue()));
     }
 
     private int numberOfShips(int id) {
@@ -424,7 +426,7 @@ public class FleetService {
         }
     }
 
-    private void selectAllShips(int id) {
+    private void selectAllShips(int id) throws InterruptedException {
         if (isStatusOn(id)) {
             firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + id + "]")).click();
         }
