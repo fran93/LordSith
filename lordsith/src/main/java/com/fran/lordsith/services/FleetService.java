@@ -4,6 +4,7 @@ import com.fran.lordsith.enums.MenuEnum;
 import com.fran.lordsith.enums.StatusEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
 import com.fran.lordsith.model.Resources;
+import com.fran.lordsith.utilities.TechnologyUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -91,7 +92,7 @@ public class FleetService {
 
     private void sendExpedition2() throws InterruptedException {
         if (isExpeditionAvailable() && isThereAFleet() && isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId())
-                && numberOfShips(TechnologyEnum.GROSSER_TRANSPORTER.getId(), getListOfShips()) > calculateNumberOfCargos(planetService.getPoints()) / 2) {
+                && numberOfShips(TechnologyEnum.GROSSER_TRANSPORTER.getId()) > calculateNumberOfCargos(planetService.getPoints()) / 2) {
             firefox.get().findElement(By.name("transporterLarge")).sendKeys(String.valueOf(calculateNumberOfCargos(planetService.getPoints())));
             firefox.loading();
 
@@ -239,33 +240,54 @@ public class FleetService {
         List<WebElement> rows = message.findElements(By.className("compacting"));
         if (rows.size() >= 5) {
             int necesaryFleet = getNecesaryFleet(rows);
-            String defenses = rows.get(4).findElement(By.className("tooltipRight")).getText().split(":")[1];
+            String rawDefenses = rows.get(4).findElement(By.className("tooltipRight")).getText().split(":")[1];
+            long defenses = Long.parseLong(rawDefenses.trim().replaceAll("\\.", ""));
 
-            if (defenses.trim().equals("0") && necesaryFleet >= MIN_CARGOS_TO_ATTACK) {
+            if (necesaryFleet >= MIN_CARGOS_TO_ATTACK) {
                 firefox.jsClick(message.findElement(By.className("icon_attack")));
                 firefox.loading();
 
                 if (isFleetAvailable()) {
-                    sendAttack(id, necesaryFleet);
+                    sendAttack(id, necesaryFleet, defenses);
                 } else {
                     openMessages();
                     firefox.shortLoading();
                 }
             } else {
-                if (necesaryFleet >= MIN_CARGOS_TO_ATTACK) {
-                    String coordinates = message.findElement(By.className("msg_title")).getText();
-                    log.info(messageSource.getMessage("fleet.farm", new Object[]{coordinates, defenses, necesaryFleet}, Locale.ENGLISH));
-                } else {
-                    log.info(messageSource.getMessage("fleet.discard", null, Locale.ENGLISH));
-                }
+                log.info(messageSource.getMessage("fleet.discard", null, Locale.ENGLISH));
                 firefox.jsClick(message.findElement(By.className("icon_refuse")));
                 firefox.loading();
             }
         }
     }
 
-    private void sendAttack(String id, int necesaryFleet) throws InterruptedException {
-        firefox.get().findElement(By.name("transporterSmall")).sendKeys(String.valueOf(necesaryFleet));
+    private void sendAttack(String id, int necesaryFleet, long defenses) throws InterruptedException {
+        if (defenses == 0) {
+            firefox.get().findElement(By.name("transporterSmall")).sendKeys(String.valueOf(necesaryFleet));
+            log.info(messageSource.getMessage("fleet.attack", new Object[]{necesaryFleet, TechnologyEnum.KLEINER_TRANSPORTER.name()}, Locale.ENGLISH));
+        } else if (defenses < 500000) {
+            int countKreuzer = numberOfShips(TechnologyEnum.KREUZER.getId());
+            long militaryFleet = defenses / 3;
+            if (countKreuzer >= militaryFleet) {
+                firefox.get().findElement(By.name("transporterSmall")).sendKeys(String.valueOf(necesaryFleet));
+                firefox.get().findElement(By.name("cruiser")).sendKeys(String.valueOf(militaryFleet));
+                log.info(messageSource.getMessage("fleet.attack", new Object[]{militaryFleet, TechnologyEnum.KREUZER.name()}, Locale.ENGLISH));
+            }
+        } else if (defenses < 1000000) {
+            int countBalls = numberOfShips(TechnologyEnum.TODESSTERN.getId());
+            long militaryFleet = 1;
+            if (countBalls >= militaryFleet) {
+                firefox.get().findElement(By.name("deathstar")).sendKeys(String.valueOf(militaryFleet));
+                log.info(messageSource.getMessage("fleet.attack", new Object[]{militaryFleet, TechnologyEnum.TODESSTERN.name()}, Locale.ENGLISH));
+            }
+        } else {
+            int countBalls = numberOfShips(TechnologyEnum.TODESSTERN.getId());
+            long militaryFleet = defenses / 1000000;
+            if (countBalls >= militaryFleet) {
+                firefox.get().findElement(By.name("deathstar")).sendKeys(String.valueOf(militaryFleet));
+                log.info(messageSource.getMessage("fleet.attack", new Object[]{militaryFleet, TechnologyEnum.TODESSTERN.name()}, Locale.ENGLISH));
+            }
+        }
         firefox.shortLoading();
 
         if (canContinue(CONTINUE_TO_FLEET2)) {
@@ -274,8 +296,6 @@ public class FleetService {
                 weiterWeiter(CONTINUE_TO_FLEET3);
                 if (canContinue(SEND_FLEET)) {
                     weiterWeiter(SEND_FLEET);
-
-                    log.info(messageSource.getMessage("fleet.attack", null, Locale.ENGLISH));
 
                     openMessages();
 
@@ -318,8 +338,8 @@ public class FleetService {
         return firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + id + "]")).getAttribute("data-status").equals(StatusEnum.ON.getValue());
     }
 
-    private int numberOfShips(int id, List<WebElement> ships) {
-        Optional<WebElement> theShip = ships.stream().filter(ship -> ship.getAttribute("data-technology").equals(String.valueOf(id))).findFirst();
+    private int numberOfShips(int id) {
+        Optional<WebElement> theShip = TechnologyUtils.getTechnologyById(id, getListOfShips());
         return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
     }
 
@@ -328,7 +348,7 @@ public class FleetService {
     }
 
     private boolean isExpeditionAvailable() {
-        if(menuService.isOnPage(MenuEnum.FLOTTE)) {
+        if (menuService.isOnPage(MenuEnum.FLOTTE)) {
             List<WebElement> slotElements = firefox.get().findElement(By.id("slots")).findElements(By.className("fleft"));
             String rawExpe = slotElements.get(1).getText();
             String splitedExpeditions = rawExpe.split(":")[1].trim();
@@ -359,7 +379,7 @@ public class FleetService {
     public void transportResources() throws InterruptedException {
         menuService.openPage(MenuEnum.FLOTTE);
 
-        if (isThereAFleet() && isFleetAvailable() && numberOfShips(TechnologyEnum.KLEINER_TRANSPORTER.getId(), getListOfShips()) >= MINIMUM_TRANSPORT) {
+        if (isThereAFleet() && isFleetAvailable() && numberOfShips(TechnologyEnum.KLEINER_TRANSPORTER.getId()) >= MINIMUM_TRANSPORT) {
             Resources amountToTransport = getAmountToTransport();
 
             if (amountToTransport.getMetall() > 0 || amountToTransport.getKristall() > 0 || amountToTransport.getDeuterium() > 0) {
@@ -370,12 +390,12 @@ public class FleetService {
 
     public void deployFleet() throws InterruptedException {
         menuService.openPage(MenuEnum.FLOTTE);
-        List<WebElement> ships = getListOfShips();
-        int countKreuzer = numberOfShips(TechnologyEnum.KREUZER.getId(), ships);
-        int countSchlachtKreuzer = numberOfShips(TechnologyEnum.SCHLACHTKREUZER.getId(), ships);
-        int countReaper = numberOfShips(TechnologyEnum.REAPER.getId(), ships);
-        int countZerstorer = numberOfShips(TechnologyEnum.ZERSTORER.getId(), ships);
-        int countPathfinder = numberOfShips(TechnologyEnum.PATHFINDER.getId(), ships);
+
+        int countKreuzer = numberOfShips(TechnologyEnum.KREUZER.getId());
+        int countSchlachtKreuzer = numberOfShips(TechnologyEnum.SCHLACHTKREUZER.getId());
+        int countReaper = numberOfShips(TechnologyEnum.REAPER.getId());
+        int countZerstorer = numberOfShips(TechnologyEnum.ZERSTORER.getId());
+        int countPathfinder = numberOfShips(TechnologyEnum.PATHFINDER.getId());
 
         if (countKreuzer > MIN_FLEET_TO_DEPLOY || countSchlachtKreuzer > MIN_FLEET_TO_DEPLOY || countZerstorer > MIN_FLEET_TO_DEPLOY || countPathfinder > MIN_FLEET_TO_DEPLOY
                 || countReaper > MIN_FLEET_TO_DEPLOY) {

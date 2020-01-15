@@ -67,7 +67,11 @@ public class CommanderService {
         List<String> planetIds = planetService.getPlanetList();
 
         for (int i = 0; i < planetIds.size(); i++) {
-            managePlanets(planetIds, i);
+            try {
+                managePlanets(planetIds, i);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
 
         returnToMainPlanet(planetIds);
