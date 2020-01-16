@@ -72,8 +72,16 @@ public class CommanderService {
         }
 
         returnToMainPlanet();
-        manageFleetService.scan();
-        manageFleetService.hunting();
+        try {
+            manageFleetService.scan();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        try {
+            manageFleetService.hunting();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
         loginService.logout();
         log.info(messageSource.getMessage("commander.done", null, Locale.ENGLISH));
