@@ -4,7 +4,6 @@ import com.fran.lordsith.enums.MenuEnum;
 import com.fran.lordsith.enums.StatusEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
 import com.fran.lordsith.model.Resources;
-import com.fran.lordsith.utilities.TechnologyUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -33,7 +32,7 @@ public class FleetService {
     private static final String SYSTEM_INPUT = "system_input";
     private static final String LI_DATA_TECHNOLOGY = "//li[@data-technology=";
     private static final int MIN_CARGOS_TO_ATTACK = 10;
-    private static final int MIN_FLEET_TO_DEPLOY = 100;
+    private static final int MIN_FLEET_TO_DEPLOY = 50;
     private static final int MAX_SPY_REPORTS = 10;
     private static final int ATTACK_SYSTEM_RANGE = 150;
 
@@ -56,6 +55,10 @@ public class FleetService {
     @Autowired
     @Lazy
     MenuService menuService;
+
+    @Autowired
+    @Lazy
+    TechnologyService technologyService;
 
     Logger log = LoggerFactory.getLogger(FleetService.class);
 
@@ -216,9 +219,12 @@ public class FleetService {
     }
 
     private int getGalaxyFreeSlots() throws InterruptedException {
-        firefox.shortLoading();
-        String[] slotValue = firefox.get().findElement(By.id("slotValue")).getText().split("/");
-        return Integer.parseInt(slotValue[1]) - Integer.parseInt(slotValue[0]);
+        if (menuService.isOnPage(MenuEnum.GALAXIE)) {
+            firefox.shortLoading();
+            String[] slotValue = firefox.get().findElement(By.id("slotValue")).getText().split("/");
+            return Integer.parseInt(slotValue[1]) - Integer.parseInt(slotValue[0]);
+        }
+        return 0;
     }
 
     private boolean isSondeAvailable() throws InterruptedException {
@@ -338,17 +344,13 @@ public class FleetService {
 
     private boolean isStatusOn(int id) throws InterruptedException {
         firefox.shortLoading();
-        Optional<WebElement> defense = TechnologyUtils.getTechnologyById(id, getListOfShips());
+        Optional<WebElement> defense = technologyService.getTechnologyById(id);
         return defense.isPresent() && (defense.get().getAttribute("data-status").equals(StatusEnum.ON.getValue()));
     }
 
     private int numberOfShips(int id) {
-        Optional<WebElement> theShip = TechnologyUtils.getTechnologyById(id, getListOfShips());
+        Optional<WebElement> theShip = technologyService.getTechnologyById(id);
         return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
-    }
-
-    private List<WebElement> getListOfShips() {
-        return firefox.get().findElements(By.className("technology"));
     }
 
     private boolean isExpeditionAvailable() {

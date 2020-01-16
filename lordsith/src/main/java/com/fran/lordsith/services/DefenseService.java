@@ -4,7 +4,6 @@ import com.fran.lordsith.enums.MenuEnum;
 import com.fran.lordsith.enums.StatusEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
 import com.fran.lordsith.model.Defense;
-import com.fran.lordsith.utilities.TechnologyUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -30,6 +29,7 @@ public class DefenseService {
     private static final int BASE_IONENGESCHUZ = 1000;
     private static final int BASE_GAUSSKANONE = 500;
     private static final int BASE_PLASMAWERFER = 250;
+    private static final int BASE_ABFANGRAKETE = 1000;
 
     @Autowired
     @Lazy
@@ -46,6 +46,10 @@ public class DefenseService {
     @Autowired
     @Lazy
     MenuService menuService;
+
+    @Autowired
+    @Lazy
+    TechnologyService technologyService;
 
     Logger log = LoggerFactory.getLogger(DefenseService.class);
 
@@ -75,9 +79,9 @@ public class DefenseService {
         defenses.add(new Defense(BASE_IONENGESCHUZ, TechnologyEnum.IONENGESCHUZ, false));
         defenses.add(new Defense(BASE_GAUSSKANONE, TechnologyEnum.GAUSSKANONE, false));
         defenses.add(new Defense(BASE_PLASMAWERFER, TechnologyEnum.PLASMAWERFER, false));
-        defenses.add(new Defense(1, TechnologyEnum.KLEINE_SCHILDKUPPEL, true));
-        defenses.add(new Defense(1, TechnologyEnum.GROSSE_SCHILDKUPPEL, true));
-        defenses.add(new Defense(1, TechnologyEnum.ABFANGRAKETE, true));
+        defenses.add(new Defense(BASE_ABFANGRAKETE, TechnologyEnum.ABFANGRAKETE, false));
+        defenses.add(new Defense(10, TechnologyEnum.KLEINE_SCHILDKUPPEL, true));
+        defenses.add(new Defense(10, TechnologyEnum.GROSSE_SCHILDKUPPEL, true));
 
         defenses.forEach(defense -> defense.setAmountToBuild((calculateNumberOfDefense(defense.getBaseAmount(), planetService.getPoints()) / adjust) - getAmount(defense.getTechnology().getId())));
         Optional<Defense> defenseToBuild = defenses.stream().filter(defense -> isStatusOn(defense.getTechnology().getId()) && defense.getAmountToBuild() > 0).findFirst();
@@ -91,17 +95,13 @@ public class DefenseService {
     }
 
     private int getAmount(int id) {
-        Optional<WebElement> theShip = TechnologyUtils.getTechnologyById(id, getListOfDefenses());
+        Optional<WebElement> theShip = technologyService.getTechnologyById(id);
         return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
-    }
-
-    private List<WebElement> getListOfDefenses() {
-        return firefox.get().findElements(By.className("technology"));
     }
 
     private boolean isStatusOn(int id) {
         boolean isInQueue = firefox.get().findElements(By.className("queuePic")).stream().anyMatch(pic -> pic.getAttribute("alt").trim().endsWith("_" + id));
-        Optional<WebElement> defense = TechnologyUtils.getTechnologyById(id, getListOfDefenses());
+        Optional<WebElement> defense = technologyService.getTechnologyById(id);
 
         return defense.isPresent() && (defense.get().getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !isInQueue);
     }

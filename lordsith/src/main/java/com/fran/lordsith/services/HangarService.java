@@ -3,7 +3,6 @@ package com.fran.lordsith.services;
 import com.fran.lordsith.enums.MenuEnum;
 import com.fran.lordsith.enums.StatusEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
-import com.fran.lordsith.utilities.TechnologyUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -13,7 +12,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -29,51 +27,65 @@ public class HangarService {
 	FleetService expeditionService;
 
 	@Autowired
-	@Lazy
-	PlanetService planetService;
+    @Lazy
+    PlanetService planetService;
 
-	@Autowired
-	@Lazy
-	MessageSource messageSource;
+    @Autowired
+    @Lazy
+    MessageSource messageSource;
 
-	@Autowired
-	@Lazy
-	MenuService menuService;
+    @Autowired
+    @Lazy
+    MenuService menuService;
 
-	private static final String LI_DATA_TECHNOLOGY = "//li[@data-technology=";
+    @Autowired
+    @Lazy
+    TechnologyService technologyService;
 
-	Logger log = LoggerFactory.getLogger(HangarService.class);
+    private static final String LI_DATA_TECHNOLOGY = "//li[@data-technology=";
 
-	public void buildExpeditionFleet() throws InterruptedException {
-		menuService.openPage(MenuEnum.SCHIFFSWERFT);
+    Logger log = LoggerFactory.getLogger(HangarService.class);
 
-		int desiredShips = expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 2;
-		long amountCargos = getAmount(TechnologyEnum.GROSSER_TRANSPORTER.getId());
+    public void buildExpeditionFleet() throws InterruptedException {
+        menuService.openPage(MenuEnum.SCHIFFSWERFT);
+
+        int desiredShips = expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 2;
+        long amountCargos = getAmount(TechnologyEnum.GROSSER_TRANSPORTER.getId());
 		long amountPath = getAmount(TechnologyEnum.PATHFINDER.getId());
 		long amountZerstorer = getAmount(TechnologyEnum.ZERSTORER.getId());
 
 		if (isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId()) && amountCargos < desiredShips) {
 			build(TechnologyEnum.GROSSER_TRANSPORTER, desiredShips - amountCargos);
-		}
+        }
 
-		if (isStatusOn(TechnologyEnum.PATHFINDER.getId()) && amountPath == 0) {
-			build(TechnologyEnum.PATHFINDER, 1);
-		}
+        if (isStatusOn(TechnologyEnum.PATHFINDER.getId()) && amountPath == 0) {
+            build(TechnologyEnum.PATHFINDER, 1);
+        }
 
-		if (isStatusOn(TechnologyEnum.ZERSTORER.getId()) && amountZerstorer == 0) {
-			build(TechnologyEnum.ZERSTORER, 1);
-		}
-	}
+        if (isStatusOn(TechnologyEnum.ZERSTORER.getId()) && amountZerstorer == 0) {
+            build(TechnologyEnum.ZERSTORER, 1);
+        }
+    }
+
+    public void buildTransportFleet() throws InterruptedException {
+        menuService.openPage(MenuEnum.SCHIFFSWERFT);
+        int desiredShips = expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 2;
+        long amountCargos = getAmount(TechnologyEnum.KLEINER_TRANSPORTER.getId());
+
+        if (isStatusOn(TechnologyEnum.KLEINER_TRANSPORTER.getId()) && amountCargos < desiredShips) {
+            build(TechnologyEnum.KLEINER_TRANSPORTER, desiredShips - amountCargos);
+        }
+    }
 
     public void buildSolarSatelliteFleet() throws InterruptedException {
-		menuService.openPage(MenuEnum.SCHIFFSWERFT);
+        menuService.openPage(MenuEnum.SCHIFFSWERFT);
 
-		if (isStatusOn(TechnologyEnum.SOLARSATELLIT.getId())) {
-			build(TechnologyEnum.SOLARSATELLIT, 100);
-		}
-	}
+        if (isStatusOn(TechnologyEnum.SOLARSATELLIT.getId())) {
+            build(TechnologyEnum.SOLARSATELLIT, 100);
+        }
+    }
 
-	public void buildDeathStar(boolean isMainPlanet) throws InterruptedException {
+    public void buildDeathStar(boolean isMainPlanet) throws InterruptedException {
 		menuService.openPage(MenuEnum.SCHIFFSWERFT);
 
 		int desiredShips = isMainPlanet ? expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 1000000 : 1;
@@ -84,38 +96,18 @@ public class HangarService {
 		}
 	}
 
-	public void buildHuntingFleet() throws InterruptedException {
-		long amountSpionageSonde = getAmount(TechnologyEnum.SPIONAGESONDE.getId());
-		int desiredShips = 25;
-
-		if (isStatusOn(TechnologyEnum.SPIONAGESONDE.getId()) && amountSpionageSonde < desiredShips) {
-			build(TechnologyEnum.SPIONAGESONDE, desiredShips - amountSpionageSonde);
-		}
-
-		long amountKleiner = getAmount(TechnologyEnum.KLEINER_TRANSPORTER.getId());
-		desiredShips = 50;
-
-		if (isStatusOn(TechnologyEnum.KLEINER_TRANSPORTER.getId()) && amountKleiner < desiredShips) {
-			build(TechnologyEnum.KLEINER_TRANSPORTER, desiredShips - amountKleiner);
-		}
-	}
-
 	private int getAmount(int id) {
-		Optional<WebElement> theShip = TechnologyUtils.getTechnologyById(id, getListOfShips());
-		return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
-	}
-
-	private List<WebElement> getListOfShips() {
-		return firefox.get().findElements(By.className("technology"));
-	}
+        Optional<WebElement> theShip = technologyService.getTechnologyById(id);
+        return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
+    }
 
 	private boolean isStatusOn(int id) throws InterruptedException {
-		firefox.shortLoading();
-		boolean isInQueue = firefox.get().findElements(By.className("queuePic")).stream().anyMatch(pic -> pic.getAttribute("alt").trim().endsWith("_" + id));
-		Optional<WebElement> defense = TechnologyUtils.getTechnologyById(id, getListOfShips());
+        firefox.shortLoading();
+        boolean isInQueue = firefox.get().findElements(By.className("queuePic")).stream().anyMatch(pic -> pic.getAttribute("alt").trim().endsWith("_" + id));
+        Optional<WebElement> defense = technologyService.getTechnologyById(id);
 
-		return defense.isPresent() && (defense.get().getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !isInQueue);
-	}
+        return defense.isPresent() && (defense.get().getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !isInQueue);
+    }
 
 	private void build(TechnologyEnum tech, long quantity) throws InterruptedException {
 		firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + tech.getId() + "]")).click();

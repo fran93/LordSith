@@ -10,7 +10,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -19,15 +18,15 @@ public class PlanetService {
 
     @Autowired
     @Lazy
-    private FirefoxClient firefox;
+    FirefoxClient firefox;
 
     @Autowired
     @Lazy
-    private MessageSource messageSource;
+    MessageSource messageSource;
 
     @Autowired
     @Lazy
-    private MenuService menuService;
+    MenuService menuService;
 
     private long points;
 
@@ -46,27 +45,31 @@ public class PlanetService {
         }
     }
 
-    public void nextPlanet(String id) throws InterruptedException {
+    public void nextPlanet(int index) throws InterruptedException {
         menuService.openPage(MenuEnum.UBERSICHT);
-        firefox.shortLoading();
-        firefox.get().findElement(By.id(id)).click();
+        WebElement planet = getPlanetByIndex(index);
+        String name = planet.findElement(By.className("planet-name")).getText();
+        planet.click();
         firefox.loading();
         extractPoints();
         extractFreeFields();
-
         log.info(messageSource.getMessage("login.points", new Object[]{points}, Locale.ENGLISH));
-        log.info(messageSource.getMessage("planet.fields", new Object[]{id, getFreeFields()}, Locale.ENGLISH));
+        log.info(messageSource.getMessage("planet.fields", new Object[]{name, getFreeFields()}, Locale.ENGLISH));
 
     }
 
-    public List<String> getPlanetList() throws InterruptedException {
-        menuService.openPage(MenuEnum.UBERSICHT);
-        List<String> planetIds = new ArrayList<>();
-        if (menuService.isOnPage(MenuEnum.UBERSICHT)) {
-            firefox.get().findElement(By.id("planetList")).findElements(By.className("smallplanet")).forEach(planet -> planetIds.add(planet.getAttribute("id")));
-        }
+    public WebElement getPlanetByIndex(int index) throws InterruptedException {
+        return getPlanetList().get(index);
+    }
 
-        return planetIds;
+    public List<WebElement> getPlanetList() throws InterruptedException {
+        menuService.openPage(MenuEnum.UBERSICHT);
+
+        return firefox.get().findElement(By.id("planetList")).findElements(By.className("smallplanet"));
+    }
+
+    public int countPlanets() throws InterruptedException {
+        return getPlanetList().size();
     }
 
     public void extractFreeFields() {

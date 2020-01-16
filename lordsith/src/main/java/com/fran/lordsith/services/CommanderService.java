@@ -7,7 +7,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Locale;
 
 @Service
@@ -64,17 +63,15 @@ public class CommanderService {
             loginService.login();
         }
 
-        List<String> planetIds = planetService.getPlanetList();
-
-        for (int i = 0; i < planetIds.size(); i++) {
+        for (int i = 0; i < planetService.countPlanets(); i++) {
             try {
-                managePlanets(planetIds, i);
+                managePlanets(i);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
 
-        returnToMainPlanet(planetIds);
+        returnToMainPlanet();
         manageFleetService.scan();
         manageFleetService.hunting();
 
@@ -82,8 +79,8 @@ public class CommanderService {
         log.info(messageSource.getMessage("commander.done", null, Locale.ENGLISH));
     }
 
-    private void managePlanets(List<String> planetIds, int i) throws InterruptedException {
-        planetService.nextPlanet(planetIds.get(i));
+    private void managePlanets(int i) throws InterruptedException {
+        planetService.nextPlanet(i);
 
         handlerService.scrapFleet();
         if (isMainPlanet(i)) {
@@ -100,20 +97,17 @@ public class CommanderService {
             researchService.research();
         }
 
-        if(planetService.hasGrowEnough()) {
+        if (planetService.hasGrowEnough()) {
             defenseService.buildDefenses(isMainPlanet(i));
             hangarService.buildDeathStar(isMainPlanet(i));
             hangarService.buildExpeditionFleet();
-            if (isMainPlanet(i)) {
-                hangarService.buildHuntingFleet();
-            }
-
+            hangarService.buildTransportFleet();
         }
         firefox.shortLoading();
     }
 
-    private void returnToMainPlanet(List<String> planetIds) throws InterruptedException {
-        planetService.nextPlanet(planetIds.get(0));
+    private void returnToMainPlanet() throws InterruptedException {
+        planetService.nextPlanet(0);
     }
 
     private boolean isMainPlanet(int i) {
