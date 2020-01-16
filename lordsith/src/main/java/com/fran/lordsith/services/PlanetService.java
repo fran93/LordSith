@@ -64,6 +64,7 @@ public class PlanetService {
 
     public List<WebElement> getPlanetList() throws InterruptedException {
         menuService.openPage(MenuEnum.UBERSICHT);
+        firefox.shortLoading();
 
         return firefox.get().findElement(By.id("planetList")).findElements(By.className("smallplanet"));
     }
