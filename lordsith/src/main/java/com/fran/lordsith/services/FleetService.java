@@ -262,10 +262,9 @@ public class FleetService {
 
           if (isFleetAvailable()) {
             sendAttack(id, necesaryFleet, defenses);
-          } else {
-            openMessages();
-            firefox.shortLoading();
           }
+          openMessages();
+          firefox.shortLoading();
         } else {
           log.info(messageSource.getMessage("fleet.discard", null, Locale.ENGLISH));
           firefox.jsClick(message.get().findElement(By.className("icon_refuse")));
