@@ -2,6 +2,7 @@ package com.fran.lordsith.services;
 
 import com.fran.lordsith.enums.MenuEnum;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.NoSuchWindowException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +72,7 @@ public class LoginService {
             if (firefox.get().getCurrentUrl().contains("page=ingame")) {
                 firefox.get().findElements(By.className("menubutton")).get(MenuEnum.UBERSICHT.getId()).click();
             }
-        } catch (NoSuchWindowException ex) {
+        } catch (NoSuchWindowException | NoSuchSessionException ex) {
             firefox.restart();
             log.info(messageSource.getMessage("commander.new.team", new Object[]{exhaustion}, Locale.ENGLISH));
         }

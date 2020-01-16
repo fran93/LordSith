@@ -48,6 +48,7 @@ public class PlanetService {
 
     public void nextPlanet(String id) throws InterruptedException {
         menuService.openPage(MenuEnum.UBERSICHT);
+        firefox.shortLoading();
         firefox.get().findElement(By.id(id)).click();
         firefox.loading();
         extractPoints();

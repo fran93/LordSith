@@ -236,27 +236,29 @@ public class FleetService {
     }
 
     private void processMessage(String id) throws InterruptedException {
-        WebElement message = firefox.get().findElement(By.xpath("//li[@data-msg-id=" + id + "]"));
-        List<WebElement> rows = message.findElements(By.className("compacting"));
-        if (rows.size() >= 5) {
-            int necesaryFleet = getNecesaryFleet(rows);
-            String rawDefenses = rows.get(4).findElement(By.className("tooltipRight")).getText().split(":")[1];
-            long defenses = Long.parseLong(rawDefenses.trim().replaceAll("\\.", ""));
+        Optional<WebElement> message = firefox.get().findElement(By.id("ui-id-16")).findElements(By.className("msg")).stream().filter(msg -> msg.getAttribute("data-msg-id").equals(id)).findFirst();
+        if (message.isPresent()) {
+            List<WebElement> rows = message.get().findElements(By.className("compacting"));
+            if (rows.size() >= 5) {
+                int necesaryFleet = getNecesaryFleet(rows);
+                String rawDefenses = rows.get(4).findElement(By.className("tooltipRight")).getText().split(":")[1];
+                long defenses = Long.parseLong(rawDefenses.trim().replaceAll("\\.", ""));
 
-            if (necesaryFleet >= MIN_CARGOS_TO_ATTACK) {
-                firefox.jsClick(message.findElement(By.className("icon_attack")));
-                firefox.loading();
+                if (necesaryFleet >= MIN_CARGOS_TO_ATTACK) {
+                    firefox.jsClick(message.get().findElement(By.className("icon_attack")));
+                    firefox.loading();
 
-                if (isFleetAvailable()) {
-                    sendAttack(id, necesaryFleet, defenses);
+                    if (isFleetAvailable()) {
+                        sendAttack(id, necesaryFleet, defenses);
+                    } else {
+                        openMessages();
+                        firefox.shortLoading();
+                    }
                 } else {
-                    openMessages();
-                    firefox.shortLoading();
+                    log.info(messageSource.getMessage("fleet.discard", null, Locale.ENGLISH));
+                    firefox.jsClick(message.get().findElement(By.className("icon_refuse")));
+                    firefox.loading();
                 }
-            } else {
-                log.info(messageSource.getMessage("fleet.discard", null, Locale.ENGLISH));
-                firefox.jsClick(message.findElement(By.className("icon_refuse")));
-                firefox.loading();
             }
         }
     }
