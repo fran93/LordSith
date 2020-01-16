@@ -66,7 +66,7 @@ public class PlanetService {
         menuService.openPage(MenuEnum.UBERSICHT);
         firefox.shortLoading();
 
-        return firefox.get().findElement(By.id("planetList")).findElements(By.className("smallplanet"));
+        return firefox.get().findElements(By.className("smallplanet"));
     }
 
     public int countPlanets() throws InterruptedException {
