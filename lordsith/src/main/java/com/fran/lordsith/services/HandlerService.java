@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
+import java.util.NoSuchElementException;
 
 @Service
 public class HandlerService {
@@ -35,6 +36,10 @@ public class HandlerService {
   @Autowired
   @Lazy
   MenuService menuService;
+
+  @Autowired
+  @Lazy
+  LoginService loginService;
 
   Logger log = LoggerFactory.getLogger(HandlerService.class);
 
@@ -76,20 +81,27 @@ public class HandlerService {
     firefox.loading(1);
     firefox.loading(By.className("back_to_overview"));
     firefox.get().findElement(By.className("back_to_overview")).click();
-    firefox.loading(1);
+    firefox.loading(2);
     firefox.loading(By.id("js_traderImportExport"));
     firefox.get().findElement(By.id("js_traderImportExport")).click();
 
-    if (!firefox.get().findElement(By.className("got_item_text")).isDisplayed()) {
-      firefox.loading(1);
-      firefox.get().findElement(By.className("js_sliderMetalMax")).click();
-      if (!firefox.get().findElement(By.className("pay")).getAttribute(CLASS).contains("disabled")) {
+    try {
+      if (!firefox.get().findElement(By.className("got_item_text")).isDisplayed()) {
         firefox.loading(1);
-        firefox.get().findElement(By.className("pay")).click();
+        firefox.get().findElement(By.className("js_sliderMetalMax")).click();
+        if (!firefox.get().findElement(By.className("pay")).getAttribute(CLASS).contains("disabled")) {
+          firefox.loading(1);
+          firefox.get().findElement(By.className("pay")).click();
 
-        firefox.get().findElement(By.className("take")).click();
-        firefox.loading(1);
+          firefox.get().findElement(By.className("take")).click();
+          firefox.loading(1);
+        }
       }
+    } catch (NoSuchElementException ex) {
+      log.info("ImportExport: " + ex.getMessage());
+      firefox.quit();
+      firefox.restart();
+      loginService.login();
     }
   }
 }

@@ -59,7 +59,7 @@ public class TechnologyService {
         List<WebElement> technologies = firefox.get().findElements(By.className("technology"));
         return technologies.stream().filter(tech -> tech.getAttribute("data-technology").equals(String.valueOf(id))).findFirst();
       } catch (StaleElementReferenceException ex) {
-        log.info("getTechnologyById", ex.getMessage());
+        log.info("getTechnologyById:" + ex.getMessage());
       }
 
       return Optional.empty();
@@ -97,7 +97,7 @@ public class TechnologyService {
                 log.info(messageSource.getMessage("generic.build", new Object[]{quantity, tech.name()}, Locale.ENGLISH));
             }
         } catch (TimeoutException ex) {
-            log.info("build", ex.getMessage());
+          log.info("build:" + ex.getMessage());
         }
     }
 }

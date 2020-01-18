@@ -109,7 +109,7 @@ public class HangarService {
       Optional<WebElement> defense = technologyService.getTechnologyById(id);
       return defense.isPresent() && (defense.get().getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !isInQueue);
     } catch (StaleElementReferenceException ex) {
-      log.info("Status on", ex.getMessage());
+      log.info("Status on: " + ex.getMessage());
     }
     return false;
   }
