@@ -68,16 +68,6 @@ public class HangarService {
     }
   }
 
-  public void buildTransportFleet() throws InterruptedException {
-    menuService.openPage(MenuEnum.SCHIFFSWERFT);
-    int desiredShips = expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 2;
-    long amountCargos = getAmount(TechnologyEnum.KLEINER_TRANSPORTER.getId());
-
-    if (isStatusOn(TechnologyEnum.KLEINER_TRANSPORTER.getId()) && amountCargos < desiredShips) {
-      technologyService.build(TechnologyEnum.KLEINER_TRANSPORTER, desiredShips - amountCargos);
-    }
-  }
-
   public void buildSolarSatelliteFleet() throws InterruptedException {
     menuService.openPage(MenuEnum.SCHIFFSWERFT);
 

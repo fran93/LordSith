@@ -109,7 +109,6 @@ public class CommanderService {
       hangarService.prepareHangar();
       hangarService.buildDeathStar(isMainPlanet(i));
       hangarService.buildExpeditionFleet();
-      hangarService.buildTransportFleet();
     }
   }
 

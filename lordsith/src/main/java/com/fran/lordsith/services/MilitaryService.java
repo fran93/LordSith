@@ -42,13 +42,13 @@ public class MilitaryService {
   }
 
   private List<WebElement> getMessages() throws InterruptedException {
-    firefox.loading(1);
+    firefox.loading(2);
     return firefox.get().findElements(By.className("msg")).stream()
         .filter(msg -> msg.getAttribute("data-msg-id") != null && !msg.getAttribute("data-msg-id").trim().isEmpty()).collect(Collectors.toList());
   }
 
   private void processMessage(String id) throws InterruptedException {
-    firefox.loading(1);
+    firefox.loading(2);
     Optional<WebElement> message = getMessages().stream().filter(msg -> msg.getAttribute("data-msg-id").equals(id)).findFirst();
     if (message.isPresent()) {
       List<WebElement> rows = message.get().findElements(By.className("compacting"));
