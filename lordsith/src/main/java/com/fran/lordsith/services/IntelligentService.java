@@ -2,6 +2,7 @@ package com.fran.lordsith.services;
 
 import com.fran.lordsith.enums.MenuEnum;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,9 +64,10 @@ public class IntelligentService {
     }
   }
 
-  private void recycle() {
+  private void recycle() throws InterruptedException {
     List<WebElement> expeditionSlotBox = firefox.get().findElements(By.className("expeditionDebrisSlotBox"));
     if (!expeditionSlotBox.isEmpty()) {
+      firefox.loading(1);
       firefox.mouseOver(expeditionSlotBox.get(0).findElement(By.className("js_bday_debris")));
       WebElement debris = firefox.get().findElement(By.id("debris16"));
       String debrisRecyclers = debris.findElement(By.className("debris-recyclers")).getText();
@@ -107,7 +109,11 @@ public class IntelligentService {
     List<WebElement> inactives = firefox.get().findElements(By.className("inactive_filter"));
     for (WebElement inactive : inactives) {
       firefox.loading(1);
-      inactive.findElement(By.className("espionage")).click();
+      try {
+        inactive.findElement(By.className("espionage")).click();
+      } catch (StaleElementReferenceException ex) {
+        log.info("Spy: " + ex.getMessage());
+      }
     }
 
     return inactives.size();
