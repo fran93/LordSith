@@ -42,37 +42,34 @@ public class HandlerService {
         menuService.openPage(MenuEnum.HANDLER);
 
         firefox.get().findElement(By.id("js_traderScrap")).click();
-        firefox.loading();
 
         if (firefox.get().getCurrentUrl().contains("page=traderScrap")) {
             clickScrap("button204");
             clickScrap("button205");
             clickScrap("button207");
             clickScrap("button211");
-            firefox.shortLoading();
 
             if (planetService.hasPoints()) {
-                firefox.get().findElement(By.className("forward")).click();
-                firefox.shortLoading();
-                String rawAmount = firefox.get().findElement(By.id("button203")).findElement(By.className("amount")).getText().replaceAll("\\.", "");
-                if (!rawAmount.trim().isEmpty()) {
-                    long current = Long.parseLong(rawAmount);
-                    long base = fleetService.calculateNumberOfCargos(planetService.getPoints());
-                    long desired = current - (base + base / 2);
+              firefox.loading(By.className("forward"));
+              firefox.loading(1);
+              firefox.get().findElement(By.className("forward")).click();
+              String rawAmount = firefox.get().findElement(By.id("button203")).findElement(By.className("amount")).getText().replaceAll("\\.", "");
+              if (!rawAmount.trim().isEmpty()) {
+                long current = Long.parseLong(rawAmount);
+                long base = fleetService.calculateNumberOfCargos(planetService.getPoints());
+                long desired = current - (base + base / 2);
 
-                    if (desired > 0) {
-                        firefox.get().findElement(By.id("ship_203")).sendKeys(String.valueOf(desired));
-                        firefox.shortLoading();
-                    }
+                if (desired > 0) {
+                  firefox.get().findElement(By.id("ship_203")).sendKeys(String.valueOf(desired));
+                }
                 }
             }
 
+          firefox.loading(1);
             if (!firefox.get().findElement(By.id("js_scrapScrapIT")).getAttribute(CLASS).contains("disabled")) {
                 firefox.get().findElement(By.id("js_scrapScrapIT")).click();
-                firefox.loading();
 
                 firefox.get().findElement(By.className("yes")).click();
-                firefox.shortLoading();
 
                 log.info(messageSource.getMessage("handler.scrap", null, Locale.ENGLISH));
             }
@@ -86,24 +83,20 @@ public class HandlerService {
     }
 
     public void importExport() throws InterruptedException {
-        firefox.shortLoading();
-        if (!firefox.get().findElements(By.className("back_to_overview")).isEmpty()) {
-            firefox.get().findElement(By.className("back_to_overview")).click();
-            firefox.loading();
-            firefox.get().findElement(By.id("js_traderImportExport")).click();
-            firefox.loading();
+      firefox.loading(1);
+      firefox.loading(By.className("back_to_overview"));
+      firefox.get().findElement(By.className("back_to_overview")).click();
+      firefox.loading(1);
+      firefox.loading(By.id("js_traderImportExport"));
+      firefox.get().findElement(By.id("js_traderImportExport")).click();
 
-            if (!firefox.get().findElement(By.className("got_item_text")).isDisplayed()) {
-                firefox.get().findElement(By.className("js_sliderMetalMax")).click();
-                firefox.shortLoading();
-                if (!firefox.get().findElement(By.className("pay")).getAttribute(CLASS).contains("disabled")) {
-                    firefox.get().findElement(By.className("pay")).click();
-                    firefox.shortLoading();
+      if (!firefox.get().findElement(By.className("got_item_text")).isDisplayed()) {
+        firefox.get().findElement(By.className("js_sliderMetalMax")).click();
+        if (!firefox.get().findElement(By.className("pay")).getAttribute(CLASS).contains("disabled")) {
+          firefox.get().findElement(By.className("pay")).click();
 
-                    firefox.get().findElement(By.className("take")).click();
-                    firefox.shortLoading();
-                }
-            }
+          firefox.get().findElement(By.className("take")).click();
         }
+      }
     }
 }

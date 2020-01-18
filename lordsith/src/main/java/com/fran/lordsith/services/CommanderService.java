@@ -12,114 +12,117 @@ import java.util.Locale;
 @Service
 public class CommanderService {
 
-    @Autowired
-    @Lazy
-    LoginService loginService;
+  @Autowired
+  @Lazy
+  LoginService loginService;
 
-    @Autowired
-    @Lazy
-    BuildingService buildingService;
+  @Autowired
+  @Lazy
+  BuildingService buildingService;
 
-    @Autowired
-    @Lazy
-    ResearchService researchService;
+  @Autowired
+  @Lazy
+  ResearchService researchService;
 
-    @Autowired
-    @Lazy
-    FleetService manageFleetService;
+  @Autowired
+  @Lazy
+  HangarService hangarService;
 
-    @Autowired
-    @Lazy
-    HangarService hangarService;
+  @Autowired
+  @Lazy
+  DefenseService defenseService;
 
-    @Autowired
-    @Lazy
-    FirefoxClient firefox;
+  @Autowired
+  @Lazy
+  HandlerService handlerService;
 
-    @Autowired
-    @Lazy
-    DefenseService defenseService;
+  @Autowired
+  @Lazy
+  PlanetService planetService;
 
-    @Autowired
-    @Lazy
-    HandlerService handlerService;
+  @Autowired
+  @Lazy
+  MessageSource messageSource;
 
-    @Autowired
-    @Lazy
-    PlanetService planetService;
+  @Autowired
+  @Lazy
+  FirefoxClient firefoxClient;
 
-    @Autowired
-    @Lazy
-    MessageSource messageSource;
+  @Autowired
+  @Lazy
+  ExpeditionService expeditionService;
 
-    Logger log = LoggerFactory.getLogger(CommanderService.class);
+  @Autowired
+  @Lazy
+  CivilService civilService;
 
-    /**
-     * Bugs to fix here:
-     *
-     */
-    public void command() throws InterruptedException {
-        if (!loginService.isLogged()) {
-            loginService.login();
-        }
+  @Autowired
+  @Lazy
+  MilitaryService militaryService;
 
-        for (int i = 0; i < planetService.countPlanets(); i++) {
-            try {
-                managePlanets(i);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
+  @Autowired
+  @Lazy
+  IntelligentService intelligentService;
 
-        returnToMainPlanet();
-        try {
-            manageFleetService.scan();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        try {
-            manageFleetService.hunting();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+  Logger log = LoggerFactory.getLogger(CommanderService.class);
 
-        loginService.logout();
-        log.info(messageSource.getMessage("commander.done", null, Locale.ENGLISH));
+  /**
+   * Bugs to fix here:
+   * Handler loading bad.
+   */
+  public void command() throws InterruptedException {
+    if (!loginService.isLogged()) {
+      loginService.login();
     }
 
-    private void managePlanets(int i) throws InterruptedException {
-        planetService.nextPlanet(i);
-
-        handlerService.scrapFleet();
-        if (isMainPlanet(i)) {
-            handlerService.importExport();
-        }
-
-        manageFleetService.sendExpedition();
-        if (!isMainPlanet(i)) {
-            manageFleetService.transportResources();
-            manageFleetService.deployFleet();
-        }
-
-        if (buildingService.buildMinesOrFacilities()) {
-            researchService.research();
-        }
-
-        if (planetService.hasGrowEnough()) {
-            defenseService.buildDefenses(isMainPlanet(i));
-            hangarService.buildDeathStar(isMainPlanet(i));
-            hangarService.buildExpeditionFleet();
-            hangarService.buildTransportFleet();
-        }
-        firefox.shortLoading();
+    for (int i = 0; i < planetService.countPlanets(); i++) {
+      managePlanets(i);
     }
 
-    private void returnToMainPlanet() throws InterruptedException {
-        planetService.nextPlanet(0);
+    returnToMainPlanet();
+
+    intelligentService.scan();
+    firefoxClient.waiting();
+    militaryService.hunting();
+
+
+    loginService.logout();
+    log.info(messageSource.getMessage("commander.done", null, Locale.ENGLISH));
+  }
+
+  private void managePlanets(int i) throws InterruptedException {
+    planetService.nextPlanet(i);
+
+    handlerService.scrapFleet();
+    if (isMainPlanet(i)) {
+      handlerService.importExport();
     }
 
-    private boolean isMainPlanet(int i) {
-        return i == 0;
+    expeditionService.sendExpedition();
+    if (!isMainPlanet(i)) {
+      civilService.transportResources();
+      civilService.deployFleet();
     }
+
+    if (buildingService.buildMinesOrFacilities()) {
+      researchService.research();
+    }
+
+    if (planetService.hasGrowEnough()) {
+      defenseService.buildDefenses(isMainPlanet(i));
+      hangarService.prepareHangar();
+      hangarService.buildDeathStar(isMainPlanet(i));
+      hangarService.buildExpeditionFleet();
+      hangarService.buildTransportFleet();
+    }
+  }
+
+  private void returnToMainPlanet() throws InterruptedException {
+    planetService.nextPlanet(0);
+  }
+
+  private boolean isMainPlanet(int i) {
+    return i == 0;
+  }
 
 }

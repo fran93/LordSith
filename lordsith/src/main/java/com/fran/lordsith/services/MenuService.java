@@ -14,14 +14,14 @@ public class MenuService {
 
     @Autowired
     @Lazy
-    private FirefoxClient firefox;
+    FirefoxClient firefox;
 
-    public void openPage(MenuEnum menu) throws InterruptedException {
+    public void openPage(MenuEnum menu) {
         if (!isOnPage(menu)) {
+            firefox.loading(By.className("menubutton"));
             List<WebElement> buttons = firefox.get().findElements(By.className("menubutton"));
-            if(!buttons.isEmpty()) {
+            if (!buttons.isEmpty()) {
                 buttons.get(menu.getId()).click();
-                firefox.shortLoading();
             }
         }
     }

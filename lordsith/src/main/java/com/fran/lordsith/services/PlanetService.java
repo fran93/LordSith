@@ -37,21 +37,20 @@ public class PlanetService {
 
     Logger log = LoggerFactory.getLogger(PlanetService.class);
 
-    public void extractPoints() throws InterruptedException {
-        firefox.loading();
-        String scoreContentField = firefox.get().findElement(By.id("scoreContentField")).getText();
-        if (!scoreContentField.isEmpty()) {
-            points = Long.parseLong(scoreContentField.split(" ")[0].replaceAll("\\.", ""));
-        }
+    public void extractPoints() {
+      String scoreContentField = firefox.get().findElement(By.id("scoreContentField")).getText();
+      if (!scoreContentField.isEmpty()) {
+        points = Long.parseLong(scoreContentField.split(" ")[0].replaceAll("\\.", ""));
+      }
     }
 
     public void nextPlanet(int index) throws InterruptedException {
         menuService.openPage(MenuEnum.UBERSICHT);
         WebElement planet = getPlanetByIndex(index);
         String name = planet.findElement(By.className("planet-name")).getText();
-        planet.click();
-        firefox.loading();
-        extractPoints();
+      planet.click();
+      firefox.loading(3);
+      extractPoints();
         extractFreeFields();
         log.info(messageSource.getMessage("login.points", new Object[]{points}, Locale.ENGLISH));
         log.info(messageSource.getMessage("planet.fields", new Object[]{name, getFreeFields()}, Locale.ENGLISH));
@@ -64,7 +63,6 @@ public class PlanetService {
 
     public List<WebElement> getPlanetList() throws InterruptedException {
         menuService.openPage(MenuEnum.UBERSICHT);
-        firefox.shortLoading();
 
         return firefox.get().findElements(By.className("smallplanet"));
     }

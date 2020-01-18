@@ -203,10 +203,9 @@ public class BuildingService {
         mines.add(techno);
     }
 
-    private void upTechnology(Technology tech, AtomicBoolean building) throws InterruptedException {
+    private void upTechnology(Technology tech, AtomicBoolean building) {
         if (tech.getStatus().equals(StatusEnum.ON.getValue())) {
             firefox.get().findElement(By.xpath("//li[@data-technology=" + tech.getId() + "]")).findElement(By.tagName("button")).click();
-            firefox.shortLoading();
             building.set(true);
 
             log.info(messageSource.getMessage("building.build", new Object[]{TechnologyEnum.getById(tech.getId()).name(), tech.getLevel()}, Locale.ENGLISH));

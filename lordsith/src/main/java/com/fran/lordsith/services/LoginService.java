@@ -42,19 +42,18 @@ public class LoginService {
     public void login() throws InterruptedException {
 		handleExhaustion();
 		firefox.get().get(url);
-        firefox.shortLoading();
 
         if (firefox.get().findElements(By.className("hub-logo")).isEmpty()) {
             firefox.get().findElement(By.id("loginRegisterTabs")).findElement(By.tagName("span")).click();
             firefox.get().findElement(By.name("email")).sendKeys(email);
             firefox.get().findElement(By.name("password")).sendKeys(password);
             firefox.get().findElement(By.xpath("//button[@type='submit']")).click();
-            firefox.shortLoading();
         }
 
         firefox.get().findElement(By.id("joinGame")).findElement(By.tagName("a")).findElement(By.tagName("button")).click();
         firefox.get().findElement(By.id("accountlist")).findElement(By.tagName("button")).click();
-        firefox.closeTab();
+      firefox.loading(1);
+      firefox.closeTab();
     }
 
 	private void handleExhaustion() {
@@ -79,9 +78,8 @@ public class LoginService {
         return firefox.get().getCurrentUrl().contains("page=ingame");
     }
 
-    public void logout() throws InterruptedException {
-        firefox.get().findElement(By.id("bar")).findElements(By.tagName("li")).get(7).click();
-        firefox.shortLoading();
-    }
+  public void logout() {
+    firefox.get().findElement(By.id("bar")).findElements(By.tagName("li")).get(7).click();
+  }
 
 }

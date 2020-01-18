@@ -6,23 +6,17 @@ import com.fran.lordsith.enums.TechnologyEnum;
 import com.fran.lordsith.model.Defense;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
 public class DefenseService {
 
-    private static final String UPGRADE = "upgrade";
-    private static final String LI_DATA_TECHNOLOGY = "//li[@data-technology=";
     private static final int BASE_RAKETENWERFER = 10000;
     private static final int BASE_LEICHTESLASERGESCHUTZ = 10000;
     private static final int BASE_SCHWERESLASERGESCHUTZ = 1000;
@@ -41,17 +35,11 @@ public class DefenseService {
 
     @Autowired
     @Lazy
-    MessageSource messageSource;
-
-    @Autowired
-    @Lazy
     MenuService menuService;
 
     @Autowired
     @Lazy
     TechnologyService technologyService;
-
-    Logger log = LoggerFactory.getLogger(DefenseService.class);
 
     public long calculateNumberOfDefense(int baseNumber, long points) {
         if (points < 50000) {
@@ -73,63 +61,39 @@ public class DefenseService {
         int adjust = isMainPlanet ? 1 : 10;
 
         List<Defense> defenses = new ArrayList<>();
-        defenses.add(new Defense(BASE_RAKETENWERFER, TechnologyEnum.RAKETENWERFER, false));
-        defenses.add(new Defense(BASE_LEICHTESLASERGESCHUTZ, TechnologyEnum.LEICHTESLASERGESCHUTZ, false));
-        defenses.add(new Defense(BASE_SCHWERESLASERGESCHUTZ, TechnologyEnum.SCHWERESLASERGESCHUTZ, false));
-        defenses.add(new Defense(BASE_IONENGESCHUZ, TechnologyEnum.IONENGESCHUZ, false));
-        defenses.add(new Defense(BASE_GAUSSKANONE, TechnologyEnum.GAUSSKANONE, false));
-        defenses.add(new Defense(BASE_PLASMAWERFER, TechnologyEnum.PLASMAWERFER, false));
-        defenses.add(new Defense(BASE_ABFANGRAKETE, TechnologyEnum.ABFANGRAKETE, false));
-        defenses.add(new Defense(10, TechnologyEnum.KLEINE_SCHILDKUPPEL, true));
-        defenses.add(new Defense(10, TechnologyEnum.GROSSE_SCHILDKUPPEL, true));
+      defenses.add(new Defense(BASE_RAKETENWERFER, TechnologyEnum.RAKETENWERFER, false));
+      defenses.add(new Defense(BASE_LEICHTESLASERGESCHUTZ, TechnologyEnum.LEICHTESLASERGESCHUTZ, false));
+      defenses.add(new Defense(BASE_SCHWERESLASERGESCHUTZ, TechnologyEnum.SCHWERESLASERGESCHUTZ, false));
+      defenses.add(new Defense(BASE_IONENGESCHUZ, TechnologyEnum.IONENGESCHUZ, false));
+      defenses.add(new Defense(BASE_GAUSSKANONE, TechnologyEnum.GAUSSKANONE, false));
+      defenses.add(new Defense(BASE_PLASMAWERFER, TechnologyEnum.PLASMAWERFER, false));
+      defenses.add(new Defense(BASE_ABFANGRAKETE, TechnologyEnum.ABFANGRAKETE, false));
+      defenses.add(new Defense(10, TechnologyEnum.KLEINE_SCHILDKUPPEL, true));
+      defenses.add(new Defense(10, TechnologyEnum.GROSSE_SCHILDKUPPEL, true));
 
-        defenses.forEach(defense -> defense.setAmountToBuild((calculateNumberOfDefense(defense.getBaseAmount(), planetService.getPoints()) / adjust) - getAmount(defense.getTechnology().getId())));
-        Optional<Defense> defenseToBuild = defenses.stream().filter(defense -> isStatusOn(defense.getTechnology().getId()) && defense.getAmountToBuild() > 0).findFirst();
-        if (defenseToBuild.isPresent()) {
-            if (defenseToBuild.get().isUnique()) {
-                build(defenseToBuild.get().getTechnology());
-            } else {
-                build(defenseToBuild.get().getTechnology(), defenseToBuild.get().getAmountToBuild());
-            }
+      List<String> queue = new ArrayList<>();
+      firefox.get().findElements(By.className("queuePic")).forEach(pic -> queue.add(pic.getAttribute("alt").trim()));
+
+      defenses.forEach(defense -> defense.setAmountToBuild((calculateNumberOfDefense(defense.getBaseAmount(), planetService.getPoints()) / adjust) - getAmount(defense.getTechnology().getId())));
+      Optional<Defense> defenseToBuild = defenses.stream().filter(defense -> isStatusOn(defense.getTechnology().getId(), queue) && defense.getAmountToBuild() > 0).findFirst();
+      if (defenseToBuild.isPresent()) {
+        if (defenseToBuild.get().isUnique()) {
+          technologyService.build(defenseToBuild.get().getTechnology());
+        } else {
+          technologyService.build(defenseToBuild.get().getTechnology(), defenseToBuild.get().getAmountToBuild());
         }
+      }
     }
 
-    private int getAmount(int id) {
-        Optional<WebElement> theShip = technologyService.getTechnologyById(id);
-        return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
-    }
+  private int getAmount(int id) {
+    Optional<WebElement> theShip = technologyService.getTechnologyById(id);
+    return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
+  }
 
-    private boolean isStatusOn(int id) {
-        boolean isInQueue = firefox.get().findElements(By.className("queuePic")).stream().anyMatch(pic -> pic.getAttribute("alt").trim().endsWith("_" + id));
-        Optional<WebElement> defense = technologyService.getTechnologyById(id);
+  private boolean isStatusOn(int id, List<String> queue) {
+    boolean isInQueue = queue.stream().anyMatch(pic -> pic.endsWith("_" + id));
+    Optional<WebElement> defense = technologyService.getTechnologyById(id);
 
-        return defense.isPresent() && (defense.get().getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !isInQueue);
-    }
-
-    private void build(TechnologyEnum defense) throws InterruptedException {
-        firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + defense.getId() + "]")).click();
-        firefox.shortLoading();
-
-        if (!firefox.get().findElements(By.className(UPGRADE)).isEmpty()) {
-            firefox.jsClick(firefox.get().findElement(By.className(UPGRADE)));
-            firefox.shortLoading();
-        }
-
-        log.info(messageSource.getMessage("generic.build", new Object[]{1, defense.name()}, Locale.ENGLISH));
-    }
-
-    private void build(TechnologyEnum defense, long quantity) throws InterruptedException {
-        firefox.get().findElement(By.xpath(LI_DATA_TECHNOLOGY + defense.getId() + "]")).click();
-        firefox.shortLoading();
-
-        firefox.get().findElement(By.id("build_amount")).sendKeys(String.valueOf(quantity));
-        firefox.loading();
-
-        if (!firefox.get().findElements(By.className(UPGRADE)).isEmpty()) {
-            firefox.jsClick(firefox.get().findElement(By.className(UPGRADE)));
-            firefox.loading();
-        }
-
-        log.info(messageSource.getMessage("generic.build", new Object[]{quantity, defense.name()}, Locale.ENGLISH));
-    }
+    return defense.isPresent() && (defense.get().getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !isInQueue);
+  }
 }

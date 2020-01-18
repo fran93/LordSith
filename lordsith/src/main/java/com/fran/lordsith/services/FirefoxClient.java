@@ -1,13 +1,12 @@
 package com.fran.lordsith.services;
 
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -36,48 +35,45 @@ public class FirefoxClient {
         } else {
             driver.manage().window().maximize();
         }
+      driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     }
 
     public WebDriver get() {
         return driver;
     }
 
-    public void jsClick(WebElement element) {
-        JavascriptExecutor executor = (JavascriptExecutor) driver;
-        executor.executeScript("arguments[0].click();", element);
-    }
+  public void jsClick(WebElement element) {
+    JavascriptExecutor executor = (JavascriptExecutor) driver;
+    executor.executeScript("arguments[0].click();", element);
+  }
 
-    public void mouseOver(WebElement element) {
-        Actions mouseHover = new Actions(driver);
-        mouseHover.moveToElement(element).click().build().perform();
-    }
+  public void mouseOver(WebElement element) {
+    Actions mouseHover = new Actions(driver);
+    mouseHover.moveToElement(element).click().build().perform();
+  }
 
-    public void shortLoading() throws InterruptedException {
-        TimeUnit.SECONDS.sleep(1);
-    }
+  public void loading(By element) {
+    WebDriverWait wait = new WebDriverWait(driver, 5);
+    wait.until(ExpectedConditions.visibilityOfElementLocated(element));
+  }
 
-    public void loading() throws InterruptedException {
-        TimeUnit.SECONDS.sleep(3);
-    }
+  public void loading(int seconds) throws InterruptedException {
+    TimeUnit.SECONDS.sleep(seconds);
+  }
 
-    public void longLoading() throws InterruptedException {
-        TimeUnit.SECONDS.sleep(6);
-    }
+  public void waiting() throws InterruptedException {
+    TimeUnit.SECONDS.sleep(30);
+  }
 
-    public void longestLoading() throws InterruptedException {
-        TimeUnit.MINUTES.sleep(1);
-    }
-
-    public void closeTab() throws InterruptedException {
-        String oldtab = driver.getWindowHandle();
-        driver.close();
-        driver.getWindowHandles().forEach(window -> {
-            if (!window.equals(oldtab)) {
-                driver.switchTo().window(window);
-            }
-        });
-        longLoading();
-    }
+  public void closeTab() {
+    String oldtab = driver.getWindowHandle();
+    driver.close();
+    driver.getWindowHandles().forEach(window -> {
+      if (!window.equals(oldtab)) {
+        driver.switchTo().window(window);
+      }
+    });
+  }
 
     public void restart() {
         init();

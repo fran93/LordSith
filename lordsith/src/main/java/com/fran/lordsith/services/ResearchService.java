@@ -70,21 +70,20 @@ public class ResearchService {
         mines.add(techno);
     }
 
-    private void chooseWhatToBuild(ArrayList<Technology> researchs, AtomicBoolean researching) throws InterruptedException {
-        if (!researching.get() && !researchs.isEmpty()) {
-            researchs.sort(Comparator.comparingDouble(Technology::getTotalCost));
-            upTechnology(researchs.get(0), researching);
-        }
+    private void chooseWhatToBuild(ArrayList<Technology> researchs, AtomicBoolean researching) {
+      if (!researching.get() && !researchs.isEmpty()) {
+        researchs.sort(Comparator.comparingDouble(Technology::getTotalCost));
+        upTechnology(researchs.get(0), researching);
+      }
     }
 
-    private void upTechnology(Technology tech, AtomicBoolean researching) throws InterruptedException {
-        log.info(messageSource.getMessage("research.update", new Object[]{TechnologyEnum.getById(tech.getId()).name(), tech.getLevel()}, Locale.ENGLISH));
+  private void upTechnology(Technology tech, AtomicBoolean researching) {
+    log.info(messageSource.getMessage("research.update", new Object[]{TechnologyEnum.getById(tech.getId()).name(), tech.getLevel()}, Locale.ENGLISH));
 
-        if (tech.getStatus().equals(StatusEnum.ON.getValue())) {
-            firefox.get().findElement(By.xpath("//li[@data-technology=" + tech.getId() + "]")).findElement(By.tagName("button")).click();
-            firefox.shortLoading();
-            researching.set(true);
-        }
+    if (tech.getStatus().equals(StatusEnum.ON.getValue())) {
+      firefox.get().findElement(By.xpath("//li[@data-technology=" + tech.getId() + "]")).findElement(By.tagName("button")).click();
+      researching.set(true);
     }
+  }
 
 }
