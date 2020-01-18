@@ -64,21 +64,25 @@ public class IntelligentService {
     }
   }
 
-  private void recycle() throws InterruptedException {
-    List<WebElement> expeditionSlotBox = firefox.get().findElements(By.className("expeditionDebrisSlotBox"));
-    if (!expeditionSlotBox.isEmpty()) {
-      firefox.loading(1);
-      firefox.mouseOver(expeditionSlotBox.get(0).findElement(By.className("js_bday_debris")));
-      WebElement debris = firefox.get().findElement(By.id("debris16"));
-      String debrisRecyclers = debris.findElement(By.className("debris-recyclers")).getText();
-      if (!debrisRecyclers.trim().isEmpty()) {
-        int requiredRecycles = Integer.parseInt(debrisRecyclers.split(":")[1].trim());
-        if (requiredRecycles >= 5 && !debris.findElements(By.tagName("a")).isEmpty()) {
-          debris.findElement(By.tagName("a")).click();
+  private void recycle() {
+    try {
+      List<WebElement> expeditionSlotBox = firefox.get().findElements(By.className("expeditionDebrisSlotBox"));
+      if (!expeditionSlotBox.isEmpty()) {
+        firefox.loading(1);
+        firefox.mouseOver(expeditionSlotBox.get(0).findElement(By.className("js_bday_debris")));
+        WebElement debris = firefox.get().findElement(By.id("debris16"));
+        String debrisRecyclers = debris.findElement(By.className("debris-recyclers")).getText();
+        if (!debrisRecyclers.trim().isEmpty()) {
+          int requiredRecycles = Integer.parseInt(debrisRecyclers.split(":")[1].trim());
+          if (requiredRecycles >= 5 && !debris.findElements(By.tagName("a")).isEmpty()) {
+            debris.findElement(By.tagName("a")).click();
 
-          log.info(messageSource.getMessage("fleet.recycle", null, Locale.ENGLISH));
+            log.info(messageSource.getMessage("fleet.recycle", null, Locale.ENGLISH));
+          }
         }
       }
+    } catch (StaleElementReferenceException | InterruptedException ex) {
+      log.info("recycle: " + ex.getMessage());
     }
   }
 
