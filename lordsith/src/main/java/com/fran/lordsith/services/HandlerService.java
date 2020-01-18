@@ -14,89 +14,79 @@ import java.util.Locale;
 @Service
 public class HandlerService {
 
-    private static final String CLASS = "class";
+  private static final String CLASS = "class";
 
-    @Autowired
-    @Lazy
-    FirefoxClient firefox;
+  @Autowired
+  @Lazy
+  FirefoxClient firefox;
 
-    @Autowired
-    @Lazy
-    MessageSource messageSource;
+  @Autowired
+  @Lazy
+  MessageSource messageSource;
 
-    @Autowired
-    @Lazy
-    FleetService fleetService;
+  @Autowired
+  @Lazy
+  FleetService fleetService;
 
-    @Autowired
-    @Lazy
-    PlanetService planetService;
+  @Autowired
+  @Lazy
+  PlanetService planetService;
 
-    @Autowired
-    @Lazy
-    MenuService menuService;
+  @Autowired
+  @Lazy
+  MenuService menuService;
 
-    Logger log = LoggerFactory.getLogger(HandlerService.class);
+  Logger log = LoggerFactory.getLogger(HandlerService.class);
 
-    public void scrapFleet() throws InterruptedException {
-        menuService.openPage(MenuEnum.HANDLER);
+  public void scrapFleet() throws InterruptedException {
+    menuService.openPage(MenuEnum.HANDLER);
 
-        firefox.get().findElement(By.id("js_traderScrap")).click();
+    firefox.get().findElement(By.id("js_traderScrap")).click();
 
-        if (firefox.get().getCurrentUrl().contains("page=traderScrap")) {
-            clickScrap("button204");
-            clickScrap("button205");
-            clickScrap("button207");
-            clickScrap("button211");
+    if (firefox.get().getCurrentUrl().contains("page=traderScrap")) {
+      if (planetService.hasPoints()) {
+        firefox.loading(By.className("forward"));
+        firefox.loading(1);
+        firefox.get().findElement(By.className("forward")).click();
+        firefox.loading(1);
+        String rawAmount = firefox.get().findElement(By.id("button203")).findElement(By.className("amount")).getText().replaceAll("\\.", "");
+        if (!rawAmount.trim().isEmpty()) {
+          long current = Long.parseLong(rawAmount);
+          long base = fleetService.calculateNumberOfCargos(planetService.getPoints());
+          long desired = current - (base + base / 2);
 
-            if (planetService.hasPoints()) {
-              firefox.loading(By.className("forward"));
-              firefox.loading(1);
-              firefox.get().findElement(By.className("forward")).click();
-              String rawAmount = firefox.get().findElement(By.id("button203")).findElement(By.className("amount")).getText().replaceAll("\\.", "");
-              if (!rawAmount.trim().isEmpty()) {
-                long current = Long.parseLong(rawAmount);
-                long base = fleetService.calculateNumberOfCargos(planetService.getPoints());
-                long desired = current - (base + base / 2);
-
-                if (desired > 0) {
-                  firefox.get().findElement(By.id("ship_203")).sendKeys(String.valueOf(desired));
-                }
-                }
-            }
-
-          firefox.loading(1);
-            if (!firefox.get().findElement(By.id("js_scrapScrapIT")).getAttribute(CLASS).contains("disabled")) {
-                firefox.get().findElement(By.id("js_scrapScrapIT")).click();
-
-                firefox.get().findElement(By.className("yes")).click();
-
-                log.info(messageSource.getMessage("handler.scrap", null, Locale.ENGLISH));
-            }
-        }
-    }
-
-    private void clickScrap(String id) {
-        if (firefox.get().findElement(By.id(id)).getAttribute(CLASS).endsWith("on")) {
-            firefox.get().findElement(By.id(id)).click();
-        }
-    }
-
-    public void importExport() throws InterruptedException {
-      firefox.loading(1);
-      firefox.loading(By.className("back_to_overview"));
-      firefox.get().findElement(By.className("back_to_overview")).click();
-      firefox.loading(1);
-      firefox.loading(By.id("js_traderImportExport"));
-      firefox.get().findElement(By.id("js_traderImportExport")).click();
-
-      if (!firefox.get().findElement(By.className("got_item_text")).isDisplayed()) {
-        firefox.get().findElement(By.className("js_sliderMetalMax")).click();
-        if (!firefox.get().findElement(By.className("pay")).getAttribute(CLASS).contains("disabled")) {
-          firefox.get().findElement(By.className("pay")).click();
-
-          firefox.get().findElement(By.className("take")).click();
+          if (desired > 0) {
+            firefox.get().findElement(By.id("ship_203")).sendKeys(String.valueOf(desired));
+          }
         }
       }
+
+      firefox.loading(1);
+      if (!firefox.get().findElement(By.id("js_scrapScrapIT")).getAttribute(CLASS).contains("disabled")) {
+        firefox.get().findElement(By.id("js_scrapScrapIT")).click();
+
+        firefox.get().findElement(By.className("yes")).click();
+
+        log.info(messageSource.getMessage("handler.scrap", null, Locale.ENGLISH));
+      }
     }
+  }
+
+  public void importExport() throws InterruptedException {
+    firefox.loading(1);
+    firefox.loading(By.className("back_to_overview"));
+    firefox.get().findElement(By.className("back_to_overview")).click();
+    firefox.loading(1);
+    firefox.loading(By.id("js_traderImportExport"));
+    firefox.get().findElement(By.id("js_traderImportExport")).click();
+
+    if (!firefox.get().findElement(By.className("got_item_text")).isDisplayed()) {
+      firefox.get().findElement(By.className("js_sliderMetalMax")).click();
+      if (!firefox.get().findElement(By.className("pay")).getAttribute(CLASS).contains("disabled")) {
+        firefox.get().findElement(By.className("pay")).click();
+
+        firefox.get().findElement(By.className("take")).click();
+      }
+    }
+  }
 }

@@ -89,13 +89,15 @@ public class FleetService {
     if (menuService.isOnPage(MenuEnum.FLOTTE)) {
       List<WebElement> slotElements = firefox.get().findElement(By.id("slots")).findElements(By.className("fleft"));
       String rawSlots = slotElements.get(0).getText();
-      String splitedSlots = rawSlots.split(":")[1].trim();
+      String[] rawSlotSplit = rawSlots.split(":");
+      if (rawSlotSplit.length > 1) {
+        String splitedSlots = rawSlotSplit[1].trim();
 
-      int currentSlots = Integer.parseInt(splitedSlots.split("/")[0]);
-      int maxSlots = Integer.parseInt(splitedSlots.split("/")[1]);
+        int currentSlots = Integer.parseInt(splitedSlots.split("/")[0]);
+        int maxSlots = Integer.parseInt(splitedSlots.split("/")[1]);
 
-      return currentSlots < maxSlots;
-
+        return currentSlots < maxSlots;
+      }
     }
     return false;
   }

@@ -104,7 +104,7 @@ public class CommanderService {
       civilService.deployFleet();
     }
 
-    if (buildingService.buildMinesOrFacilities()) {
+    if (buildingService.buildMinesOrFacilities() && isMainPlanet(i)) {
       researchService.research();
     }
 
