@@ -3,6 +3,7 @@ package com.fran.lordsith.services;
 import com.fran.lordsith.enums.MenuEnum;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,17 +23,17 @@ public class MenuService {
     Logger log = LoggerFactory.getLogger(MenuService.class);
 
     public void openPage(MenuEnum menu) {
-        try {
-            if (!isOnPage(menu)) {
-                firefox.loading(By.className("menubutton"));
-                List<WebElement> buttons = firefox.get().findElements(By.className("menubutton"));
-                if (!buttons.isEmpty()) {
-                    buttons.get(menu.getId()).click();
-                }
-            }
-        } catch (StaleElementReferenceException ex) {
-            log.info("openPage", ex);
+      try {
+        if (!isOnPage(menu)) {
+          firefox.loading(By.className("menubutton"));
+          List<WebElement> buttons = firefox.get().findElements(By.className("menubutton"));
+          if (!buttons.isEmpty()) {
+            buttons.get(menu.getId()).click();
+          }
         }
+      } catch (StaleElementReferenceException | TimeoutException ex) {
+        log.info("openPage", ex);
+      }
     }
 
     public boolean isOnPage(MenuEnum menu) {

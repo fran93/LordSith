@@ -67,6 +67,7 @@ public class MilitaryService {
         } else {
           log.info(messageSource.getMessage("fleet.discard", null, Locale.ENGLISH));
           firefox.jsClick(message.get().findElement(By.className("icon_refuse")));
+          firefox.loading(1);
         }
       }
     }

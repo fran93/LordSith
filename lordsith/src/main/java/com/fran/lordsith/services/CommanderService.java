@@ -66,10 +66,6 @@ public class CommanderService {
 
   Logger log = LoggerFactory.getLogger(CommanderService.class);
 
-  /**
-   * Bugs to fix here:
-   * Handler loading bad.
-   */
   public void command() throws InterruptedException {
     if (!loginService.isLogged()) {
       loginService.login();
