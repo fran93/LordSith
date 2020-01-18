@@ -40,17 +40,17 @@ public class ResearchService {
 
     Logger log = LoggerFactory.getLogger(ResearchService.class);
 
-    public boolean research() throws InterruptedException {
-        ArrayList<Technology> researchs = new ArrayList<>();
-        AtomicBoolean researching = new AtomicBoolean(false);
+    public boolean research() {
+      ArrayList<Technology> researchs = new ArrayList<>();
+      AtomicBoolean researching = new AtomicBoolean(false);
 
-        menuService.openPage(MenuEnum.FORSCHUNG);
+      menuService.openPage(MenuEnum.FORSCHUNG);
 
-        firefox.get().findElements(By.className("technology")).forEach(technology -> {
-            int id = Integer.parseInt(technology.getAttribute("data-technology"));
-            String status = technology.getAttribute("data-status");
-            if (status.equals(StatusEnum.ACTIVE.getValue())) {
-                researching.set(true);
+      firefox.get().findElements(By.className("technology")).forEach(technology -> {
+        int id = Integer.parseInt(technology.getAttribute("data-technology"));
+        String status = technology.getAttribute("data-status");
+        if (status.equals(StatusEnum.ACTIVE.getValue())) {
+          researching.set(true);
             }
 
             if (!status.equals(StatusEnum.OFF.getValue()) && id >= TechnologyEnum.SPIONAGETECHNIK.getId() && id <= TechnologyEnum.INTERGALAKTISCHES_FORSCHUNGSNETZWERK.getId()) {

@@ -57,17 +57,17 @@ public class PlanetService {
 
     }
 
-    public WebElement getPlanetByIndex(int index) throws InterruptedException {
+    public WebElement getPlanetByIndex(int index) {
         return getPlanetList().get(index);
     }
 
-    public List<WebElement> getPlanetList() throws InterruptedException {
+    public List<WebElement> getPlanetList() {
         menuService.openPage(MenuEnum.UBERSICHT);
 
         return firefox.get().findElements(By.className("smallplanet"));
     }
 
-    public int countPlanets() throws InterruptedException {
+    public int countPlanets() {
         return getPlanetList().size();
     }
 

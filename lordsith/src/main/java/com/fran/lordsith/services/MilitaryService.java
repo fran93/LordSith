@@ -29,6 +29,7 @@ public class MilitaryService {
   @Autowired
   @Lazy
   MessageSource messageSource;
+
   Logger log = LoggerFactory.getLogger(MilitaryService.class);
 
   private void processMessages() throws InterruptedException {
@@ -79,7 +80,7 @@ public class MilitaryService {
       log.info(messageSource.getMessage("fleet.attack", new Object[]{necesaryFleet, TechnologyEnum.KLEINER_TRANSPORTER.name()}, Locale.ENGLISH));
     } else if (defenses < 500000) {
       int countKreuzer = fleetService.numberOfShips(TechnologyEnum.KREUZER.getId());
-      long militaryFleet = defenses / 3;
+      long militaryFleet = defenses / 3000;
       if (countKreuzer >= militaryFleet) {
         firefox.get().findElement(By.name("transporterSmall")).sendKeys(String.valueOf(necesaryFleet));
         firefox.get().findElement(By.name("cruiser")).sendKeys(String.valueOf(militaryFleet));
@@ -95,6 +96,7 @@ public class MilitaryService {
     } else {
       int countBalls = fleetService.numberOfShips(TechnologyEnum.TODESSTERN.getId());
       long militaryFleet = defenses / 1000000;
+      firefox.loading(1);
       if (countBalls >= militaryFleet) {
         firefox.get().findElement(By.name("deathstar")).sendKeys(String.valueOf(militaryFleet));
         log.info(messageSource.getMessage("fleet.attack", new Object[]{militaryFleet, TechnologyEnum.TODESSTERN.name()}, Locale.ENGLISH));
@@ -108,6 +110,7 @@ public class MilitaryService {
         if (fleetService.canContinue(FleetService.SEND_FLEET)) {
           fleetService.weiterWeiter(FleetService.SEND_FLEET);
 
+          firefox.loading(1);
           openMessages();
 
           if (firefox.get().getCurrentUrl().trim().endsWith("messages")) {

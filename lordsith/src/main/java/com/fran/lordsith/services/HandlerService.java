@@ -81,11 +81,14 @@ public class HandlerService {
     firefox.get().findElement(By.id("js_traderImportExport")).click();
 
     if (!firefox.get().findElement(By.className("got_item_text")).isDisplayed()) {
+      firefox.loading(1);
       firefox.get().findElement(By.className("js_sliderMetalMax")).click();
       if (!firefox.get().findElement(By.className("pay")).getAttribute(CLASS).contains("disabled")) {
+        firefox.loading(1);
         firefox.get().findElement(By.className("pay")).click();
 
         firefox.get().findElement(By.className("take")).click();
+        firefox.loading(1);
       }
     }
   }

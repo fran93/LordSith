@@ -106,6 +106,7 @@ public class IntelligentService {
     firefox.loading(1);
     List<WebElement> inactives = firefox.get().findElements(By.className("inactive_filter"));
     for (WebElement inactive : inactives) {
+      firefox.loading(1);
       inactive.findElement(By.className("espionage")).click();
     }
 

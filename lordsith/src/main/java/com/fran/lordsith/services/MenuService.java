@@ -32,7 +32,7 @@ public class MenuService {
           }
         }
       } catch (StaleElementReferenceException | TimeoutException ex) {
-        log.info("openPage", ex);
+        log.info("openPage", ex.getMessage());
       }
     }
 

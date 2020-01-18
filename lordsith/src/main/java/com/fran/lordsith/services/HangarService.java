@@ -4,7 +4,10 @@ import com.fran.lordsith.enums.MenuEnum;
 import com.fran.lordsith.enums.StatusEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -35,6 +38,8 @@ public class HangarService {
   @Autowired
   @Lazy
   TechnologyService technologyService;
+
+  Logger log = LoggerFactory.getLogger(HangarService.class);
 
   private List<String> queue = new ArrayList<>();
 
@@ -98,11 +103,15 @@ public class HangarService {
   }
 
   private boolean isStatusOn(int id) throws InterruptedException {
-    boolean isInQueue = queue.stream().anyMatch(pic -> pic.endsWith("_" + id));
-    firefox.loading(1);
-    Optional<WebElement> defense = technologyService.getTechnologyById(id);
-
-    return defense.isPresent() && (defense.get().getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !isInQueue);
+    try {
+      boolean isInQueue = queue.stream().anyMatch(pic -> pic.endsWith("_" + id));
+      firefox.loading(1);
+      Optional<WebElement> defense = technologyService.getTechnologyById(id);
+      return defense.isPresent() && (defense.get().getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !isInQueue);
+    } catch (StaleElementReferenceException ex) {
+      log.info("Status on", ex.getMessage());
+    }
+    return false;
   }
 
 }
