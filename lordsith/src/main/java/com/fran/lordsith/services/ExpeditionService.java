@@ -48,7 +48,7 @@ public class ExpeditionService {
   }
 
   private void sendExpedition2() throws InterruptedException {
-    firefox.loading(1);
+    firefox.loading(2);
     if (isExpeditionAvailable() && fleetService.isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId())
         && fleetService.numberOfShips(TechnologyEnum.GROSSER_TRANSPORTER.getId()) > fleetService.calculateNumberOfCargos(planetService.getPoints()) / 2) {
       firefox.get().findElement(By.name("transporterLarge")).sendKeys(String.valueOf(fleetService.calculateNumberOfCargos(planetService.getPoints())));
@@ -61,7 +61,7 @@ public class ExpeditionService {
         firefox.get().findElement(By.name("destroyer")).sendKeys("1");
       }
 
-      firefox.loading(1);
+      firefox.loading(2);
 
       if (fleetService.canContinue(FleetService.CONTINUE_TO_FLEET2)) {
         fleetService.weiterWeiter(FleetService.CONTINUE_TO_FLEET2);
@@ -74,7 +74,7 @@ public class ExpeditionService {
           if (fleetService.canContinue(FleetService.SEND_FLEET)) {
             fleetService.weiterWeiter(FleetService.SEND_FLEET);
 
-            firefox.loading(1);
+            firefox.loading(2);
             log.info(messageSource.getMessage("fleet.expedition", null, Locale.ENGLISH));
           }
         }
