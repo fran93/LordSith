@@ -4,6 +4,7 @@ import com.fran.lordsith.enums.TechnologyEnum;
 import com.fran.lordsith.model.Resources;
 import com.fran.lordsith.model.Technology;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -74,6 +75,7 @@ public class TechnologyService {
 
     public void build(TechnologyEnum tech, long quantity) throws InterruptedException {
         try {
+            firefox.loading(1);
             Optional<WebElement> ship = getTechnologyById(tech.getId());
             if (ship.isPresent()) {
                 ship.get().click();
@@ -89,8 +91,8 @@ public class TechnologyService {
 
                 log.info(messageSource.getMessage("generic.build", new Object[]{quantity, tech.name()}, Locale.ENGLISH));
             }
-        } catch (TimeoutException ex) {
-          log.info("build:" + ex.getMessage());
+        } catch (TimeoutException | StaleElementReferenceException ex) {
+            log.info("build:" + ex.getMessage());
         }
     }
 }
