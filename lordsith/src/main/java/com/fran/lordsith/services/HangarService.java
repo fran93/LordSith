@@ -93,10 +93,9 @@ public class HangarService {
     return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
   }
 
-  private boolean isStatusOn(int id) throws InterruptedException {
+  private boolean isStatusOn(int id) {
     try {
       boolean isInQueue = queue.stream().anyMatch(pic -> pic.endsWith("_" + id));
-      firefox.loading(1);
       Optional<WebElement> defense = technologyService.getTechnologyById(id);
       return defense.isPresent() && (defense.get().getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !isInQueue);
     } catch (StaleElementReferenceException | TimeoutException ex) {

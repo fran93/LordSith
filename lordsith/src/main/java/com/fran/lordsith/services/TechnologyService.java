@@ -55,11 +55,12 @@ public class TechnologyService {
 
     public Optional<WebElement> getTechnologyById(int id) {
       try {
-        firefox.loading(By.className("technology"));
-        List<WebElement> technologies = firefox.get().findElements(By.className("technology"));
-        return technologies.stream().filter(tech -> tech.getAttribute("data-technology").equals(String.valueOf(id))).findFirst();
-      } catch (StaleElementReferenceException ex) {
-        log.info("getTechnologyById:" + ex.getMessage());
+          firefox.loading(By.className("technology"));
+          firefox.loading(1);
+          List<WebElement> technologies = firefox.get().findElements(By.className("technology"));
+          return technologies.stream().filter(tech -> tech.getAttribute("data-technology").equals(String.valueOf(id))).findFirst();
+      } catch (StaleElementReferenceException | InterruptedException ex) {
+          log.info("getTechnologyById:" + ex.getMessage());
       }
 
       return Optional.empty();

@@ -69,7 +69,6 @@ public class CivilService {
       if (countKreuzer > MIN_FLEET_TO_DEPLOY || countSchlachtKreuzer > MIN_FLEET_TO_DEPLOY || countZerstorer > MIN_FLEET_TO_DEPLOY || countPathfinder > MIN_FLEET_TO_DEPLOY
           || countReaper > MIN_FLEET_TO_DEPLOY) {
 
-        firefox.loading(1);
         selectAllShips(TechnologyEnum.LEICHTER_JAGER.getId());
         selectAllShips(TechnologyEnum.SCHWERER_JAGER.getId());
         selectAllShips(TechnologyEnum.KREUZER.getId());
