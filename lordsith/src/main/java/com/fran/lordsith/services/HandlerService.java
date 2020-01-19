@@ -93,6 +93,7 @@ public class HandlerService {
           firefox.loading(1);
           firefox.get().findElement(By.className("pay")).click();
 
+          firefox.loading(1);
           firefox.get().findElement(By.className("take")).click();
           firefox.loading(1);
         }

@@ -77,8 +77,12 @@ public class CivilService {
         selectAllShips(TechnologyEnum.BOMBER.getId());
         selectAllShips(TechnologyEnum.REAPER.getId());
         selectAllShips(TechnologyEnum.SPIONAGESONDE.getId());
-        firefox.get().findElement(By.name("explorer")).sendKeys(String.valueOf(countPathfinder - 2));
-        firefox.get().findElement(By.name("destroyer")).sendKeys(String.valueOf(countZerstorer - 2));
+        if (countPathfinder > 0) {
+          firefox.get().findElement(By.name("explorer")).sendKeys(String.valueOf(countPathfinder - 2));
+        }
+        if (countZerstorer > 0) {
+          firefox.get().findElement(By.name("destroyer")).sendKeys(String.valueOf(countZerstorer - 2));
+        }
 
         if (fleetService.canContinue(FleetService.CONTINUE_TO_FLEET2)) {
           fleetService.weiterWeiter(FleetService.CONTINUE_TO_FLEET2);
