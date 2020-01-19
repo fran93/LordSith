@@ -2,6 +2,7 @@ package com.fran.lordsith.services;
 
 import com.fran.lordsith.enums.MenuEnum;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,10 +73,14 @@ public class PlanetService {
     }
 
     public void extractFreeFields() {
-        List<WebElement> spans = firefox.get().findElement(By.id("diameterContentField")).findElements(By.tagName("span"));
-        if (!spans.isEmpty()) {
-            currentFields = Integer.valueOf(spans.get(0).getText());
-            maxFields = Integer.valueOf(spans.get(1).getText());
+        try {
+            List<WebElement> spans = firefox.get().findElement(By.id("diameterContentField")).findElements(By.tagName("span"));
+            if (!spans.isEmpty()) {
+                currentFields = Integer.valueOf(spans.get(0).getText());
+                maxFields = Integer.valueOf(spans.get(1).getText());
+            }
+        } catch (StaleElementReferenceException ex) {
+            log.info("extractFreeFields: " + ex.getMessage());
         }
     }
 

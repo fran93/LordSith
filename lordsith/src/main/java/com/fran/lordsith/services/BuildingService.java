@@ -68,13 +68,15 @@ public class BuildingService {
 
         menuService.openPage(MenuEnum.VERSORGUNG);
 
-        parseMines(mines, powerPlants, storages, building);
+        if (menuService.isOnPage(MenuEnum.VERSORGUNG)) {
+            parseMines(mines, powerPlants, storages, building);
 
-        if (!building.get()) {
-            menuService.openPage(MenuEnum.ANLAGEN);
+            if (!building.get()) {
+                menuService.openPage(MenuEnum.ANLAGEN);
 
-            parseFacilities(facilities, building);
-            chooseWhatToBuild(mines, powerPlants, storages, facilities, building, parseResources(), parseStorage());
+                parseFacilities(facilities, building);
+                chooseWhatToBuild(mines, powerPlants, storages, facilities, building, parseResources(), parseStorage());
+            }
         }
 
         return building.get();

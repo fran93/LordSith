@@ -3,6 +3,7 @@ package com.fran.lordsith.services;
 import com.fran.lordsith.enums.MenuEnum;
 import com.fran.lordsith.enums.StatusEnum;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -79,7 +80,7 @@ public class FleetService {
       Optional<WebElement> theShip = technologyService.getTechnologyById(id);
       return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
     } catch (StaleElementReferenceException ex) {
-      log.info("FleetService > NumberOfShips", ex);
+      log.info("NumberOfShips: ", ex.getMessage());
     }
 
     return 0;
@@ -87,16 +88,21 @@ public class FleetService {
 
   public boolean isFleetAvailable() {
     if (menuService.isOnPage(MenuEnum.FLOTTE)) {
-      List<WebElement> slotElements = firefox.get().findElement(By.id("slots")).findElements(By.className("fleft"));
-      String rawSlots = slotElements.get(0).getText();
-      String[] rawSlotSplit = rawSlots.split(":");
-      if (rawSlotSplit.length > 1) {
-        String splitedSlots = rawSlotSplit[1].trim();
+      try {
+        firefox.loading(By.id("slots"));
+        List<WebElement> slotElements = firefox.get().findElement(By.id("slots")).findElements(By.className("fleft"));
+        String rawSlots = slotElements.get(0).getText();
+        String[] rawSlotSplit = rawSlots.split(":");
+        if (rawSlotSplit.length > 1) {
+          String splitedSlots = rawSlotSplit[1].trim();
 
-        int currentSlots = Integer.parseInt(splitedSlots.split("/")[0]);
-        int maxSlots = Integer.parseInt(splitedSlots.split("/")[1]);
+          int currentSlots = Integer.parseInt(splitedSlots.split("/")[0]);
+          int maxSlots = Integer.parseInt(splitedSlots.split("/")[1]);
 
-        return currentSlots < maxSlots;
+          return currentSlots < maxSlots;
+        }
+      } catch (NoSuchElementException ex) {
+        log.info("isFleetAvailable: " + ex.getMessage());
       }
     }
     return false;

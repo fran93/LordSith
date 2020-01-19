@@ -106,7 +106,13 @@ public class IntelligentService {
   }
 
   private int getCurrentSystem() {
-    return Integer.parseInt(firefox.get().findElement(By.id(SYSTEM_INPUT)).getAttribute("value"));
+    try {
+      return Integer.parseInt(firefox.get().findElement(By.id(SYSTEM_INPUT)).getAttribute("value"));
+    } catch (StaleElementReferenceException ex) {
+      log.info("getCurrentSystem: " + ex.getMessage());
+    }
+
+    return 0;
   }
 
   private int spy() throws InterruptedException {

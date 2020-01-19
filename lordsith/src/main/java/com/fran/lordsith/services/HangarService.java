@@ -5,6 +5,7 @@ import com.fran.lordsith.enums.StatusEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +99,7 @@ public class HangarService {
       firefox.loading(1);
       Optional<WebElement> defense = technologyService.getTechnologyById(id);
       return defense.isPresent() && (defense.get().getAttribute("data-status").equals(StatusEnum.ON.getValue()) && !isInQueue);
-    } catch (StaleElementReferenceException ex) {
+    } catch (StaleElementReferenceException | TimeoutException ex) {
       log.info("Status on: " + ex.getMessage());
     }
     return false;
