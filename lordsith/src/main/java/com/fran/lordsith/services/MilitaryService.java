@@ -2,6 +2,7 @@ package com.fran.lordsith.services;
 
 import com.fran.lordsith.enums.TechnologyEnum;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,7 +137,11 @@ public class MilitaryService {
 
   private void openMessages() {
     if (!firefox.get().getCurrentUrl().contains("page=messages")) {
-      firefox.get().findElement(By.className("messages")).click();
+      try {
+        firefox.get().findElement(By.className("messages")).click();
+      } catch (NoSuchElementException ex) {
+        log.info("openMessages: " + ex.getMessage());
+      }
     }
   }
 
