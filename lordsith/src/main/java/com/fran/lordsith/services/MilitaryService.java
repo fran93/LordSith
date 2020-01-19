@@ -3,6 +3,7 @@ package com.fran.lordsith.services;
 import com.fran.lordsith.enums.TechnologyEnum;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,8 +45,14 @@ public class MilitaryService {
 
   private List<WebElement> getMessages() throws InterruptedException {
     firefox.loading(2);
-    return firefox.get().findElements(By.className("msg")).stream()
-        .filter(msg -> msg.getAttribute("data-msg-id") != null && !msg.getAttribute("data-msg-id").trim().isEmpty()).collect(Collectors.toList());
+    try {
+      return firefox.get().findElements(By.className("msg")).stream()
+          .filter(msg -> msg.getAttribute("data-msg-id") != null && !msg.getAttribute("data-msg-id").trim().isEmpty()).collect(Collectors.toList());
+    } catch (StaleElementReferenceException ex) {
+      log.info("getMessages " + ex.getMessage());
+    }
+
+    return new ArrayList<>();
   }
 
   private void processMessage(String id) throws InterruptedException {
