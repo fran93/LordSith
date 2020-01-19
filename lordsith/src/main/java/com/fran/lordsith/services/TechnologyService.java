@@ -4,7 +4,6 @@ import com.fran.lordsith.enums.TechnologyEnum;
 import com.fran.lordsith.model.Resources;
 import com.fran.lordsith.model.Technology;
 import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -54,16 +53,9 @@ public class TechnologyService {
     }
 
     public Optional<WebElement> getTechnologyById(int id) {
-      try {
-          firefox.loading(By.className("technology"));
-          firefox.loading(1);
-          List<WebElement> technologies = firefox.get().findElements(By.className("technology"));
-          return technologies.stream().filter(tech -> tech.getAttribute("data-technology").equals(String.valueOf(id))).findFirst();
-      } catch (StaleElementReferenceException | InterruptedException ex) {
-          log.info("getTechnologyById:" + ex.getMessage());
-      }
-
-      return Optional.empty();
+        firefox.loading(By.className("technology"));
+        List<WebElement> technologies = firefox.get().findElements(By.className("technology"));
+        return technologies.stream().filter(tech -> tech.getAttribute("data-technology").equals(String.valueOf(id))).findFirst();
     }
 
     public void build(TechnologyEnum defense) throws InterruptedException {
