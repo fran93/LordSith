@@ -14,7 +14,7 @@ public class Tasks {
 	@Lazy
 	CommanderService commanderService;
 
-	@Scheduled(cron = "3 */20 6-21 * * *")
+	@Scheduled(cron = "3 */15 6-21 * * *")
 	public void daily() throws InterruptedException {
 		commanderService.command();
 	}
