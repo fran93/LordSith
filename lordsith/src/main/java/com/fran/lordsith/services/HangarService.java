@@ -80,11 +80,15 @@ public class HangarService {
   public void buildDeathStar(boolean isMainPlanet) throws InterruptedException {
     menuService.openPage(MenuEnum.SCHIFFSWERFT);
 
-    int desiredShips = isMainPlanet ? expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 1000000 : 1;
-    long amountStars = getAmount(TechnologyEnum.TODESSTERN.getId());
+    try {
+      int desiredShips = isMainPlanet ? expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 1000000 : 1;
+      long amountStars = getAmount(TechnologyEnum.TODESSTERN.getId());
 
-    if (isStatusOn(TechnologyEnum.TODESSTERN.getId()) && amountStars < desiredShips) {
-      technologyService.build(TechnologyEnum.TODESSTERN, desiredShips - amountStars);
+      if (isStatusOn(TechnologyEnum.TODESSTERN.getId()) && amountStars < desiredShips) {
+        technologyService.build(TechnologyEnum.TODESSTERN, desiredShips - amountStars);
+      }
+    } catch (TimeoutException ex) {
+      log.info("Build death start: " + ex.getMessage());
     }
   }
 

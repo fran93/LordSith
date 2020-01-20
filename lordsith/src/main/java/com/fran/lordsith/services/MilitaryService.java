@@ -63,7 +63,13 @@ public class MilitaryService {
       if (rows.size() >= 5) {
         int necesaryFleet = getNecesaryFleet(rows);
         String rawDefenses = rows.get(4).findElement(By.className("tooltipRight")).getText().split(":")[1];
-        long defenses = Long.parseLong(rawDefenses.trim().replaceAll("\\.", ""));
+        long defenses;
+        if (rawDefenses.contains("M")) {
+          defenses = Long.parseLong(rawDefenses.split(",")[0]);
+          defenses *= 1000000;
+        } else {
+          defenses = Long.parseLong(rawDefenses.trim().replaceAll("\\.", ""));
+        }
 
         if (necesaryFleet >= MIN_CARGOS_TO_ATTACK) {
           firefox.jsClick(message.get().findElement(By.className("icon_attack")));

@@ -46,16 +46,17 @@ public class ResearchService {
 
       menuService.openPage(MenuEnum.FORSCHUNG);
 
+      firefox.loading(By.className("technology"));
       firefox.get().findElements(By.className("technology")).forEach(technology -> {
         int id = Integer.parseInt(technology.getAttribute("data-technology"));
         String status = technology.getAttribute("data-status");
         if (status.equals(StatusEnum.ACTIVE.getValue())) {
           researching.set(true);
-            }
+        }
 
-            if (!status.equals(StatusEnum.OFF.getValue()) && id >= TechnologyEnum.SPIONAGETECHNIK.getId() && id <= TechnologyEnum.INTERGALAKTISCHES_FORSCHUNGSNETZWERK.getId()) {
-                parseTechnology(researchs, technology, id, status);
-            }
+        if (!status.equals(StatusEnum.OFF.getValue()) && id >= TechnologyEnum.SPIONAGETECHNIK.getId() && id <= TechnologyEnum.INTERGALAKTISCHES_FORSCHUNGSNETZWERK.getId()) {
+          parseTechnology(researchs, technology, id, status);
+        }
         });
 
         chooseWhatToBuild(researchs, researching);

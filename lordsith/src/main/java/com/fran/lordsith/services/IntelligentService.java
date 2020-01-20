@@ -2,6 +2,7 @@ package com.fran.lordsith.services;
 
 import com.fran.lordsith.enums.MenuEnum;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -132,8 +133,12 @@ public class IntelligentService {
 
   private int getGalaxyFreeSlots() {
     if (menuService.isOnPage(MenuEnum.GALAXIE)) {
-      String[] slotValue = firefox.get().findElement(By.id("slotValue")).getText().split("/");
-      return Integer.parseInt(slotValue[1]) - Integer.parseInt(slotValue[0]);
+      try {
+        String[] slotValue = firefox.get().findElement(By.id("slotValue")).getText().split("/");
+        return Integer.parseInt(slotValue[1]) - Integer.parseInt(slotValue[0]);
+      } catch (StaleElementReferenceException | NoSuchElementException ex) {
+        log.info("getGalaxyFreeSlots: " + ex.getMessage());
+      }
     }
     return 0;
   }
