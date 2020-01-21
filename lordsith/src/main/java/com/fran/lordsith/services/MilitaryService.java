@@ -1,10 +1,7 @@
 package com.fran.lordsith.services;
 
 import com.fran.lordsith.enums.TechnologyEnum;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +62,7 @@ public class MilitaryService {
         String rawDefenses = rows.get(4).findElement(By.className("tooltipRight")).getText().split(":")[1];
         long defenses;
         if (rawDefenses.contains("M")) {
-          defenses = Long.parseLong(rawDefenses.split(",")[0]);
+          defenses = Long.parseLong(rawDefenses.split(",")[0].trim());
           defenses *= 1000000;
         } else {
           defenses = Long.parseLong(rawDefenses.trim().replaceAll("\\.", ""));
@@ -128,7 +125,11 @@ public class MilitaryService {
           openMessages();
 
           if (firefox.get().getCurrentUrl().trim().endsWith("messages")) {
-            firefox.get().findElement(By.xpath("//li[@data-msg-id=" + id + "]")).findElement(By.className("icon_refuse")).click();
+            try {
+              firefox.get().findElement(By.xpath("//li[@data-msg-id=" + id + "]")).findElement(By.className("icon_refuse")).click();
+            } catch (ElementClickInterceptedException ex) {
+              log.info("sendAttack: " + ex.getMessage());
+            }
           }
         }
       }

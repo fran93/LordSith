@@ -102,6 +102,7 @@ public class IntelligentService {
     if (system > 499) {
       system -= 499;
     }
+    firefox.loading(By.id(SYSTEM_INPUT));
     firefox.get().findElement(By.id(SYSTEM_INPUT)).sendKeys(String.valueOf(system));
     firefox.get().findElement(By.id(SYSTEM_INPUT)).submit();
   }
@@ -144,7 +145,12 @@ public class IntelligentService {
   }
 
   private boolean isSondeAvailable() {
-    return Integer.parseInt(firefox.get().findElement(By.id("probeValue")).getText().trim().replaceAll("\\.", "")) > 5;
+    try {
+      return Integer.parseInt(firefox.get().findElement(By.id("probeValue")).getText().trim().replaceAll("\\.", "")) > 5;
+    } catch (StaleElementReferenceException ex) {
+      log.info("isSondeAvailable: " + ex.getMessage());
+    }
+    return false;
   }
 
 

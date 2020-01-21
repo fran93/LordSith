@@ -5,7 +5,10 @@ import com.fran.lordsith.enums.StatusEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
 import com.fran.lordsith.model.Defense;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -33,23 +36,25 @@ public class DefenseService {
     @Lazy
     PlanetService planetService;
 
-    @Autowired
-    @Lazy
-    MenuService menuService;
+  @Autowired
+  @Lazy
+  MenuService menuService;
 
-    @Autowired
-    @Lazy
-    TechnologyService technologyService;
+  @Autowired
+  @Lazy
+  TechnologyService technologyService;
 
-    public long calculateNumberOfDefense(int baseNumber, long points) {
-        if (points < 50000) {
-            return 0;
-        } else if (points < 100000) {
-            return (long) (baseNumber * 0.25);
-        } else if (points < 500000) {
-            return (long) (baseNumber * 0.50);
-        } else if (points < 1000000) {
-            return (long) (baseNumber * 0.75);
+  Logger log = LoggerFactory.getLogger(DefenseService.class);
+
+  public long calculateNumberOfDefense(int baseNumber, long points) {
+    if (points < 50000) {
+      return 0;
+    } else if (points < 100000) {
+      return (long) (baseNumber * 0.25);
+    } else if (points < 500000) {
+      return (long) (baseNumber * 0.50);
+    } else if (points < 1000000) {
+      return (long) (baseNumber * 0.75);
         } else {
             return (points / 1000000) * baseNumber;
         }
@@ -86,8 +91,13 @@ public class DefenseService {
     }
 
   private int getAmount(int id) {
-    Optional<WebElement> theShip = technologyService.getTechnologyById(id);
-    return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
+    try {
+      Optional<WebElement> theShip = technologyService.getTechnologyById(id);
+      return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
+    } catch (TimeoutException ex) {
+      log.info("getAmount: " + ex.getMessage());
+    }
+    return 0;
   }
 
   private boolean isStatusOn(int id, List<String> queue) {

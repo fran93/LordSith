@@ -46,6 +46,7 @@ public class HandlerService {
   public void scrapFleet() throws InterruptedException {
     menuService.openPage(MenuEnum.HANDLER);
 
+    firefox.loading(By.id("js_traderScrap"));
     firefox.get().findElement(By.id("js_traderScrap")).click();
 
     if (firefox.get().getCurrentUrl().contains("page=traderScrap")) {
