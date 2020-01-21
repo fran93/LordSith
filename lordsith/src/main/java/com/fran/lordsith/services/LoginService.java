@@ -68,12 +68,12 @@ public class LoginService {
 
 	public boolean isLogged() {
         try {
-            if (firefox.get().getCurrentUrl().contains("page=ingame")) {
-                firefox.get().findElements(By.className("menubutton")).get(MenuEnum.UBERSICHT.getId()).click();
-            }
-        } catch (NoSuchWindowException | NoSuchSessionException ex) {
-            firefox.restart();
-            log.info(messageSource.getMessage("commander.new.team", new Object[]{exhaustion}, Locale.ENGLISH));
+          if (firefox.get().getCurrentUrl().contains("page=ingame")) {
+            firefox.get().findElements(By.className("menubutton")).get(MenuEnum.UBERSICHT.getId()).click();
+          }
+        } catch (NoSuchWindowException | NoSuchSessionException | IndexOutOfBoundsException ex) {
+          firefox.restart();
+          log.info(messageSource.getMessage("commander.new.team", new Object[]{exhaustion}, Locale.ENGLISH));
         }
         return firefox.get().getCurrentUrl().contains("page=ingame");
     }

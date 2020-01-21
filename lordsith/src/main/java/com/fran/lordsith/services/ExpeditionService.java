@@ -3,6 +3,7 @@ package com.fran.lordsith.services;
 import com.fran.lordsith.enums.MenuEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,14 +85,18 @@ public class ExpeditionService {
 
   private boolean isExpeditionAvailable() {
     if (menuService.isOnPage(MenuEnum.FLOTTE)) {
-      List<WebElement> slotElements = firefox.get().findElement(By.id("slots")).findElements(By.className("fleft"));
-      String rawExpe = slotElements.get(1).getText();
-      String splitedExpeditions = rawExpe.split(":")[1].trim();
+      try {
+        List<WebElement> slotElements = firefox.get().findElement(By.id("slots")).findElements(By.className("fleft"));
+        String rawExpe = slotElements.get(1).getText();
+        String splitedExpeditions = rawExpe.split(":")[1].trim();
 
-      int currentExpeditions = Integer.parseInt(splitedExpeditions.split("/")[0]);
-      int maxExpeditions = Integer.parseInt(splitedExpeditions.split("/")[1]);
+        int currentExpeditions = Integer.parseInt(splitedExpeditions.split("/")[0]);
+        int maxExpeditions = Integer.parseInt(splitedExpeditions.split("/")[1]);
 
-      return fleetService.isFleetAvailable() && fleetService.isThereAFleet() && currentExpeditions < maxExpeditions;
+        return fleetService.isFleetAvailable() && fleetService.isThereAFleet() && currentExpeditions < maxExpeditions;
+      } catch (NoSuchElementException ex) {
+        log.info("isExpeditionAvailable" + ex.getMessage());
+      }
     }
     return false;
   }
