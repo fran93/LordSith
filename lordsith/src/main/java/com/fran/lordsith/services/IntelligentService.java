@@ -67,7 +67,7 @@ public class IntelligentService {
 
   private void recycle() {
     try {
-      firefox.loading(1);
+      firefox.loading(2);
       List<WebElement> expeditionSlotBox = firefox.get().findElements(By.className("expeditionDebrisSlotBox"));
       if (!expeditionSlotBox.isEmpty()) {
         firefox.loading(1);
