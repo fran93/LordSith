@@ -79,6 +79,7 @@ public class LoginService {
     }
 
   public void logout() {
+    firefox.loading(By.id("bar"));
     firefox.get().findElement(By.id("bar")).findElements(By.tagName("li")).get(7).click();
   }
 

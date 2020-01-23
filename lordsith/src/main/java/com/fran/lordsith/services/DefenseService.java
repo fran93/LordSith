@@ -20,8 +20,8 @@ import java.util.Optional;
 @Service
 public class DefenseService {
 
-  private static final int BASE_RAKETENWERFER = 50000;
-  private static final int BASE_LEICHTESLASERGESCHUTZ = 50000;
+  private static final int BASE_RAKETENWERFER = 40000;
+  private static final int BASE_LEICHTESLASERGESCHUTZ = 40000;
   private static final int BASE_SCHWERESLASERGESCHUTZ = 1000;
   private static final int BASE_IONENGESCHUZ = 1000;
   private static final int BASE_GAUSSKANONE = 500;
