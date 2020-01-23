@@ -20,21 +20,21 @@ import java.util.Optional;
 @Service
 public class DefenseService {
 
-    private static final int BASE_RAKETENWERFER = 10000;
-    private static final int BASE_LEICHTESLASERGESCHUTZ = 10000;
-    private static final int BASE_SCHWERESLASERGESCHUTZ = 1000;
-    private static final int BASE_IONENGESCHUZ = 1000;
-    private static final int BASE_GAUSSKANONE = 500;
-    private static final int BASE_PLASMAWERFER = 250;
-    private static final int BASE_ABFANGRAKETE = 1000;
+  private static final int BASE_RAKETENWERFER = 20000;
+  private static final int BASE_LEICHTESLASERGESCHUTZ = 20000;
+  private static final int BASE_SCHWERESLASERGESCHUTZ = 2000;
+  private static final int BASE_IONENGESCHUZ = 2000;
+  private static final int BASE_GAUSSKANONE = 1000;
+  private static final int BASE_PLASMAWERFER = 500;
+  private static final int BASE_ABFANGRAKETE = 1000;
 
-    @Autowired
-    @Lazy
-    FirefoxClient firefox;
+  @Autowired
+  @Lazy
+  FirefoxClient firefox;
 
-    @Autowired
-    @Lazy
-    PlanetService planetService;
+  @Autowired
+  @Lazy
+  PlanetService planetService;
 
   @Autowired
   @Lazy
