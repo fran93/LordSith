@@ -3,6 +3,7 @@ package com.fran.lordsith.services;
 import com.fran.lordsith.enums.MenuEnum;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +47,12 @@ public class HandlerService {
   public void scrapFleet() throws InterruptedException {
     menuService.openPage(MenuEnum.HANDLER);
 
-    firefox.loading(By.id("js_traderScrap"));
-    firefox.get().findElement(By.id("js_traderScrap")).click();
+    try {
+      firefox.loading(By.id("js_traderScrap"));
+      firefox.get().findElement(By.id("js_traderScrap")).click();
+    } catch (TimeoutException | NoSuchElementException ex) {
+      log.info("scrapFleet" + ex.getMessage());
+    }
 
     if (firefox.get().getCurrentUrl().contains("page=traderScrap")) {
       if (planetService.hasPoints()) {

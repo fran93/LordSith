@@ -2,6 +2,7 @@ package com.fran.lordsith.services;
 
 import com.fran.lordsith.enums.MenuEnum;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -39,9 +40,14 @@ public class PlanetService {
     Logger log = LoggerFactory.getLogger(PlanetService.class);
 
     public void extractPoints() {
-      String scoreContentField = firefox.get().findElement(By.id("scoreContentField")).getText();
-      if (!scoreContentField.isEmpty()) {
-        points = Long.parseLong(scoreContentField.split(" ")[0].replaceAll("\\.", ""));
+      try {
+        firefox.loading(By.id("scoreContentField"));
+        String scoreContentField = firefox.get().findElement(By.id("scoreContentField")).getText();
+        if (!scoreContentField.isEmpty()) {
+          points = Long.parseLong(scoreContentField.split(" ")[0].replaceAll("\\.", ""));
+        }
+      } catch (NoSuchElementException ex) {
+        log.info("extractPoints: " + ex.getMessage());
       }
     }
 
