@@ -77,6 +77,7 @@ public class CommanderService {
 
     returnToMainPlanet();
 
+    militaryService.hunting();
     intelligentService.scan();
     firefoxClient.waiting();
     militaryService.hunting();
