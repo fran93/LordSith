@@ -106,7 +106,7 @@ public class MilitaryService {
       }
     } else {
       int countBalls = fleetService.numberOfShips(TechnologyEnum.TODESSTERN.getId());
-      long militaryFleet = defenses / 1000000;
+      long militaryFleet = defenses / 500000;
       firefox.loading(1);
       if (countBalls >= militaryFleet) {
         firefox.get().findElement(By.name("deathstar")).sendKeys(String.valueOf(militaryFleet));
