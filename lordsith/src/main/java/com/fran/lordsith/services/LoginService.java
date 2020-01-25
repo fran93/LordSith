@@ -17,66 +17,66 @@ import java.util.Locale;
 @Service
 public class LoginService {
 
-    public static final int MAX_EXHAUSTION = 5;
-    @Value("${ogame.email}")
-    String email;
+  public static final int MAX_EXHAUSTION = 5;
+  @Value("${ogame.email}")
+  String email;
 
-    @Value("${ogame.password}")
-    String password;
+  @Value("${ogame.password}")
+  String password;
 
-    @Value("${ogame.url}")
-    String url;
+  @Value("${ogame.url}")
+  String url;
 
-    @Autowired
-    @Lazy
-    FirefoxClient firefox;
+  @Autowired
+  @Lazy
+  FirefoxClient firefox;
 
-    @Autowired
-    @Lazy
-    MessageSource messageSource;
+  @Autowired
+  @Lazy
+  MessageSource messageSource;
 
-    Logger log = LoggerFactory.getLogger(LoginService.class);
+  Logger log = LoggerFactory.getLogger(LoginService.class);
 
-    private int exhaustion;
+  private int exhaustion;
 
-    public void login() throws InterruptedException {
-		handleExhaustion();
-		firefox.get().get(url);
+  public void login() throws InterruptedException {
+    handleExhaustion();
+    firefox.get().get(url);
 
-        if (firefox.get().findElements(By.className("hub-logo")).isEmpty()) {
-            firefox.get().findElement(By.id("loginRegisterTabs")).findElement(By.tagName("span")).click();
-            firefox.get().findElement(By.name("email")).sendKeys(email);
-            firefox.get().findElement(By.name("password")).sendKeys(password);
-            firefox.get().findElement(By.xpath("//button[@type='submit']")).click();
-        }
-
-        firefox.get().findElement(By.id("joinGame")).findElement(By.tagName("a")).findElement(By.tagName("button")).click();
-        firefox.get().findElement(By.id("accountlist")).findElement(By.tagName("button")).click();
-      firefox.loading(1);
-      firefox.closeTab();
+    if (firefox.get().findElements(By.className("hub-logo")).isEmpty()) {
+      firefox.get().findElement(By.id("loginRegisterTabs")).findElement(By.tagName("span")).click();
+      firefox.get().findElement(By.name("email")).sendKeys(email);
+      firefox.get().findElement(By.name("password")).sendKeys(password);
+      firefox.get().findElement(By.xpath("//button[@type='submit']")).click();
     }
 
-	private void handleExhaustion() {
-		exhaustion++;
-		if(exhaustion >= MAX_EXHAUSTION) {
-			firefox.quit();
-			firefox.restart();
-			log.info(messageSource.getMessage("commander.new.team", new Object[]{exhaustion}, Locale.ENGLISH));
-            exhaustion = 0;
-		}
-	}
+    firefox.get().findElement(By.id("joinGame")).findElement(By.tagName("a")).findElement(By.tagName("button")).click();
+    firefox.jsClick(firefox.get().findElement(By.id("accountlist")).findElement(By.tagName("button")));
+    firefox.loading(1);
+    firefox.closeTab();
+  }
 
-	public boolean isLogged() {
-        try {
-          if (firefox.get().getCurrentUrl().contains("page=ingame")) {
-            firefox.get().findElements(By.className("menubutton")).get(MenuEnum.UBERSICHT.getId()).click();
-          }
-        } catch (NoSuchWindowException | NoSuchSessionException | IndexOutOfBoundsException ex) {
-          firefox.restart();
-          log.info(messageSource.getMessage("commander.new.team", new Object[]{exhaustion}, Locale.ENGLISH));
-        }
-        return firefox.get().getCurrentUrl().contains("page=ingame");
+  private void handleExhaustion() {
+    exhaustion++;
+    if (exhaustion >= MAX_EXHAUSTION) {
+      firefox.quit();
+      firefox.restart();
+      log.info(messageSource.getMessage("commander.new.team", new Object[]{exhaustion}, Locale.ENGLISH));
+      exhaustion = 0;
     }
+  }
+
+  public boolean isLogged() {
+    try {
+      if (firefox.get().getCurrentUrl().contains("page=ingame")) {
+        firefox.get().findElements(By.className("menubutton")).get(MenuEnum.UBERSICHT.getId()).click();
+      }
+    } catch (NoSuchWindowException | NoSuchSessionException | IndexOutOfBoundsException ex) {
+      firefox.restart();
+      log.info(messageSource.getMessage("commander.new.team", new Object[]{exhaustion}, Locale.ENGLISH));
+    }
+    return firefox.get().getCurrentUrl().contains("page=ingame");
+  }
 
   public void logout() {
     firefox.loading(By.id("bar"));

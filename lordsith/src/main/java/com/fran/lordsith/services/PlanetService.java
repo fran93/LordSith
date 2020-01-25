@@ -1,10 +1,7 @@
 package com.fran.lordsith.services;
 
 import com.fran.lordsith.enums.MenuEnum;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +43,7 @@ public class PlanetService {
         if (!scoreContentField.isEmpty()) {
           points = Long.parseLong(scoreContentField.split(" ")[0].replaceAll("\\.", ""));
         }
-      } catch (NoSuchElementException ex) {
+      } catch (NoSuchElementException | TimeoutException ex) {
         log.info("extractPoints: " + ex.getMessage());
       }
     }
