@@ -43,6 +43,10 @@ public class LoginService {
     handleExhaustion();
     firefox.get().get(url);
 
+    if (!firefox.get().findElements(By.className("openX_int_closeButton")).isEmpty()) {
+      firefox.get().findElement(By.className("openX_int_closeButton")).click();
+    }
+
     if (firefox.get().findElements(By.className("hub-logo")).isEmpty()) {
       firefox.get().findElement(By.id("loginRegisterTabs")).findElement(By.tagName("span")).click();
       firefox.get().findElement(By.name("email")).sendKeys(email);
@@ -51,7 +55,7 @@ public class LoginService {
     }
 
     firefox.get().findElement(By.id("joinGame")).findElement(By.tagName("a")).findElement(By.tagName("button")).click();
-    firefox.jsClick(firefox.get().findElement(By.id("accountlist")).findElement(By.tagName("button")));
+    firefox.get().findElement(By.id("accountlist")).findElement(By.tagName("button")).click();
     firefox.loading(1);
     firefox.closeTab();
   }

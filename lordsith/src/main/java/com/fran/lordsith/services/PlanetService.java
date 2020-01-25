@@ -46,7 +46,7 @@ public class PlanetService {
     menuService.openPage(MenuEnum.UBERSICHT);
     WebElement planet = getPlanetByIndex(index);
     String name = planet.findElement(By.className("planet-name")).getText();
-    firefox.jsClick(planet);
+    planet.click();
     firefox.loading(3);
     extractPoints();
     extractFreeFields();
