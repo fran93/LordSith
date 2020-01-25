@@ -88,6 +88,7 @@ public class CommanderService {
   }
 
   private void managePlanets(int i) throws InterruptedException {
+    loginService.removeBanner();
     planetService.nextPlanet(i);
 
     handlerService.scrapFleet();
