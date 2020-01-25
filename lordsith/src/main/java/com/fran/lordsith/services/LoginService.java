@@ -1,9 +1,7 @@
 package com.fran.lordsith.services;
 
 import com.fran.lordsith.enums.MenuEnum;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchSessionException;
-import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,8 +85,12 @@ public class LoginService {
   }
 
   public void logout() {
-    firefox.loading(By.id("bar"));
-    firefox.get().findElement(By.id("bar")).findElements(By.tagName("li")).get(7).click();
+    try {
+      firefox.loading(By.id("bar"));
+      firefox.get().findElement(By.id("bar")).findElements(By.tagName("li")).get(7).click();
+    } catch (StaleElementReferenceException | NoSuchElementException ex) {
+      log.info("logout:" + ex.getMessage());
+    }
   }
 
 }

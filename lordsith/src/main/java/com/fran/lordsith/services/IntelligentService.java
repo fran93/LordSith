@@ -37,31 +37,35 @@ public class IntelligentService {
   public void scan() throws InterruptedException {
     menuService.openPage(MenuEnum.GALAXIE);
 
-    int planetSystem = getCurrentSystem();
-    int reportCount = 0;
+    try {
+      int planetSystem = getCurrentSystem();
+      int reportCount = 0;
 
-    while (getGalaxyFreeSlots() > 0 && reportCount < MAX_SPY_REPORTS && isSondeAvailable()) {
-      if (!(rightSystem > 0 && planetSystem == getCurrentSystem())) {
-        log.info(messageSource.getMessage("fleet.spy", new Object[]{getCurrentSystem()}, Locale.ENGLISH));
-        recycle();
-        reportCount += spy();
-      }
+      while (getGalaxyFreeSlots() > 0 && reportCount < MAX_SPY_REPORTS && isSondeAvailable()) {
+        if (!(rightSystem > 0 && planetSystem == getCurrentSystem())) {
+          log.info(messageSource.getMessage("fleet.spy", new Object[]{getCurrentSystem()}, Locale.ENGLISH));
+          recycle();
+          reportCount += spy();
+        }
 
-      if (rightSystem > ATTACK_SYSTEM_RANGE && leftSystem > ATTACK_SYSTEM_RANGE) {
-        goToSystem(planetSystem);
-        rightSystem = 0;
-        leftSystem = 0;
-      } else if (rightSystem > ATTACK_SYSTEM_RANGE) {
-        goLeft(planetSystem);
-      } else if (leftSystem > ATTACK_SYSTEM_RANGE) {
-        goRight(planetSystem);
-      } else if (rightSystem == 0) {
-        goRight(planetSystem);
-      } else if (leftSystem >= rightSystem) {
-        goRight(planetSystem);
-      } else {
-        goLeft(planetSystem);
+        if (rightSystem > ATTACK_SYSTEM_RANGE && leftSystem > ATTACK_SYSTEM_RANGE) {
+          goToSystem(planetSystem);
+          rightSystem = 0;
+          leftSystem = 0;
+        } else if (rightSystem > ATTACK_SYSTEM_RANGE) {
+          goLeft(planetSystem);
+        } else if (leftSystem > ATTACK_SYSTEM_RANGE) {
+          goRight(planetSystem);
+        } else if (rightSystem == 0) {
+          goRight(planetSystem);
+        } else if (leftSystem >= rightSystem) {
+          goRight(planetSystem);
+        } else {
+          goLeft(planetSystem);
+        }
       }
+    } catch (NoSuchElementException ex) {
+      log.info("scan: " + ex.getMessage());
     }
   }
 

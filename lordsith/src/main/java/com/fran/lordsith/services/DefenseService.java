@@ -5,6 +5,7 @@ import com.fran.lordsith.enums.StatusEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
 import com.fran.lordsith.model.Defense;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -55,17 +56,18 @@ public class DefenseService {
       return (long) (baseNumber * 0.50);
     } else if (points < 1000000) {
       return (long) (baseNumber * 0.75);
-        } else {
-            return (points / 1000000) * baseNumber;
-        }
+    } else {
+      return (points / 1000000) * baseNumber;
     }
+  }
 
-    public void buildDefenses(boolean isMainPlanet) throws InterruptedException {
-        menuService.openPage(MenuEnum.VERTEIDIGUNG);
+  public void buildDefenses(boolean isMainPlanet) throws InterruptedException {
+    menuService.openPage(MenuEnum.VERTEIDIGUNG);
 
-        int adjust = isMainPlanet ? 1 : 10;
+    try {
+      int adjust = isMainPlanet ? 1 : 10;
 
-        List<Defense> defenses = new ArrayList<>();
+      List<Defense> defenses = new ArrayList<>();
       defenses.add(new Defense(BASE_RAKETENWERFER, TechnologyEnum.RAKETENWERFER, false));
       defenses.add(new Defense(BASE_LEICHTESLASERGESCHUTZ, TechnologyEnum.LEICHTESLASERGESCHUTZ, false));
       defenses.add(new Defense(BASE_SCHWERESLASERGESCHUTZ, TechnologyEnum.SCHWERESLASERGESCHUTZ, false));
@@ -79,6 +81,7 @@ public class DefenseService {
       List<String> queue = new ArrayList<>();
       firefox.get().findElements(By.className("queuePic")).forEach(pic -> queue.add(pic.getAttribute("alt").trim()));
 
+
       defenses.forEach(defense -> defense.setAmountToBuild((calculateNumberOfDefense(defense.getBaseAmount(), planetService.getPoints()) / adjust) - getAmount(defense.getTechnology().getId())));
       Optional<Defense> defenseToBuild = defenses.stream().filter(defense -> isStatusOn(defense.getTechnology().getId(), queue) && defense.getAmountToBuild() > 0).findFirst();
       if (defenseToBuild.isPresent()) {
@@ -88,16 +91,14 @@ public class DefenseService {
           technologyService.build(defenseToBuild.get().getTechnology(), defenseToBuild.get().getAmountToBuild());
         }
       }
+    } catch (TimeoutException | StaleElementReferenceException ex) {
+      log.info("buildDefenses: " + ex.getMessage());
     }
+  }
 
   private int getAmount(int id) {
-    try {
-      Optional<WebElement> theShip = technologyService.getTechnologyById(id);
-      return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
-    } catch (TimeoutException ex) {
-      log.info("getAmount: " + ex.getMessage());
-    }
-    return 0;
+    Optional<WebElement> theShip = technologyService.getTechnologyById(id);
+    return theShip.map(webElement -> Integer.parseInt(webElement.findElement(By.className("amount")).getAttribute("data-value"))).orElse(0);
   }
 
   private boolean isStatusOn(int id, List<String> queue) {
