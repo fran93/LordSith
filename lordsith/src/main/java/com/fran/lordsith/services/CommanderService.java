@@ -98,8 +98,8 @@ public class CommanderService {
 
     expeditionService.sendExpedition();
     if (!isMainPlanet(i)) {
-      civilService.transportResources();
       civilService.deployFleet();
+      civilService.transportResources();
     }
 
     if (buildingService.buildMinesOrFacilities() && isMainPlanet(i)) {
