@@ -6,6 +6,7 @@ import com.fran.lordsith.enums.TechnologyEnum;
 import com.fran.lordsith.model.Resources;
 import com.fran.lordsith.model.Technology;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,18 +66,21 @@ public class BuildingService {
         ArrayList<Technology> storages = new ArrayList<>();
         ArrayList<Technology> facilities = new ArrayList<>();
         AtomicBoolean building = new AtomicBoolean(false);
+        try {
+            menuService.openPage(MenuEnum.VERSORGUNG);
 
-        menuService.openPage(MenuEnum.VERSORGUNG);
+            if (menuService.isOnPage(MenuEnum.VERSORGUNG)) {
+                parseMines(mines, powerPlants, storages, building);
 
-        if (menuService.isOnPage(MenuEnum.VERSORGUNG)) {
-            parseMines(mines, powerPlants, storages, building);
+                if (!building.get()) {
+                    menuService.openPage(MenuEnum.ANLAGEN);
 
-            if (!building.get()) {
-                menuService.openPage(MenuEnum.ANLAGEN);
-
-                parseFacilities(facilities, building);
-                chooseWhatToBuild(mines, powerPlants, storages, facilities, building, parseResources(), parseStorage());
+                    parseFacilities(facilities, building);
+                    chooseWhatToBuild(mines, powerPlants, storages, facilities, building, parseResources(), parseStorage());
+                }
             }
+        } catch (NoSuchElementException ex) {
+            log.info("buildMinesOrFacilities: " + ex.getMessage());
         }
 
         return building.get();
