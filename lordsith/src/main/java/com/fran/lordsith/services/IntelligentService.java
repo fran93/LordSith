@@ -103,12 +103,16 @@ public class IntelligentService {
   }
 
   private void goToSystem(int system) {
-    if (system > 499) {
-      system -= 499;
+    try {
+      if (system > 499) {
+        system -= 499;
+      }
+      firefox.loading(By.id(SYSTEM_INPUT));
+      firefox.get().findElement(By.id(SYSTEM_INPUT)).sendKeys(String.valueOf(system));
+      firefox.get().findElement(By.id(SYSTEM_INPUT)).submit();
+    } catch (NoSuchElementException ex) {
+      log.info("goToSystem: " + ex.getMessage());
     }
-    firefox.loading(By.id(SYSTEM_INPUT));
-    firefox.get().findElement(By.id(SYSTEM_INPUT)).sendKeys(String.valueOf(system));
-    firefox.get().findElement(By.id(SYSTEM_INPUT)).submit();
   }
 
   private int getCurrentSystem() {

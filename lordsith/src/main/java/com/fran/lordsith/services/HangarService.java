@@ -81,7 +81,7 @@ public class HangarService {
     menuService.openPage(MenuEnum.SCHIFFSWERFT);
 
     try {
-      int desiredShips = isMainPlanet ? expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 1000000 : 1;
+      long desiredShips = isMainPlanet ? planetService.getPoints() / 1000000 : 1;
       long amountStars = getAmount(TechnologyEnum.TODESSTERN.getId());
 
       if (isStatusOn(TechnologyEnum.TODESSTERN.getId()) && amountStars < desiredShips) {

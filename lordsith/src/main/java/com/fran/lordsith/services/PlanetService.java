@@ -37,7 +37,7 @@ public class PlanetService {
       if (!scoreContentField.isEmpty()) {
         points = Long.parseLong(scoreContentField.split(" ")[0].replaceAll("\\.", ""));
       }
-    } catch (NoSuchElementException | TimeoutException ex) {
+    } catch (NoSuchElementException | TimeoutException | NumberFormatException ex) {
       log.info("extractPoints: " + ex.getMessage());
     }
   }
