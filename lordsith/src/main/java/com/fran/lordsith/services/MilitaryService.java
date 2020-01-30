@@ -62,6 +62,7 @@ public class MilitaryService {
         String rawDefenses = rows.get(4).findElement(By.className("tooltipRight")).getText().split(":")[1];
         long defenses;
         if (rawDefenses.contains("M")) {
+          rawDefenses = rawDefenses.replaceFirst("M", "");
           defenses = Long.parseLong(rawDefenses.split(",")[0].trim());
           defenses *= 1000000;
         } else {
