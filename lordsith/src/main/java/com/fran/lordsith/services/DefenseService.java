@@ -61,11 +61,34 @@ public class DefenseService {
     }
   }
 
+  public int calculateAdjust(boolean isMainPlanet) {
+    if (isMainPlanet) {
+      return 1;
+    }
+    if (planetService.getCurrentFields() < 160) {
+      return 60;
+    }
+    if (planetService.getCurrentFields() < 170) {
+      return 30;
+    }
+    if (planetService.getCurrentFields() < 180) {
+      return 25;
+    }
+    if (planetService.getCurrentFields() < 190) {
+      return 20;
+    }
+    if (planetService.getCurrentFields() < 200) {
+      return 15;
+    } else {
+      return 10;
+    }
+  }
+
   public void buildDefenses(boolean isMainPlanet) throws InterruptedException {
     menuService.openPage(MenuEnum.VERTEIDIGUNG);
 
     try {
-      int adjust = isMainPlanet ? 1 : 10;
+      int adjust = calculateAdjust(isMainPlanet);
 
       List<Defense> defenses = new ArrayList<>();
       defenses.add(new Defense(BASE_RAKETENWERFER, TechnologyEnum.RAKETENWERFER, false));

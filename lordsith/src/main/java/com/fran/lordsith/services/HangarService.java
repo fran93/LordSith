@@ -51,21 +51,25 @@ public class HangarService {
   public void buildExpeditionFleet() throws InterruptedException {
     menuService.openPage(MenuEnum.SCHIFFSWERFT);
 
-    int desiredShips = expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 2;
-    long amountCargos = getAmount(TechnologyEnum.GROSSER_TRANSPORTER.getId());
-    long amountPath = getAmount(TechnologyEnum.PATHFINDER.getId());
-    long amountZerstorer = getAmount(TechnologyEnum.ZERSTORER.getId());
+    try {
+      int desiredShips = expeditionService.calculateNumberOfCargos(planetService.getPoints()) / 2;
+      long amountCargos = getAmount(TechnologyEnum.GROSSER_TRANSPORTER.getId());
+      long amountPath = getAmount(TechnologyEnum.PATHFINDER.getId());
+      long amountZerstorer = getAmount(TechnologyEnum.ZERSTORER.getId());
 
-    if (isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId()) && amountCargos < desiredShips) {
-      technologyService.build(TechnologyEnum.GROSSER_TRANSPORTER, desiredShips - amountCargos);
-    }
+      if (isStatusOn(TechnologyEnum.GROSSER_TRANSPORTER.getId()) && amountCargos < desiredShips) {
+        technologyService.build(TechnologyEnum.GROSSER_TRANSPORTER, desiredShips - amountCargos);
+      }
 
-    if (isStatusOn(TechnologyEnum.PATHFINDER.getId()) && amountPath == 0) {
-      technologyService.build(TechnologyEnum.PATHFINDER, 1);
-    }
+      if (isStatusOn(TechnologyEnum.PATHFINDER.getId()) && amountPath == 0) {
+        technologyService.build(TechnologyEnum.PATHFINDER, 1);
+      }
 
-    if (isStatusOn(TechnologyEnum.ZERSTORER.getId()) && amountZerstorer == 0) {
-      technologyService.build(TechnologyEnum.ZERSTORER, 1);
+      if (isStatusOn(TechnologyEnum.ZERSTORER.getId()) && amountZerstorer == 0) {
+        technologyService.build(TechnologyEnum.ZERSTORER, 1);
+      }
+    } catch (StaleElementReferenceException | TimeoutException ex) {
+      log.info("buildExpeditionFleet: " + ex.getMessage());
     }
   }
 

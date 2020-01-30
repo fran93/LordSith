@@ -97,6 +97,10 @@ public class PlanetService {
     return maxFields - currentFields;
   }
 
+  public int getCurrentFields() {
+    return currentFields;
+  }
+
   public boolean hasFields() {
     return currentFields > 0 && maxFields > 0;
   }
