@@ -72,7 +72,7 @@ public class CommanderService {
     }
 
     managePlanets(0);
-    for (int i = planetService.countPlanets(); i > 0; i--) {
+    for (int i = planetService.countPlanets() - 1; i > 0; i--) {
       managePlanets(i);
     }
     goToMainPlanet();
