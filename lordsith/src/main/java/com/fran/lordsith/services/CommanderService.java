@@ -71,11 +71,11 @@ public class CommanderService {
       loginService.login();
     }
 
-    for (int i = 0; i < planetService.countPlanets(); i++) {
+    managePlanets(0);
+    for (int i = planetService.countPlanets(); i > 0; i--) {
       managePlanets(i);
     }
-
-    returnToMainPlanet();
+    goToMainPlanet();
 
     militaryService.hunting();
     intelligentService.scan();
@@ -114,7 +114,7 @@ public class CommanderService {
     }
   }
 
-  private void returnToMainPlanet() throws InterruptedException {
+  private void goToMainPlanet() throws InterruptedException {
     planetService.nextPlanet(0);
   }
 
