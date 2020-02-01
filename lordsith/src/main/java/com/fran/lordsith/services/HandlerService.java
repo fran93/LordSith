@@ -50,36 +50,36 @@ public class HandlerService {
     try {
       firefox.loading(By.id("js_traderScrap"));
       firefox.get().findElement(By.id("js_traderScrap")).click();
-    } catch (TimeoutException | NoSuchElementException ex) {
-      log.info("scrapFleet" + ex.getMessage());
-    }
 
-    if (firefox.get().getCurrentUrl().contains("page=traderScrap")) {
-      if (planetService.hasPoints()) {
-        firefox.loading(By.className("forward"));
-        firefox.loading(1);
-        firefox.get().findElement(By.className("forward")).click();
-        firefox.loading(1);
-        String rawAmount = firefox.get().findElement(By.id("button203")).findElement(By.className("amount")).getText().replaceAll("\\.", "");
-        if (!rawAmount.trim().isEmpty()) {
-          long current = Long.parseLong(rawAmount);
-          long base = fleetService.calculateNumberOfCargos(planetService.getPoints());
-          long desired = current - (base + base / 2);
+      if (firefox.get().getCurrentUrl().contains("page=traderScrap")) {
+        if (planetService.hasPoints()) {
+          firefox.loading(By.className("forward"));
+          firefox.loading(1);
+          firefox.get().findElement(By.className("forward")).click();
+          firefox.loading(1);
+          String rawAmount = firefox.get().findElement(By.id("button203")).findElement(By.className("amount")).getText().replaceAll("\\.", "");
+          if (!rawAmount.trim().isEmpty()) {
+            long current = Long.parseLong(rawAmount);
+            long base = fleetService.calculateNumberOfCargos(planetService.getPoints());
+            long desired = current - (base + base / 2);
 
-          if (desired > 0) {
-            firefox.get().findElement(By.id("ship_203")).sendKeys(String.valueOf(desired));
+            if (desired > 0) {
+              firefox.get().findElement(By.id("ship_203")).sendKeys(String.valueOf(desired));
+            }
           }
         }
+
+        firefox.loading(1);
+        if (!firefox.get().findElement(By.id("js_scrapScrapIT")).getAttribute(CLASS).contains("disabled")) {
+          firefox.get().findElement(By.id("js_scrapScrapIT")).click();
+
+          firefox.get().findElement(By.className("yes")).click();
+
+          log.info(messageSource.getMessage("handler.scrap", null, Locale.ENGLISH));
+        }
       }
-
-      firefox.loading(1);
-      if (!firefox.get().findElement(By.id("js_scrapScrapIT")).getAttribute(CLASS).contains("disabled")) {
-        firefox.get().findElement(By.id("js_scrapScrapIT")).click();
-
-        firefox.get().findElement(By.className("yes")).click();
-
-        log.info(messageSource.getMessage("handler.scrap", null, Locale.ENGLISH));
-      }
+    } catch (TimeoutException | NoSuchElementException ex) {
+      log.info("scrapFleet" + ex.getMessage());
     }
   }
 

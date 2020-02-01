@@ -21,6 +21,7 @@ public class IntelligentService {
   private static final int MAX_SPY_REPORTS = 10;
   private static final int ATTACK_SYSTEM_RANGE = 150;
   private static final String SYSTEM_INPUT = "system_input";
+  public static final int MIN_REQUIRED_RECYCLES = 5;
   @Autowired
   @Lazy
   MenuService menuService;
@@ -80,7 +81,7 @@ public class IntelligentService {
         String debrisRecyclers = debris.findElement(By.className("debris-recyclers")).getText();
         if (!debrisRecyclers.trim().isEmpty()) {
           int requiredRecycles = Integer.parseInt(debrisRecyclers.split(":")[1].trim());
-          if (requiredRecycles >= 5 && !debris.findElements(By.tagName("a")).isEmpty()) {
+          if (requiredRecycles >= MIN_REQUIRED_RECYCLES && !debris.findElements(By.tagName("a")).isEmpty()) {
             debris.findElement(By.tagName("a")).click();
 
             log.info(messageSource.getMessage("fleet.recycle", null, Locale.ENGLISH));
