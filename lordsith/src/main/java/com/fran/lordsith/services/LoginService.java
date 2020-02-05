@@ -88,7 +88,7 @@ public class LoginService {
     try {
       firefox.loading(By.id("bar"));
       firefox.get().findElement(By.id("bar")).findElements(By.tagName("li")).get(7).click();
-    } catch (StaleElementReferenceException | NoSuchElementException ex) {
+    } catch (StaleElementReferenceException | NoSuchElementException | TimeoutException ex) {
       log.info("logout:" + ex.getMessage());
     }
   }

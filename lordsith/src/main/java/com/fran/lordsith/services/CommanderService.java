@@ -102,7 +102,7 @@ public class CommanderService {
       civilService.transportResources();
     }
 
-    if (buildingService.buildMinesOrFacilities() && isMainPlanet(i)) {
+    if ((buildingService.buildMinesOrFacilities() || planetService.hasGrowEnough()) && isMainPlanet(i)) {
       researchService.research();
     }
 
