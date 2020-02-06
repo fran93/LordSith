@@ -42,17 +42,20 @@ public class PlanetService {
     }
   }
 
-  public void nextPlanet(int index) throws InterruptedException {
-    menuService.openPage(MenuEnum.UBERSICHT);
-    WebElement planet = getPlanetByIndex(index);
-    String name = planet.findElement(By.className("planet-name")).getText();
-    planet.click();
-    firefox.loading(3);
-    extractPoints();
-    extractFreeFields();
-    log.info(messageSource.getMessage("login.points", new Object[]{points}, Locale.ENGLISH));
-    log.info(messageSource.getMessage("planet.fields", new Object[]{name, getFreeFields()}, Locale.ENGLISH));
-
+  public void nextPlanet(int index) {
+    try {
+      menuService.openPage(MenuEnum.UBERSICHT);
+      WebElement planet = getPlanetByIndex(index);
+      String name = planet.findElement(By.className("planet-name")).getText();
+      planet.click();
+      firefox.loading(3);
+      extractPoints();
+      extractFreeFields();
+      log.info(messageSource.getMessage("login.points", new Object[]{points}, Locale.ENGLISH));
+      log.info(messageSource.getMessage("planet.fields", new Object[]{name, getFreeFields()}, Locale.ENGLISH));
+    } catch (InterruptedException | IndexOutOfBoundsException ex) {
+      log.info("nextPlanet: " + ex.getMessage());
+    }
   }
 
   public WebElement getPlanetByIndex(int index) {
@@ -73,8 +76,8 @@ public class PlanetService {
     try {
       List<WebElement> spans = firefox.get().findElement(By.id("diameterContentField")).findElements(By.tagName("span"));
       if (!spans.isEmpty()) {
-        currentFields = Integer.valueOf(spans.get(0).getText());
-        maxFields = Integer.valueOf(spans.get(1).getText());
+        currentFields = Integer.parseInt(spans.get(0).getText());
+        maxFields = Integer.parseInt(spans.get(1).getText());
       }
     } catch (StaleElementReferenceException | NumberFormatException ex) {
       log.info("extractFreeFields: " + ex.getMessage());

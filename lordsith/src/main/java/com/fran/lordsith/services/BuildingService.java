@@ -7,6 +7,7 @@ import com.fran.lordsith.model.Resources;
 import com.fran.lordsith.model.Technology;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +80,7 @@ public class BuildingService {
                     chooseWhatToBuild(mines, powerPlants, storages, facilities, building, parseResources(), parseStorage());
                 }
             }
-        } catch (NoSuchElementException ex) {
+        } catch (NoSuchElementException | StaleElementReferenceException ex) {
             log.info("buildMinesOrFacilities: " + ex.getMessage());
         }
 
