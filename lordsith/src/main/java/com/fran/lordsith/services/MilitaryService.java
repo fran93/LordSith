@@ -90,20 +90,13 @@ public class MilitaryService {
     if (defenses == 0) {
       firefox.get().findElement(By.name("transporterSmall")).sendKeys(String.valueOf(necesaryFleet));
       log.info(messageSource.getMessage("fleet.attack", new Object[]{necesaryFleet, TechnologyEnum.KLEINER_TRANSPORTER.name()}, Locale.ENGLISH));
-    } else if (defenses < 500000) {
+    } else if (defenses < 1000000) {
       int countKreuzer = fleetService.numberOfShips(TechnologyEnum.KREUZER.getId());
-      long militaryFleet = defenses / 3000;
+      long militaryFleet = defenses / 2000;
       if (countKreuzer >= militaryFleet) {
         firefox.get().findElement(By.name("transporterSmall")).sendKeys(String.valueOf(necesaryFleet));
         firefox.get().findElement(By.name("cruiser")).sendKeys(String.valueOf(militaryFleet));
         log.info(messageSource.getMessage("fleet.attack", new Object[]{militaryFleet, TechnologyEnum.KREUZER.name()}, Locale.ENGLISH));
-      }
-    } else if (defenses < 1000000) {
-      int countBalls = fleetService.numberOfShips(TechnologyEnum.TODESSTERN.getId());
-      long militaryFleet = 1;
-      if (countBalls >= militaryFleet) {
-        firefox.get().findElement(By.name("deathstar")).sendKeys(String.valueOf(militaryFleet));
-        log.info(messageSource.getMessage("fleet.attack", new Object[]{militaryFleet, TechnologyEnum.TODESSTERN.name()}, Locale.ENGLISH));
       }
     } else {
       int countBalls = fleetService.numberOfShips(TechnologyEnum.TODESSTERN.getId());
