@@ -1,11 +1,11 @@
 package com.fran.lordsith.services;
 
 import com.fran.lordsith.enums.MenuEnum;
+import com.fran.lordsith.properties.OgameProperties;
 import org.openqa.selenium.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -16,14 +16,9 @@ import java.util.Locale;
 public class LoginService {
 
   public static final int MAX_EXHAUSTION = 5;
-  @Value("${ogame.email}")
-  String email;
 
-  @Value("${ogame.password}")
-  String password;
-
-  @Value("${ogame.url}")
-  String url;
+  @Autowired
+  OgameProperties ogameProperties;
 
   @Autowired
   @Lazy
@@ -39,14 +34,14 @@ public class LoginService {
 
   public void login() throws InterruptedException {
     handleExhaustion();
-    firefox.get().get(url);
+    firefox.get().get(ogameProperties.getUrl());
 
     removeBanner();
 
     if (firefox.get().findElements(By.className("hub-logo")).isEmpty()) {
       firefox.get().findElement(By.id("loginRegisterTabs")).findElement(By.tagName("span")).click();
-      firefox.get().findElement(By.name("email")).sendKeys(email);
-      firefox.get().findElement(By.name("password")).sendKeys(password);
+      firefox.get().findElement(By.name("email")).sendKeys(ogameProperties.getEmail());
+      firefox.get().findElement(By.name("password")).sendKeys(ogameProperties.getPassword());
       firefox.get().findElement(By.xpath("//button[@type='submit']")).click();
     }
 

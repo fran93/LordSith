@@ -4,6 +4,7 @@ import com.fran.lordsith.enums.MenuEnum;
 import com.fran.lordsith.enums.StatusEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
 import com.fran.lordsith.model.Defense;
+import com.fran.lordsith.properties.DefenseProperties;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
@@ -21,13 +22,8 @@ import java.util.Optional;
 @Service
 public class DefenseService {
 
-  private static final int BASE_RAKETENWERFER = 30000;
-  private static final int BASE_LEICHTESLASERGESCHUTZ = 30000;
-  private static final int BASE_SCHWERESLASERGESCHUTZ = 1000;
-  private static final int BASE_IONENGESCHUZ = 1000;
-  private static final int BASE_GAUSSKANONE = 500;
-  private static final int BASE_PLASMAWERFER = 250;
-  private static final int BASE_ABFANGRAKETE = 1000;
+  @Autowired
+  DefenseProperties defenseProperties;
 
   @Autowired
   @Lazy
@@ -91,13 +87,13 @@ public class DefenseService {
       int adjust = calculateAdjust(isMainPlanet);
 
       List<Defense> defenses = new ArrayList<>();
-      defenses.add(new Defense(BASE_RAKETENWERFER, TechnologyEnum.RAKETENWERFER, false));
-      defenses.add(new Defense(BASE_LEICHTESLASERGESCHUTZ, TechnologyEnum.LEICHTESLASERGESCHUTZ, false));
-      defenses.add(new Defense(BASE_SCHWERESLASERGESCHUTZ, TechnologyEnum.SCHWERESLASERGESCHUTZ, false));
-      defenses.add(new Defense(BASE_IONENGESCHUZ, TechnologyEnum.IONENGESCHUZ, false));
-      defenses.add(new Defense(BASE_GAUSSKANONE, TechnologyEnum.GAUSSKANONE, false));
-      defenses.add(new Defense(BASE_PLASMAWERFER, TechnologyEnum.PLASMAWERFER, false));
-      defenses.add(new Defense(BASE_ABFANGRAKETE, TechnologyEnum.ABFANGRAKETE, false));
+      defenses.add(new Defense(defenseProperties.getRaketenwerfer(), TechnologyEnum.RAKETENWERFER, false));
+      defenses.add(new Defense(defenseProperties.getLeichteslasergeschutz(), TechnologyEnum.LEICHTESLASERGESCHUTZ, false));
+      defenses.add(new Defense(defenseProperties.getSchwereslasergeschutz(), TechnologyEnum.SCHWERESLASERGESCHUTZ, false));
+      defenses.add(new Defense(defenseProperties.getIonengeschuz(), TechnologyEnum.IONENGESCHUZ, false));
+      defenses.add(new Defense(defenseProperties.getGausskanone(), TechnologyEnum.GAUSSKANONE, false));
+      defenses.add(new Defense(defenseProperties.getPlasmawerfer(), TechnologyEnum.PLASMAWERFER, false));
+      defenses.add(new Defense(defenseProperties.getAbfangrakete(), TechnologyEnum.ABFANGRAKETE, false));
       defenses.add(new Defense(10, TechnologyEnum.KLEINE_SCHILDKUPPEL, true));
       defenses.add(new Defense(10, TechnologyEnum.GROSSE_SCHILDKUPPEL, true));
 

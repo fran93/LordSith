@@ -2,6 +2,7 @@ package com.fran.lordsith.services;
 
 import com.fran.lordsith.enums.MenuEnum;
 import com.fran.lordsith.enums.StatusEnum;
+import com.fran.lordsith.properties.ExpeditionProperties;
 import org.openqa.selenium.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,13 @@ public class FleetService {
   public static final String SEND_FLEET = "sendFleet";
   public static final String CONTINUE_TO_FLEET3 = "continueToFleet3";
   public static final String CONTINUE_TO_FLEET2 = "continueToFleet2";
+  public static final int EXPEDITION_LEVEL_0 = 100000;
+  public static final int EXPEDITION_LEVEL_1 = 1000000;
+  public static final int EXPEDITION_LEVEL_2 = 5000000;
+  public static final int EXPEDITION_LEVEL_3 = 25000000;
+  public static final int EXPEDITION_LEVEL_4 = 50000000;
+  public static final int EXPEDITION_LEVEL_5 = 75000000;
+  public static final int EXPEDITION_LEVEL_6 = 100000000;
 
   @Autowired
   @Lazy
@@ -29,28 +37,31 @@ public class FleetService {
   MenuService menuService;
 
   @Autowired
+  ExpeditionProperties expeditionProperties;
+
+  @Autowired
   @Lazy
   TechnologyService technologyService;
 
   Logger log = LoggerFactory.getLogger(FleetService.class);
 
   public int calculateNumberOfCargos(long points) {
-    if (points < 100000) {
-      return 300;
-    } else if (points < 1000000) {
-      return 700;
-    } else if (points < 5000000) {
-      return 1000;
-    } else if (points < 25000000) {
-      return 1400;
-    } else if (points < 50000000) {
-      return 1800;
-    } else if (points < 75000000) {
-      return 2100;
-    } else if (points < 100000000) {
-      return 2400;
+    if (points < EXPEDITION_LEVEL_0) {
+      return expeditionProperties.getLevel0();
+    } else if (points < EXPEDITION_LEVEL_1) {
+      return expeditionProperties.getLevel1();
+    } else if (points < EXPEDITION_LEVEL_2) {
+      return expeditionProperties.getLevel2();
+    } else if (points < EXPEDITION_LEVEL_3) {
+      return expeditionProperties.getLevel3();
+    } else if (points < EXPEDITION_LEVEL_4) {
+      return expeditionProperties.getLevel4();
+    } else if (points < EXPEDITION_LEVEL_5) {
+      return expeditionProperties.getLevel5();
+    } else if (points < EXPEDITION_LEVEL_6) {
+      return expeditionProperties.getLevel6();
     } else {
-      return 2900;
+      return expeditionProperties.getLevel7();
     }
   }
 
