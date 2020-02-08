@@ -5,6 +5,7 @@ import com.fran.lordsith.enums.StatusEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
 import com.fran.lordsith.model.Technology;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,24 +45,29 @@ public class ResearchService {
       ArrayList<Technology> researchs = new ArrayList<>();
       AtomicBoolean researching = new AtomicBoolean(false);
 
-      menuService.openPage(MenuEnum.FORSCHUNG);
+      try {
+        menuService.openPage(MenuEnum.FORSCHUNG);
 
-      firefox.loading(By.className("technology"));
-      firefox.get().findElements(By.className("technology")).forEach(technology -> {
-        int id = Integer.parseInt(technology.getAttribute("data-technology"));
-        String status = technology.getAttribute("data-status");
-        if (status.equals(StatusEnum.ACTIVE.getValue())) {
-          researching.set(true);
-        }
+        firefox.loading(By.className("technology"));
+        firefox.get().findElements(By.className("technology")).forEach(technology -> {
+          int id = Integer.parseInt(technology.getAttribute("data-technology"));
+          String status = technology.getAttribute("data-status");
+          if (status.equals(StatusEnum.ACTIVE.getValue())) {
+            researching.set(true);
+          }
 
-        if (!status.equals(StatusEnum.OFF.getValue()) && id >= TechnologyEnum.SPIONAGETECHNIK.getId() && id <= TechnologyEnum.INTERGALAKTISCHES_FORSCHUNGSNETZWERK.getId()) {
-          parseTechnology(researchs, technology, id, status);
-        }
+          if (!status.equals(StatusEnum.OFF.getValue()) && id >= TechnologyEnum.SPIONAGETECHNIK.getId() && id <= TechnologyEnum.INTERGALAKTISCHES_FORSCHUNGSNETZWERK.getId()) {
+            parseTechnology(researchs, technology, id, status);
+          }
         });
 
         chooseWhatToBuild(researchs, researching);
 
+      } catch (TimeoutException ex) {
+        log.info("research: " + ex.getMessage());
+      }
         return researching.get();
+
     }
 
     private void parseTechnology(ArrayList<Technology> mines, WebElement technology, int id, String status) {
