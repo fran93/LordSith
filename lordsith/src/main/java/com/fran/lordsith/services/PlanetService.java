@@ -79,7 +79,7 @@ public class PlanetService {
         currentFields = Integer.parseInt(spans.get(0).getText());
         maxFields = Integer.parseInt(spans.get(1).getText());
       }
-    } catch (StaleElementReferenceException | NumberFormatException ex) {
+    } catch (StaleElementReferenceException | NumberFormatException | NoSuchElementException ex) {
       log.info("extractFreeFields: " + ex.getMessage());
     }
   }
