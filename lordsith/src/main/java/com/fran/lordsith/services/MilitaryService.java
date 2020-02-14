@@ -120,7 +120,7 @@ public class MilitaryService {
 
           if (firefox.get().getCurrentUrl().trim().endsWith("messages")) {
             try {
-              firefox.get().findElement(By.xpath("//li[@data-msg-id=" + id + "]")).findElement(By.className("icon_refuse")).click();
+              firefox.jsClick(firefox.get().findElement(By.xpath("//li[@data-msg-id=" + id + "]")).findElement(By.className("icon_refuse")));
             } catch (ElementClickInterceptedException ex) {
               log.info("sendAttack: " + ex.getMessage());
             }
