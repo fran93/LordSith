@@ -39,13 +39,17 @@ public class FirefoxClient {
       driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     }
 
-    public WebDriver get() {
-        return driver;
-    }
+  public WebDriver get() {
+    return driver;
+  }
 
   public void jsClick(WebElement element) {
     JavascriptExecutor executor = (JavascriptExecutor) driver;
     executor.executeScript("arguments[0].click();", element);
+  }
+
+  public boolean existsElement(By by) {
+    return !driver.findElements(by).isEmpty();
   }
 
   public void mouseOver(WebElement element) {

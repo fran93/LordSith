@@ -124,19 +124,20 @@ public class IntelligentService {
   }
 
   private int spy() throws InterruptedException {
-    firefox.loading(1);
-    firefox.loading(By.className("inactive_filter"));
-    List<WebElement> inactives = firefox.get().findElements(By.className("inactive_filter"));
-    for (WebElement inactive : inactives) {
-      firefox.loading(1);
-      try {
-        inactive.findElement(By.className("espionage")).click();
-      } catch (StaleElementReferenceException ex) {
-        log.info("Spy: " + ex.getMessage());
+    firefox.loading(2);
+    if (firefox.existsElement(By.className("inactive_filter"))) {
+      List<WebElement> inactives = firefox.get().findElements(By.className("inactive_filter"));
+      for (WebElement inactive : inactives) {
+        firefox.loading(1);
+        try {
+          inactive.findElement(By.className("espionage")).click();
+        } catch (StaleElementReferenceException ex) {
+          log.info("Spy: " + ex.getMessage());
+        }
       }
+      return inactives.size();
     }
-
-    return inactives.size();
+    return 0;
   }
 
   private int getGalaxyFreeSlots() {
