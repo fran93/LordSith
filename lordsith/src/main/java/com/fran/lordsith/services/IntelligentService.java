@@ -125,6 +125,7 @@ public class IntelligentService {
 
   private int spy() throws InterruptedException {
     firefox.loading(1);
+    firefox.loading(By.className("inactive_filter"));
     List<WebElement> inactives = firefox.get().findElements(By.className("inactive_filter"));
     for (WebElement inactive : inactives) {
       firefox.loading(1);
