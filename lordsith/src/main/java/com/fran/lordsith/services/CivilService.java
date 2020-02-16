@@ -4,6 +4,7 @@ import com.fran.lordsith.enums.MenuEnum;
 import com.fran.lordsith.enums.TechnologyEnum;
 import com.fran.lordsith.model.Resources;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,30 +116,34 @@ public class CivilService {
   }
 
   private void transportResources(Resources amountToTransport) throws InterruptedException {
-    Optional<WebElement> element = technologyService.getTechnologyById(TechnologyEnum.KLEINER_TRANSPORTER.getId());
-    element.ifPresent(webElement -> webElement.findElement(By.className("sprite_small")).click());
+    try {
+      Optional<WebElement> element = technologyService.getTechnologyById(TechnologyEnum.KLEINER_TRANSPORTER.getId());
+      element.ifPresent(webElement -> webElement.findElement(By.className("sprite_small")).click());
 
-    if (fleetService.canContinue(FleetService.CONTINUE_TO_FLEET2)) {
-      fleetService.weiterWeiter(FleetService.CONTINUE_TO_FLEET2);
-      firefox.get().findElement(By.id("shortcuts")).findElements(By.className("glow")).get(0).click();
+      if (fleetService.canContinue(FleetService.CONTINUE_TO_FLEET2)) {
+        fleetService.weiterWeiter(FleetService.CONTINUE_TO_FLEET2);
+        firefox.get().findElement(By.id("shortcuts")).findElements(By.className("glow")).get(0).click();
 
-      Optional<WebElement> dropDown = firefox.get().findElements(By.className("dropdownList")).stream().filter(WebElement::isDisplayed).findFirst();
-      dropDown.ifPresent(webElement -> webElement.findElements(By.tagName("li")).get(1).click());
-      if (fleetService.canContinue(FleetService.CONTINUE_TO_FLEET3)) {
-        fleetService.weiterWeiter(FleetService.CONTINUE_TO_FLEET3);
+        Optional<WebElement> dropDown = firefox.get().findElements(By.className("dropdownList")).stream().filter(WebElement::isDisplayed).findFirst();
+        dropDown.ifPresent(webElement -> webElement.findElements(By.tagName("li")).get(1).click());
+        if (fleetService.canContinue(FleetService.CONTINUE_TO_FLEET3)) {
+          fleetService.weiterWeiter(FleetService.CONTINUE_TO_FLEET3);
 
-        firefox.get().findElement(By.id("missionButton3")).click();
+          firefox.get().findElement(By.id("missionButton3")).click();
 
-        firefox.get().findElement(By.id("crystal")).sendKeys(String.valueOf(amountToTransport.getKristall()));
-        firefox.get().findElement(By.id("deuterium")).sendKeys(String.valueOf(amountToTransport.getDeuterium()));
-        firefox.get().findElement(By.id("metal")).sendKeys(String.valueOf(amountToTransport.getMetall()));
+          firefox.get().findElement(By.id("crystal")).sendKeys(String.valueOf(amountToTransport.getKristall()));
+          firefox.get().findElement(By.id("deuterium")).sendKeys(String.valueOf(amountToTransport.getDeuterium()));
+          firefox.get().findElement(By.id("metal")).sendKeys(String.valueOf(amountToTransport.getMetall()));
 
-        if (fleetService.canContinue(FleetService.SEND_FLEET)) {
-          fleetService.weiterWeiter(FleetService.SEND_FLEET);
+          if (fleetService.canContinue(FleetService.SEND_FLEET)) {
+            fleetService.weiterWeiter(FleetService.SEND_FLEET);
 
-          log.info(messageSource.getMessage("fleet.transport", null, Locale.ENGLISH));
+            log.info(messageSource.getMessage("fleet.transport", null, Locale.ENGLISH));
+          }
         }
       }
+    } catch (ElementNotInteractableException ex) {
+      log.info("transportResources: " + ex.getMessage());
     }
   }
 

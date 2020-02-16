@@ -91,7 +91,7 @@ public class HangarService {
       if (isStatusOn(TechnologyEnum.TODESSTERN.getId()) && amountStars < desiredShips) {
         technologyService.build(TechnologyEnum.TODESSTERN, desiredShips - amountStars);
       }
-    } catch (TimeoutException ex) {
+    } catch (TimeoutException | StaleElementReferenceException | NullPointerException ex) {
       log.info("Build death start: " + ex.getMessage());
     }
   }

@@ -146,9 +146,10 @@ public class MilitaryService {
   private void openMessages() {
     if (!firefox.get().getCurrentUrl().contains("page=messages")) {
       try {
+        firefox.loading(1);
         firefox.loading(By.className("messages"));
         firefox.get().findElement(By.className("messages")).click();
-      } catch (NoSuchElementException ex) {
+      } catch (NoSuchElementException | TimeoutException | InterruptedException ex) {
         log.info("openMessages: " + ex.getMessage());
       }
     }
