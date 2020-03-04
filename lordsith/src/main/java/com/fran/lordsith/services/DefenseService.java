@@ -93,21 +93,23 @@ public class DefenseService {
       defenses.add(new Defense(defenseProperties.getIonengeschuz(), TechnologyEnum.IONENGESCHUZ, false));
       defenses.add(new Defense(defenseProperties.getGausskanone(), TechnologyEnum.GAUSSKANONE, false));
       defenses.add(new Defense(defenseProperties.getPlasmawerfer(), TechnologyEnum.PLASMAWERFER, false));
-      defenses.add(new Defense(defenseProperties.getAbfangrakete(), TechnologyEnum.ABFANGRAKETE, false));
       defenses.add(new Defense(10, TechnologyEnum.KLEINE_SCHILDKUPPEL, true));
       defenses.add(new Defense(10, TechnologyEnum.GROSSE_SCHILDKUPPEL, true));
 
       List<String> queue = new ArrayList<>();
       firefox.get().findElements(By.className("queuePic")).forEach(pic -> queue.add(pic.getAttribute("alt").trim()));
 
-
-      defenses.forEach(defense -> defense.setAmountToBuild((calculateNumberOfDefense(defense.getBaseAmount(), planetService.getPoints()) / adjust) - getAmount(defense.getTechnology().getId())));
-      Optional<Defense> defenseToBuild = defenses.stream().filter(defense -> isStatusOn(defense.getTechnology().getId(), queue) && defense.getAmountToBuild() > 0).findFirst();
-      if (defenseToBuild.isPresent()) {
-        if (defenseToBuild.get().isUnique()) {
-          technologyService.build(defenseToBuild.get().getTechnology());
-        } else {
-          technologyService.build(defenseToBuild.get().getTechnology(), defenseToBuild.get().getAmountToBuild());
+      if (isStatusOn(TechnologyEnum.ABFANGRAKETE.getId(), queue)) {
+        technologyService.build(TechnologyEnum.ABFANGRAKETE, defenseProperties.getAbfangrakete());
+      } else {
+        defenses.forEach(defense -> defense.setAmountToBuild((calculateNumberOfDefense(defense.getBaseAmount(), planetService.getPoints()) / adjust) - getAmount(defense.getTechnology().getId())));
+        Optional<Defense> defenseToBuild = defenses.stream().filter(defense -> isStatusOn(defense.getTechnology().getId(), queue) && defense.getAmountToBuild() > 0).findFirst();
+        if (defenseToBuild.isPresent()) {
+          if (defenseToBuild.get().isUnique()) {
+            technologyService.build(defenseToBuild.get().getTechnology());
+          } else {
+            technologyService.build(defenseToBuild.get().getTechnology(), defenseToBuild.get().getAmountToBuild());
+          }
         }
       }
     } catch (TimeoutException | StaleElementReferenceException ex) {
