@@ -52,6 +52,8 @@ public class MilitaryService {
     return new ArrayList<>();
   }
 
+  //icon_attack
+  //fright
   private void processMessage(String id) throws InterruptedException {
     firefox.loading(2);
     Optional<WebElement> message = getMessages().stream().filter(msg -> msg.getAttribute("data-msg-id").equals(id)).findFirst();
@@ -69,8 +71,11 @@ public class MilitaryService {
           defenses = Long.parseLong(rawDefenses.trim().replaceAll("\\.", ""));
         }
 
-        if (necesaryFleet >= MIN_CARGOS_TO_ATTACK) {
-          firefox.jsClick(message.get().findElement(By.className("icon_attack")));
+        WebElement iconAttack = message.get().findElement(By.className("icon_attack"));
+        boolean notAttackedYet = iconAttack.findElements(By.className("fright")).isEmpty();
+
+        if (necesaryFleet >= MIN_CARGOS_TO_ATTACK && notAttackedYet) {
+          firefox.jsClick(iconAttack);
 
           firefox.loading(1);
           if (fleetService.isFleetAvailable()) {

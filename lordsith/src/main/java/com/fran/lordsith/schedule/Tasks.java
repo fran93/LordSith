@@ -14,18 +14,18 @@ public class Tasks {
 	@Lazy
 	CommanderService commanderService;
 
-	@Scheduled(cron = "3 */30 6-21 * * *")
-	public void daily() throws InterruptedException {
+	@Scheduled(cron = "3 */5 6-21 * * *")
+	public void daily() throws Exception {
 		commanderService.command();
 	}
 
 	@Scheduled(cron = "0 0 0 * * *")
-	public void midnight() throws InterruptedException {
+	public void midnight() throws Exception {
 		commanderService.command();
 	}
 
 	@Scheduled(cron = "0 0 3 * * *")
-	public void devilTime() throws InterruptedException {
+	public void devilTime() throws Exception {
 		commanderService.command();
 	}
 
