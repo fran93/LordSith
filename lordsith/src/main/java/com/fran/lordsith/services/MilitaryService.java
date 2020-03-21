@@ -52,86 +52,95 @@ public class MilitaryService {
     return new ArrayList<>();
   }
 
-  //icon_attack
-  //fright
   private void processMessage(String id) throws InterruptedException {
-    firefox.loading(2);
-    Optional<WebElement> message = getMessages().stream().filter(msg -> msg.getAttribute("data-msg-id").equals(id)).findFirst();
-    if (message.isPresent()) {
-      List<WebElement> rows = message.get().findElements(By.className("compacting"));
-      if (rows.size() >= 5) {
-        int necesaryFleet = getNecesaryFleet(rows);
-        String rawDefenses = rows.get(4).findElement(By.className("tooltipRight")).getText().split(":")[1];
-        long defenses;
-        if (rawDefenses.contains("M")) {
-          rawDefenses = rawDefenses.replaceFirst("M", "");
-          defenses = Long.parseLong(rawDefenses.split(",")[0].trim());
-          defenses *= 1000000;
-        } else {
-          defenses = Long.parseLong(rawDefenses.trim().replaceAll("\\.", ""));
-        }
+    try {
+      firefox.loading(2);
+      Optional<WebElement> message = getMessages().stream().filter(msg -> msg.getAttribute("data-msg-id").equals(id)).findFirst();
+      if (message.isPresent()) {
+        List<WebElement> rows = message.get().findElements(By.className("compacting"));
+        if (rows.size() >= 5) {
+          int necesaryFleet = getNecesaryFleet(rows);
+          String rawDefenses = rows.get(4).findElement(By.className("tooltipRight")).getText().split(":")[1];
+          String rawFlotten = rows.get(4).findElement(By.className("tooltipLeft")).getText().split(":")[1];
+          long defenses = parseDefenses(rawDefenses);
+          defenses += parseDefenses(rawFlotten);
 
-        WebElement iconAttack = message.get().findElement(By.className("icon_attack"));
-        boolean notAttackedYet = iconAttack.findElements(By.className("fright")).isEmpty();
+          WebElement iconAttack = message.get().findElement(By.className("icon_attack"));
+          boolean notAttackedYet = iconAttack.findElements(By.className("fright")).isEmpty();
 
-        if (necesaryFleet >= MIN_CARGOS_TO_ATTACK && notAttackedYet) {
-          firefox.jsClick(iconAttack);
+          if (necesaryFleet >= MIN_CARGOS_TO_ATTACK && notAttackedYet) {
+            firefox.jsClick(iconAttack);
 
-          firefox.loading(1);
-          if (fleetService.isFleetAvailable()) {
-            sendAttack(id, necesaryFleet, defenses);
+            firefox.loading(1);
+            if (fleetService.isFleetAvailable()) {
+              sendAttack(id, necesaryFleet, defenses);
+            }
+            openMessages();
+          } else {
+            log.info(messageSource.getMessage("fleet.discard", null, Locale.ENGLISH));
+            firefox.jsClick(message.get().findElement(By.className("icon_refuse")));
+            firefox.loading(1);
           }
-          openMessages();
-        } else {
-          log.info(messageSource.getMessage("fleet.discard", null, Locale.ENGLISH));
-          firefox.jsClick(message.get().findElement(By.className("icon_refuse")));
-          firefox.loading(1);
         }
       }
+    } catch (StaleElementReferenceException ex) {
+      log.info("processMessage " + ex.getMessage());
     }
   }
 
-  private void sendAttack(String id, int necesaryFleet, long defenses) throws InterruptedException {
-    if (defenses == 0) {
-      firefox.get().findElement(By.name("transporterSmall")).sendKeys(String.valueOf(necesaryFleet));
-      log.info(messageSource.getMessage("fleet.attack", new Object[]{necesaryFleet, TechnologyEnum.KLEINER_TRANSPORTER.name()}, Locale.ENGLISH));
-    } else if (defenses < 1000000) {
-      int countKreuzer = fleetService.numberOfShips(TechnologyEnum.KREUZER.getId());
-      long militaryFleet = defenses / 2000;
-      if (countKreuzer >= militaryFleet) {
-        firefox.get().findElement(By.name("transporterSmall")).sendKeys(String.valueOf(necesaryFleet));
-        firefox.get().findElement(By.name("cruiser")).sendKeys(String.valueOf(militaryFleet));
-        log.info(messageSource.getMessage("fleet.attack", new Object[]{militaryFleet, TechnologyEnum.KREUZER.name()}, Locale.ENGLISH));
-      }
+  private long parseDefenses(String rawDefenses) {
+    long defenses;
+    if (rawDefenses.contains("M")) {
+      rawDefenses = rawDefenses.replaceFirst("M", "");
+      defenses = Long.parseLong(rawDefenses.split(",")[0].trim());
+      defenses *= 1000000;
     } else {
-      int countBalls = fleetService.numberOfShips(TechnologyEnum.TODESSTERN.getId());
-      long militaryFleet = defenses / 500000;
-      firefox.loading(1);
-      if (countBalls >= militaryFleet) {
-        firefox.get().findElement(By.name("deathstar")).sendKeys(String.valueOf(militaryFleet));
-        log.info(messageSource.getMessage("fleet.attack", new Object[]{militaryFleet, TechnologyEnum.TODESSTERN.name()}, Locale.ENGLISH));
-      }
+      defenses = Long.parseLong(rawDefenses.trim().replaceAll("\\.", ""));
     }
+    return defenses;
+  }
 
-    if (fleetService.canContinue(FleetService.CONTINUE_TO_FLEET2)) {
-      fleetService.weiterWeiter(FleetService.CONTINUE_TO_FLEET2);
-      if (fleetService.canContinue(FleetService.CONTINUE_TO_FLEET3)) {
-        fleetService.weiterWeiter(FleetService.CONTINUE_TO_FLEET3);
-        if (fleetService.canContinue(FleetService.SEND_FLEET)) {
-          fleetService.weiterWeiter(FleetService.SEND_FLEET);
+  private void sendAttack(String id, int necesaryFleet, long defenses) throws InterruptedException {
+    try {
+      if (defenses == 0) {
+        firefox.get().findElement(By.name("transporterSmall")).sendKeys(String.valueOf(necesaryFleet));
+        log.info(messageSource.getMessage("fleet.attack", new Object[]{necesaryFleet, TechnologyEnum.KLEINER_TRANSPORTER.name()}, Locale.ENGLISH));
+      } else if (defenses < 1000000) {
+        int countKreuzer = fleetService.numberOfShips(TechnologyEnum.KREUZER.getId());
+        long militaryFleet = defenses / 2000;
+        if (countKreuzer >= militaryFleet) {
+          firefox.get().findElement(By.name("transporterSmall")).sendKeys(String.valueOf(necesaryFleet));
+          firefox.get().findElement(By.name("cruiser")).sendKeys(String.valueOf(militaryFleet));
+          log.info(messageSource.getMessage("fleet.attack", new Object[]{militaryFleet, TechnologyEnum.KREUZER.name()}, Locale.ENGLISH));
+        }
+      } else {
+        int countBalls = fleetService.numberOfShips(TechnologyEnum.TODESSTERN.getId());
+        long militaryFleet = defenses / 500000;
+        firefox.loading(1);
+        if (countBalls >= militaryFleet) {
+          firefox.get().findElement(By.name("deathstar")).sendKeys(String.valueOf(militaryFleet));
+          log.info(messageSource.getMessage("fleet.attack", new Object[]{militaryFleet, TechnologyEnum.TODESSTERN.name()}, Locale.ENGLISH));
+        }
+      }
 
-          firefox.loading(1);
-          openMessages();
+      if (fleetService.canContinue(FleetService.CONTINUE_TO_FLEET2)) {
+        fleetService.weiterWeiter(FleetService.CONTINUE_TO_FLEET2);
+        if (fleetService.canContinue(FleetService.CONTINUE_TO_FLEET3)) {
+          fleetService.weiterWeiter(FleetService.CONTINUE_TO_FLEET3);
+          if (fleetService.canContinue(FleetService.SEND_FLEET)) {
+            fleetService.weiterWeiter(FleetService.SEND_FLEET);
 
-          if (firefox.get().getCurrentUrl().trim().endsWith("messages")) {
-            try {
+            firefox.loading(1);
+            openMessages();
+
+            if (firefox.get().getCurrentUrl().trim().endsWith("messages")) {
               firefox.jsClick(firefox.get().findElement(By.xpath("//li[@data-msg-id=" + id + "]")).findElement(By.className("icon_refuse")));
-            } catch (ElementClickInterceptedException ex) {
-              log.info("sendAttack: " + ex.getMessage());
             }
           }
         }
       }
+    } catch (ElementClickInterceptedException | NoSuchElementException ex) {
+      log.info("sendAttack: " + ex.getMessage());
     }
   }
 

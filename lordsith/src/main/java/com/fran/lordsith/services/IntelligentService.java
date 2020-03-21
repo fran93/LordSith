@@ -1,10 +1,10 @@
 package com.fran.lordsith.services;
 
 import com.fran.lordsith.enums.MenuEnum;
+import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -13,22 +13,28 @@ import java.util.List;
 import java.util.Locale;
 
 @Service
+@Log4j2
 public class IntelligentService {
 
   private static final int MAX_SPY_REPORTS = 10;
-  private static final int ATTACK_SYSTEM_RANGE = 150;
   private static final String SYSTEM_INPUT = "system_input";
   public static final int MIN_REQUIRED_RECYCLES = 5;
+
   @Autowired
   @Lazy
   MenuService menuService;
+
   @Autowired
   @Lazy
   FirefoxClient firefox;
+
   @Autowired
   @Lazy
   MessageSource messageSource;
-  Logger log = LoggerFactory.getLogger(IntelligentService.class);
+
+  @Value("${military.attack.range}")
+  int systemAttackRange;
+
   private int leftSystem;
   private int rightSystem;
 
@@ -46,13 +52,13 @@ public class IntelligentService {
           reportCount += spy();
         }
 
-        if (rightSystem > ATTACK_SYSTEM_RANGE && leftSystem > ATTACK_SYSTEM_RANGE) {
+        if (rightSystem > systemAttackRange && leftSystem > systemAttackRange) {
           goToSystem(planetSystem);
           rightSystem = 0;
           leftSystem = 0;
-        } else if (rightSystem > ATTACK_SYSTEM_RANGE) {
+        } else if (rightSystem > systemAttackRange) {
           goLeft(planetSystem);
-        } else if (leftSystem > ATTACK_SYSTEM_RANGE) {
+        } else if (leftSystem > systemAttackRange) {
           goRight(planetSystem);
         } else if (rightSystem == 0) {
           goRight(planetSystem);
