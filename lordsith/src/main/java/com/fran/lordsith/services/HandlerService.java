@@ -84,14 +84,14 @@ public class HandlerService {
   }
 
   public void importExport() throws InterruptedException {
-    firefox.loading(1);
-    firefox.loading(By.className("back_to_overview"));
-    firefox.get().findElement(By.className("back_to_overview")).click();
-    firefox.loading(2);
-    firefox.loading(By.id("js_traderImportExport"));
-    firefox.get().findElement(By.id("js_traderImportExport")).click();
-
     try {
+      firefox.loading(1);
+      firefox.loading(By.className("back_to_overview"));
+      firefox.get().findElement(By.className("back_to_overview")).click();
+      firefox.loading(2);
+      firefox.loading(By.id("js_traderImportExport"));
+      firefox.get().findElement(By.id("js_traderImportExport")).click();
+
       if (!firefox.get().findElement(By.className("got_item_text")).isDisplayed()) {
         firefox.loading(1);
         firefox.get().findElement(By.className("js_sliderMetalMax")).click();
@@ -104,7 +104,7 @@ public class HandlerService {
           firefox.loading(1);
         }
       }
-    } catch (NoSuchElementException ex) {
+    } catch (NoSuchElementException | TimeoutException ex) {
       log.info("ImportExport: " + ex.getMessage());
       firefox.quit();
       firefox.restart();
