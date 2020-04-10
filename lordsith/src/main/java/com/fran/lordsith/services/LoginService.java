@@ -46,9 +46,12 @@ public class LoginService {
     }
 
     firefox.get().findElement(By.id("joinGame")).findElement(By.tagName("a")).findElement(By.tagName("button")).click();
-    firefox.get().findElement(By.id("accountlist")).findElement(By.tagName("button")).click();
-    firefox.loading(1);
-    firefox.closeTab();
+    WebElement spielen = firefox.get().findElement(By.id("accountlist")).findElement(By.tagName("button"));
+    if (!spielen.getAttribute("class").contains("disabled")) {
+      spielen.click();
+      firefox.loading(1);
+      firefox.closeTab();
+    }
   }
 
   public void removeBanner() {
